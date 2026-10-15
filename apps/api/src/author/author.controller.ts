@@ -1,0 +1,104 @@
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  HttpCode,
+  Inject,
+  NotFoundException,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { Database } from '../database/database.service.js';
+import { AuthModule } from '../auth/auth.module.js';
+import { Module } from '@nestjs/common';
+import { SessionGuard } from '../auth/session.guard.js';
+import type { AuthRequest } from '../auth/session.service.js';
+import { DiscoveryModule } from '../discovery/discovery.module.js';
+import { GITHUB_CLIENT } from '../discovery/discovery.service.js';
+import { validateMarker } from '../packages/validate-package.mjs';
+@Controller('author')
+@UseGuards(SessionGuard)
+export class AuthorController {
+  constructor(
+    private readonly db: Database,
+    @Inject(GITHUB_CLIENT) private readonly github: any,
+  ) {}
+  @Get('revisions')
+  async revisions(@Req() request: AuthRequest) {
+    return {
+      items: (
+        await this.db.pool.query(
+          'SELECT r.id,r.owner,r.module_id,r.version,r.status,r.sha256,r.validation_passed,r.validation_issues,r.created_at FROM revisions r JOIN repositories repo ON repo.id=r.repository_id WHERE repo.owner_id=$1 AND r.source_owner_id=$1 ORDER BY r.created_at DESC LIMIT 100',
+          [request.actor!.githubId],
+        )
+      ).rows,
+    };
+  }
+  @Post('repositories')
+  @HttpCode(202)
+  async submit(@Req() request: AuthRequest, @Body() body: { repository?: unknown }) {
+    if (!request.actor!.githubId) throw new ForbiddenException('Link GitHub first');
+    const input = typeof body?.repository === 'string' ? body.repository.trim() : '';
+    const fullName = input.replace(/^https:\/\/github\.com\//, '').replace(/\/$/, '');
+    if (!/^[A-Za-z0-9-]{1,39}\/[A-Za-z0-9_.-]{1,100}$/.test(fullName))
+      throw new BadRequestException();
+    const count = await this.db.pool.query(
+      "INSERT INTO rate_limits(key,count,expires_at) VALUES ($1,1,now()+interval '15 minutes') ON CONFLICT(key) DO UPDATE SET count=CASE WHEN rate_limits.expires_at<=now() THEN 1 ELSE rate_limits.count+1 END,expires_at=CASE WHEN rate_limits.expires_at<=now() THEN now()+interval '15 minutes' ELSE rate_limits.expires_at END RETURNING count",
+      ['repository:' + request.actor!.id],
+    );
+    if (count.rows[0].count > 10) throw new ForbiddenException('Repository request limit reached');
+    const value = await this.github.json(
+      `/repos/${fullName.split('/').map(encodeURIComponent).join('/')}`,
+    );
+    if (
+      value.private ||
+      value.archived ||
+      value.owner?.type !== 'User' ||
+      String(value.owner?.id) !== request.actor!.githubId ||
+      !/^\d+$/.test(String(value.id))
+    )
+      throw new NotFoundException();
+    const repository = {
+      id: String(value.id),
+      ownerId: String(value.owner.id),
+      ownerType: value.owner.type,
+      fullName: value.full_name,
+      defaultBranch: value.default_branch,
+    };
+    if (!validateMarker(await this.github.marker(repository, repository.defaultBranch)).ok)
+      throw new BadRequestException('Invalid discovery marker');
+    await this.db.pool.query(
+      'INSERT INTO discovery_jobs(repository_id,payload) VALUES ($1,$2) ON CONFLICT(repository_id) DO UPDATE SET payload=EXCLUDED.payload,next_check_at=now()',
+      [repository.id, JSON.stringify(repository)],
+    );
+    return { queued: true };
+  }
+  @Get('repositories')
+  async list(@Req() request: AuthRequest) {
+    const githubId = request.actor!.githubId;
+    if (!githubId) return { items: [] };
+    return {
+      items: (
+        await this.db.pool.query(
+          'SELECT id,owner,name,module_id AS "moduleId" FROM repositories WHERE owner_id=$1 ORDER BY owner,name LIMIT 100',
+          [githubId],
+        )
+      ).rows,
+    };
+  }
+  @Get('repositories/:id')
+  async repository(@Req() request: AuthRequest, @Param('id') id: string) {
+    const result = await this.db.pool.query(
+      'SELECT id,owner,name,module_id AS "moduleId" FROM repositories WHERE id=$1 AND owner_id=$2',
+      [id, request.actor!.githubId],
+    );
+    if (!result.rowCount) throw new NotFoundException();
+    return result.rows[0];
+  }
+}
+@Module({ imports: [AuthModule, DiscoveryModule], controllers: [AuthorController] })
+export class AuthorModule {}

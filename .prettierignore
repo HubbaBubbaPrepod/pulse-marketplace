@@ -1,0 +1,8 @@
+node_modules
+.next
+out
+artifacts
+package-lock.json
+AGENTS.md
+.superpowers
+.turbo

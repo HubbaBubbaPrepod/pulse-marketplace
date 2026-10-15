@@ -1,0 +1,20 @@
+name: pulse-marketplace
+services:
+  database:
+    image: postgres:18@sha256:74935e72241653ca55e0414067e6d8763aceb8a810eb51b452253ec3dcfc4336
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pulse_marketplace
+      POSTGRES_USER: pulse_marketplace
+      POSTGRES_PASSWORD: ${PG_PASSWORD:?Run the local environment setup first}
+    ports:
+      - '127.0.0.1:${PG_PORT:-54329}:5432'
+    volumes:
+      - marketplace_database:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U pulse_marketplace -d pulse_marketplace']
+      interval: 5s
+      timeout: 3s
+      retries: 12
+volumes:
+  marketplace_database:

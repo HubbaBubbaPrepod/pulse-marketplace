@@ -1,0 +1,37 @@
+// Development fixtures, not discovered releases or real moderation results.
+export const previewRevisions = [
+  {
+    id: 'docker:example-1',
+    module: 'Docker',
+    art: 'docker',
+    repository: 'pulse-module-docker',
+    source: 'https://github.com/HubbaBubbaPrepod/pulse-module-docker',
+    status: 'pending',
+    access: 'dockerAccess',
+    platforms: ['Linux amd64', 'Linux arm64', 'Windows amd64'],
+    checks: [{ passed: true }, { passed: true }, { passed: true }],
+    history: [],
+  },
+  {
+    id: 'redis:example-1',
+    module: 'Redis',
+    art: 'redis',
+    repository: 'example/redis',
+    status: 'pending',
+    access: 'redisAccess',
+    platforms: ['Linux amd64'],
+    checks: [{ passed: true }, { passed: false }, { passed: true }],
+    history: [],
+  },
+  {
+    id: 'nginx:example-1',
+    module: 'Nginx',
+    art: 'nginx',
+    repository: 'example/nginx',
+    status: 'rejected',
+    access: 'nginxAccess',
+    platforms: ['Linux amd64', 'Windows amd64'],
+    checks: [{ passed: true }, { passed: false }, { passed: true }],
+    history: [],
+  },
+];

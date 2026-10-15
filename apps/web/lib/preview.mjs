@@ -1,0 +1,75 @@
+export const previewModules = [
+  {
+    id: 'docker',
+    name: 'Docker',
+    category: 'containers',
+    version: '1.0.2',
+    author: 'Pulse contributors',
+    platforms: ['linux-amd64', 'linux-arm64', 'windows-amd64'],
+    repository: 'https://github.com/HubbaBubbaPrepod/pulse-module-docker',
+    description: {
+      ru: 'Контейнеры, нагрузка CPU, память и логи.',
+      en: 'Containers, CPU usage, memory and logs.',
+    },
+  },
+  {
+    id: 'postgresql',
+    name: 'PostgreSQL',
+    category: 'databases',
+    version: null,
+    author: null,
+    platforms: ['linux-amd64', 'linux-arm64', 'windows-amd64'],
+    description: {
+      ru: 'Запросы, подключения, размер баз и репликация.',
+      en: 'Queries, connections, database size and replication.',
+    },
+  },
+  {
+    id: 'nginx',
+    name: 'Nginx',
+    category: 'web',
+    version: null,
+    author: null,
+    platforms: ['linux-amd64', 'linux-arm64', 'windows-amd64'],
+    description: {
+      ru: 'Статус, запросы, ошибки и активные соединения.',
+      en: 'Status, requests, errors and active connections.',
+    },
+  },
+  {
+    id: 'redis',
+    name: 'Redis',
+    category: 'databases',
+    version: null,
+    author: null,
+    platforms: ['linux-amd64', 'linux-arm64'],
+    description: {
+      ru: 'Память, ключи, клиенты и операции.',
+      en: 'Memory, keys, clients and operations.',
+    },
+  },
+  {
+    id: 'systemd',
+    name: 'Systemd',
+    category: 'system',
+    version: null,
+    author: null,
+    platforms: ['linux-amd64', 'linux-arm64'],
+    description: {
+      ru: 'Сервисы, их статус и журнал событий.',
+      en: 'Services, their status and event logs.',
+    },
+  },
+  {
+    id: 'backup',
+    name: 'Backup',
+    category: 'storage',
+    version: null,
+    author: null,
+    platforms: ['linux-amd64', 'linux-arm64', 'windows-amd64'],
+    description: {
+      ru: 'Статус резервных копий, расписание и хранилище.',
+      en: 'Backup status, schedules and storage.',
+    },
+  },
+];

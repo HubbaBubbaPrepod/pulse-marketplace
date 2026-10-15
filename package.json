@@ -1,0 +1,28 @@
+{
+  "name": "pulse-marketplace",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "packageManager": "npm@11.6.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "verify:production": "node scripts/verify-production.mjs && node scripts/verify-auth-redirect.mjs",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "prettier": "3.9.10",
+    "turbo": "2.11.8"
+  }
+}
