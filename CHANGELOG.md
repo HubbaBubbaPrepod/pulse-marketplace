@@ -12,6 +12,8 @@
 
 ## Unreleased — API integration
 
+- Detail Google data access, usage, recipients, safeguards and deletion in both privacy policy languages; explain sign-in on the homepage and provide a branded OAuth logo.
+
 - Add public RU/EN privacy, terms, contact and security pages with document navigation; publish Marketplace moderation rules and sign-in policy links.
 
 - Document the Linux production deployment, isolated services, HTTPS renewal, request limits and verified database/package recovery.

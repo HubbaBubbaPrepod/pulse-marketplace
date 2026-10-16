@@ -10,6 +10,14 @@ export const copy = {
     heading: 'Модули для твоей',
     headingEnd: 'инфраструктуры.',
     intro: 'Найди расширение. Проверь доступ. Подключи к Pulse.',
+    serviceTitle: 'Что такое Pulse Marketplace',
+    serviceIntro:
+      'Pulse Marketplace — бесплатный каталог модулей с открытым исходным кодом для самостоятельных установок Pulse Monitor. Авторы публикуют релизы на GitHub; после проверки конкретный пакет может появиться в каталоге. Просматривать и скачивать опубликованные модули можно без аккаунта.',
+    serviceSignIn:
+      'Если вы выбираете Google или GitHub для входа, идентификатор провайдера и имя используются для вашего аккаунта и доступа к кабинету. Google-вход не даёт доступ к Gmail или Google Drive. Владение GitHub-репозиторием проверяется отдельно. Метрики и журналы ваших серверов в Marketplace не отправляются.',
+    servicePolicies: 'Документы сервиса',
+    servicePrivacy: 'Политика конфиденциальности',
+    serviceTerms: 'Условия использования',
     search: 'Поиск модулей',
     searchHint: 'Название или описание',
     all: 'Все',
@@ -123,6 +131,14 @@ export const copy = {
     heading: 'Modules for your',
     headingEnd: 'infrastructure.',
     intro: 'Find an extension. Review its access. Connect it to Pulse.',
+    serviceTitle: 'About Pulse Marketplace',
+    serviceIntro:
+      'Pulse Marketplace is a free catalog of open-source modules for self-hosted Pulse Monitor installations. Authors publish releases on GitHub; an exact package can enter the catalog after review. Browsing and downloading published modules requires no account.',
+    serviceSignIn:
+      'If you choose Google or GitHub sign-in, the provider identifier and name support your account and workspace access. Google sign-in does not grant access to Gmail or Google Drive. GitHub repository ownership is checked separately. Your server metrics and logs are not sent to Marketplace.',
+    servicePolicies: 'Service policies',
+    servicePrivacy: 'Privacy policy',
+    serviceTerms: 'Terms of service',
     search: 'Search modules',
     searchHint: 'Name or description',
     all: 'All',

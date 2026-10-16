@@ -5,13 +5,13 @@ export const legal = {
       ru: {
         title: 'Политика конфиденциальности',
         description:
-          'Какие данные обрабатывает Pulse Marketplace, как используются cookies и как обратиться за удалением данных.',
+          'Политика Pulse Marketplace: доступ к Google-данным, их использование, передача, защита, хранение и удаление.',
         sections: [
           {
             id: 'scope',
             title: 'Кто и за что отвечает',
             paragraphs: [
-              'Эта политика относится к marketplace.hubba-cloud.ru. Оператор: самозанятый Хабибулин Даниил Олегович, Россия. Контакт по персональным данным: heyhubbabubbapr@gmail.com. Поддержка: support@hubba-cloud.ru.',
+              'Эта политика описывает приложение Pulse Marketplace на marketplace.hubba-cloud.ru. Оператор: самозанятый Хабибулин Даниил Олегович, Россия. Контакт по персональным данным: heyhubbabubbapr@gmail.com. Поддержка: support@hubba-cloud.ru.',
               'Marketplace предоставляет каталог модулей и не собирает метрики, процессы, сетевые соединения или журналы серверов из ваших установок Monitor. Модули исполняются на вашем сервере, а не в Marketplace.',
             ],
           },
@@ -22,6 +22,52 @@ export const legal = {
               'При входе через GitHub или Google сохраняются идентификатор провайдера, отображаемое имя и связь с аккаунтом. Приложение запрашивает read:user у GitHub и openid profile у Google; доступ к Gmail, Drive и закрытым репозиториям не запрашивается. Пароли провайдеров не поступают в Pulse, а полученные для входа токены не сохраняются в базе аккаунтов.',
               'Если используется вход по email, хранятся адрес, имя, отметка подтверждения и стойкий хеш пароля, а не его открытый текст. В публичной установке регистрация и восстановление по email пока отключены. Для работы сервиса сохраняются роль, дата создания, сессии, временные записи OAuth и ограничения попыток входа.',
               'При публикации обрабатываются публичные сведения GitHub: владелец и идентификатор репозитория, релизы, исходная ссылка, манифест, платформы и пакет. Решения модерации, комментарии и идентификатор действующего модератора записываются в аудит.',
+            ],
+          },
+          {
+            id: 'google-access',
+            title: 'Вход через Google: какие данные доступны',
+            paragraphs: [
+              'Pulse Marketplace использует Google OpenID Connect только для входа в аккаунт и его явной привязки. Запрашиваемые разрешения: openid и profile. Из подтверждённого ID-токена приложение использует уникальный идентификатор Google (sub) и отображаемое имя (name, если Google его предоставил).',
+              'Разрешение profile может возвращать и другие базовые сведения профиля, например ссылку на фото. Текущая реализация не сохраняет и не использует фото, дату рождения или пол. Разрешение email не запрашивается, адрес Google-почты для входа не требуется. У приложения нет доступа к Gmail, Google Drive, контактам, календарю, паролю Google или закрытым репозиториям GitHub.',
+              'На время входа сервер проверяет ID-токен и параметры безопасности протокола. Долгосрочное хранение Google access token, refresh token или ID-токена в базе аккаунтов не выполняется. Идентификатор Google и имя сохраняются в базе Pulse Marketplace.',
+            ],
+          },
+          {
+            id: 'google-use',
+            title: 'Для чего используются Google-данные',
+            paragraphs: [
+              'Идентификатор Google связывает повторные входы с одним аккаунтом Pulse Marketplace. Имя используется для отображения аккаунта в интерфейсе. Привязка к уже существующему аккаунту выполняется отдельным действием пользователя; совпадение email не объединяет аккаунты автоматически.',
+              'Эти данные нужны для доступа к кабинету, разрешённым аккаунту действиям и поддержки входа. Google-вход сам по себе не доказывает владение GitHub-репозиторием: авторство модуля проверяется отдельно через GitHub.',
+              'Google-данные не используются для рекламы, перепродажи, определения кредитоспособности, построения рекламных профилей или обучения моделей искусственного интеллекта. Приложение не использует Google Workspace API. Новые разрешения и другие цели обработки не вводятся без необходимого информирования и разрешения пользователя.',
+            ],
+          },
+          {
+            id: 'google-sharing',
+            title: 'Кому доступны Google-данные',
+            paragraphs: [
+              'Google-идентификатор и привязка Google не публикуются в каталоге, не включаются в установочные JSON-пакеты и не передаются авторам модулей, Monitor или агентам. Само отображаемое имя аккаунта не используется как публичное имя владельца GitHub-модуля.',
+              'Владелец сервиса может получить доступ к записям аккаунта для администрирования, защиты сервиса и рассмотрения вашего обращения. Инфраструктура сервера хранит базу и резервные копии для работы и восстановления Marketplace. Иных получателей Google-данных для рекламы, аналитики или продажи нет.',
+              'Сам Google обрабатывает вход по собственной политике. Сведения могут предоставляться в объёме, который требуется применимым законом или необходим для защиты от злоупотреблений; это не разрешение на произвольную передачу данных. Обработка у внешних провайдеров может происходить за пределами вашей страны.',
+            ],
+          },
+          {
+            id: 'protection',
+            title: 'Как защищаются данные',
+            paragraphs: [
+              'Публичный Marketplace использует HTTPS. База PostgreSQL и внутренний API слушают только локальный интерфейс сервера и не опубликованы как внешние сервисы. Доступ к действиям кабинета проверяется на сервере по сессии и роли, запросы изменения данных проверяют Origin и CSRF-токен.',
+              'Cookie сессии защищена флагами Secure, HttpOnly и SameSite=Lax. В базе хранится хеш токена сессии; для email-пароля — стойкий хеш с индивидуальной солью. Для Google-входа используются PKCE, state и nonce. Серверные реквизиты и резервные копии ограничены файловыми правами. Это описание применяемых мер, а не гарантия отсутствия любых рисков.',
+              'Об утечке или подозрении на доступ к чужому аккаунту сообщайте на heyhubbabubbapr@gmail.com. Не прикладывайте действующие пароли, токены или приватные ключи.',
+            ],
+          },
+          {
+            id: 'google-deletion',
+            title: 'Удаление Google-привязки и аккаунта',
+            paragraphs: [
+              'Чтобы удалить Google-привязку, аккаунт или связанные с ними данные, напишите на heyhubbabubbapr@gmail.com с темой «Pulse Marketplace — удаление данных». Укажите отображаемое имя и способ входа; владелец проверит принадлежность аккаунта безопасным соразмерным способом. Самостоятельной кнопки удаления сейчас нет.',
+              'После подтверждения запроса владелец прекращает доступ через удаляемую привязку, отзывает затронутые сессии и удаляет либо обезличивает сведения, которые больше не нужны для предоставления сервиса или обязательного хранения. Если удаление затрагивает единственный способ входа, доступ к аккаунту будет утрачен; альтернативный способ входа нужно согласовать заранее.',
+              'Удаление Google-привязки не отзывает уже выданные лицензии на опубликованные модули. Необходимая история решений может сохраняться для безопасности и рассмотрения споров с минимизацией персональных данных. Резервные копии рассматриваются отдельно при удалении и восстановлении; автоматический срок их ротации пока не настроен.',
+              'Вы также можете убрать разрешение Pulse Marketplace в настройках подключений Google-аккаунта. Это действие не удаляет уже сохранённую запись из базы Marketplace: для её удаления нужно обратиться к владельцу сервиса.',
             ],
           },
           {
@@ -81,13 +127,13 @@ export const legal = {
       en: {
         title: 'Privacy policy',
         description:
-          'What data Pulse Marketplace processes, how cookies are used and how to request access, correction or deletion.',
+          'Pulse Marketplace privacy policy: Google data access, use, sharing, protection, retention and deletion.',
         sections: [
           {
             id: 'scope',
             title: 'Operator and scope',
             paragraphs: [
-              'This policy covers marketplace.hubba-cloud.ru. The operator is Daniil Olegovich Khabibulin (Хабибулин Даниил Олегович), a self-employed individual in Russia. Personal data contact: heyhubbabubbapr@gmail.com. Support: support@hubba-cloud.ru.',
+              'This policy covers the Pulse Marketplace application at marketplace.hubba-cloud.ru. The operator is Daniil Olegovich Khabibulin (Хабибулин Даниил Олегович), a self-employed individual in Russia. Personal data contact: heyhubbabubbapr@gmail.com. Support: support@hubba-cloud.ru.',
               'Marketplace provides a module catalog and does not collect metrics, processes, network connections or server logs from your Monitor installations. Modules execute on your server, not in Marketplace.',
             ],
           },
@@ -98,6 +144,52 @@ export const legal = {
               'GitHub or Google sign-in stores the provider identifier, display name and account link. The application requests GitHub read:user and Google openid profile, not Gmail, Drive or private repository access. Provider passwords never reach Pulse; tokens received for sign-in are not persisted in the account database.',
               'Email sign-in stores the address, display name, verification status and a strong password hash, not a plaintext password. Email registration and recovery are currently disabled on the public installation. Roles, creation dates, sessions, temporary OAuth records and sign-in attempt limits are stored to operate the service.',
               'Publication processing uses public GitHub data: repository owner and ID, releases, source URL, manifest, platforms and package. Moderation decisions, comments and the acting moderator identifier are recorded in the audit trail.',
+            ],
+          },
+          {
+            id: 'google-access',
+            title: 'Google sign-in: data accessed',
+            paragraphs: [
+              'Pulse Marketplace uses Google OpenID Connect only to sign in and explicitly link an identity. The requested scopes are openid and profile. From the verified ID token, the application uses the unique Google identifier (sub) and display name (name, if supplied by Google).',
+              'The profile scope may return other basic profile information, such as a photo URL. The current implementation does not store or use the photo, date of birth or gender. The email scope is not requested and a Google email address is not required for sign-in. The application cannot access Gmail, Google Drive, contacts, calendars, your Google password or private GitHub repositories.',
+              'During sign-in, the server validates the ID token and protocol security parameters. Google access tokens, refresh tokens and ID tokens are not persisted in the account database. The Google identifier and display name are stored in the Pulse Marketplace database.',
+            ],
+          },
+          {
+            id: 'google-use',
+            title: 'How Google data is used',
+            paragraphs: [
+              'The Google identifier associates repeat sign-ins with the same Pulse Marketplace account. The name identifies the account in the interface. Linking an existing account requires a separate user action; matching emails do not automatically merge accounts.',
+              'These data support workspace access, authorized account actions and sign-in support. Google sign-in alone does not establish ownership of a GitHub repository: module authorship is checked separately through GitHub.',
+              'Google data is not used for advertising, resale, creditworthiness assessment, advertising profiles or training artificial intelligence models. The application does not use Google Workspace APIs. New permissions or processing purposes require the necessary notice and user authorization.',
+            ],
+          },
+          {
+            id: 'google-sharing',
+            title: 'Who can access Google data',
+            paragraphs: [
+              'The Google identifier and identity link are not published in the catalog, embedded in installation JSON packages or shared with module authors, Monitor or agents. An account display name is not used as the public GitHub module owner name.',
+              'The service operator may access account records for administration, service protection and your support requests. Server infrastructure stores the database and backups to operate and recover Marketplace. No other recipients receive Google data for advertising, analytics or sale.',
+              'Google processes sign-in under its own privacy policy. Information may be disclosed to the extent required by applicable law or necessary to address abuse; this is not authorization for arbitrary disclosure. External providers may process data outside your country.',
+            ],
+          },
+          {
+            id: 'protection',
+            title: 'Data protection measures',
+            paragraphs: [
+              'The public Marketplace uses HTTPS. PostgreSQL and the internal API bind only to the server loopback interface and are not exposed as public services. Workspace actions require server-side session and role checks; state-changing requests check Origin and CSRF tokens.',
+              'The session cookie uses Secure, HttpOnly and SameSite=Lax. Session tokens are hashed in the database; email passwords use a strong individually salted hash. Google sign-in uses PKCE, state and nonce. File permissions restrict server credentials and backups. These are the implemented safeguards, not a guarantee that every risk is eliminated.',
+              'Report suspected disclosure or unauthorized account access to heyhubbabubbapr@gmail.com. Do not attach active passwords, tokens or private keys.',
+            ],
+          },
+          {
+            id: 'google-deletion',
+            title: 'Deleting a Google identity link or account',
+            paragraphs: [
+              'To delete a Google identity link, account or associated data, email heyhubbabubbapr@gmail.com with the subject “Pulse Marketplace — data deletion”. Include the display name and sign-in method; the operator verifies account ownership in a safe and proportionate way. There is currently no self-service deletion button.',
+              'After verifying the request, the operator disables the identity being removed, revokes affected sessions and deletes or anonymizes information no longer required to provide the service or meet mandatory retention obligations. Removing the only sign-in method loses account access; arrange an alternative sign-in method beforehand if needed.',
+              'Deleting a Google identity link does not revoke licenses already granted for published modules. Necessary decision history may be retained for security and disputes with personal data minimized. Backups are considered separately during deletion and recovery; automatic backup rotation is not yet configured.',
+              'You can also remove Pulse Marketplace access in your Google Account connections settings. Doing so does not erase the record already stored in Marketplace: contact the operator to request its deletion.',
             ],
           },
           {

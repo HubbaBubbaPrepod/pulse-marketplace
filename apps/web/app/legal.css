@@ -40,6 +40,8 @@
 .legal-rail {
   position: sticky;
   top: 110px;
+  max-height: calc(100dvh - 140px);
+  overflow-y: auto;
   display: grid;
   gap: 30px;
 }
@@ -152,6 +154,8 @@
   }
   .legal-rail {
     position: static;
+    max-height: none;
+    overflow-y: visible;
     grid-template-columns: 1fr 1fr;
     gap: 24px;
   }
@@ -193,5 +197,51 @@
 @media (max-width: 760px) {
   .site-footer nav {
     justify-content: flex-start;
+  }
+}
+
+.service-about {
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) minmax(0, 2fr);
+  gap: 48px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 32px 0;
+  margin: 0 0 32px;
+}
+.service-about h2 {
+  font-size: 22px;
+  line-height: 1.3;
+  font-weight: 500;
+  margin: 0;
+}
+.service-about p {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--muted);
+  margin: 0 0 14px;
+  max-width: 850px;
+}
+.service-about nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  font-size: 12px;
+}
+.service-about a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+@media (max-width: 760px) {
+  .service-about {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 24px 0;
+  }
+  .service-about h2 {
+    font-size: 20px;
   }
 }

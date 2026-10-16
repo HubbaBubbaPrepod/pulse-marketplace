@@ -51,6 +51,12 @@ export function LegalPage({ lang, document }) {
                 GitHub Privacy Statement ↗
               </a>
               <a href="https://policies.google.com/privacy">Google Privacy Policy ↗</a>
+              <a href="https://myaccount.google.com/connections">
+                {lang === 'ru'
+                  ? 'Управлять подключениями Google'
+                  : 'Manage Google Account connections'}{' '}
+                ↗
+              </a>
             </section>
           ) : null}
           <div className="legal-contact">
