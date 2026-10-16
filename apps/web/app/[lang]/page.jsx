@@ -41,6 +41,9 @@ export default async function Page({ params, searchParams }) {
             <p>{copy[lang].serviceSignIn}</p>
             <nav aria-label={copy[lang].servicePolicies}>
               <Link href={pathFor(lang, 'privacy')}>{copy[lang].servicePrivacy}</Link>
+              <Link href={pathFor(lang === 'ru' ? 'en' : 'ru', 'privacy')}>
+                {copy[lang].serviceOtherPrivacy}
+              </Link>
               <Link href={pathFor(lang, 'terms')}>{copy[lang].serviceTerms}</Link>
             </nav>
           </div>

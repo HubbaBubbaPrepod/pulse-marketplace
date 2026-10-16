@@ -3,7 +3,7 @@ export const legal = {
   documents: {
     privacy: {
       ru: {
-        title: 'Политика конфиденциальности',
+        title: 'Политика конфиденциальности Pulse Marketplace',
         description:
           'Политика обработки и защиты персональных данных пользователей Pulse Marketplace.',
         sections: [
@@ -11,7 +11,7 @@ export const legal = {
             id: 'scope',
             title: 'Общие положения',
             paragraphs: [
-              'Настоящая Политика конфиденциальности и обработки персональных данных (далее — «Политика») определяет цели, состав, порядок обработки и меры защиты персональных данных при использовании сайта https://marketplace.hubba-cloud.ru/ (далее — «Сайт», «Сервис»).',
+              'Настоящая Политика конфиденциальности и обработки персональных данных (далее — «Политика») определяет цели, состав, порядок обработки и меры защиты персональных данных при использовании приложения Pulse Marketplace на сайте https://marketplace.hubba-cloud.ru/ (далее — «Сайт», «Сервис»).',
               'Оператором персональных данных является Хабибулин Даниил Олегович, самозанятый, плательщик налога на профессиональный доход (далее — «Оператор»). Реквизиты Оператора указаны в настоящем документе.',
               'Политика подготовлена с учётом Федерального закона от 27.07.2006 № 152-ФЗ «О персональных данных» и иных применимых нормативных правовых актов Российской Федерации. Политика является общедоступным документом и размещается на Сайте.',
               'Действие Политики распространяется на посетителей каталога, зарегистрированных пользователей, авторов модулей и лиц, направляющих обращения Оператору. Marketplace не является размещённым сервисом мониторинга и не получает метрики, процессы, сетевые соединения или журналы пользовательских серверов из Monitor и агентов.',
@@ -104,7 +104,7 @@ export const legal = {
             id: 'retention',
             title: 'Сроки хранения, прекращение обработки и уничтожение',
             paragraphs: [
-              'Профиль хранится для работы аккаунта. Сессия истекает через 7 дней, состояние OAuth — через 10 минут; просроченные записи авторизации очищаются фоновым процессом. История публикаций и модерации сохраняется для целостности каталога и рассмотрения спорных ситуаций.',
+              'Идентификатор Google и отображаемое имя хранятся в базе PostgreSQL Pulse Marketplace, пока они необходимы для работы аккаунта и Google-входа, если не поступил запрос на удаление или не возникло иное законное основание хранения. Порядок удаления указан в разделе об удалении Google-привязки ниже. Другие данные профиля хранятся для работы аккаунта. Сессия истекает через 7 дней, состояние OAuth — через 10 минут; просроченные записи авторизации очищаются фоновым процессом. История публикаций и модерации сохраняется для целостности каталога и рассмотрения спорных ситуаций.',
               'Резервные копии базы и пакетов создаются ежедневно. Сейчас их ротацией управляет владелец вручную: автоматический срок удаления копий не установлен. Удаление записей из основной базы само по себе не стирает уже созданные резервные копии. При запросе удаления владелец отдельно учитывает их и восстановление данных.',
             ],
           },
@@ -120,7 +120,7 @@ export const legal = {
             id: 'protection',
             title: 'Меры защиты персональных данных',
             paragraphs: [
-              'Публичный Marketplace использует HTTPS. База PostgreSQL и внутренний API слушают только локальный интерфейс сервера и не опубликованы как внешние сервисы. Доступ к действиям кабинета проверяется на сервере по сессии и роли, запросы изменения данных проверяют Origin и CSRF-токен.',
+              'К идентификатору Google и отображаемому имени применяются те же меры защиты, что и к другим данным аккаунта. Публичный Marketplace использует HTTPS. База PostgreSQL и внутренний API слушают только локальный интерфейс сервера и не опубликованы как внешние сервисы. Доступ к действиям кабинета проверяется на сервере по сессии и роли, запросы изменения данных проверяют Origin и CSRF-токен.',
               'Cookie сессии защищена флагами Secure, HttpOnly и SameSite=Lax. В базе хранится хеш токена сессии; для email-пароля — стойкий хеш с индивидуальной солью. Для Google-входа используются PKCE, state и nonce. Серверные реквизиты и резервные копии ограничены файловыми правами. Это описание применяемых мер, а не гарантия отсутствия любых рисков.',
               'Об утечке или подозрении на доступ к чужому аккаунту сообщайте на heyhubbabubbapr@gmail.com. Не прикладывайте действующие пароли, токены или приватные ключи.',
             ],
@@ -175,7 +175,7 @@ export const legal = {
         showOperator: true,
       },
       en: {
-        title: 'Privacy policy',
+        title: 'Pulse Marketplace Privacy Policy',
         description:
           'Policy governing the processing and protection of Pulse Marketplace users’ personal data.',
         sections: [
@@ -183,7 +183,7 @@ export const legal = {
             id: 'scope',
             title: 'General provisions',
             paragraphs: [
-              'This Privacy and Personal Data Processing Policy (the “Policy”) establishes the purposes, categories, processing procedures and safeguards for personal data processed through https://marketplace.hubba-cloud.ru/ (the “Website” or “Service”).',
+              'This Privacy and Personal Data Processing Policy (the “Policy”) establishes the purposes, categories, processing procedures and safeguards for personal data processed by the Pulse Marketplace application at https://marketplace.hubba-cloud.ru/ (the “Website” or “Service”).',
               'The personal data controller is Daniil Olegovich Khabibulin, a self-employed individual paying Russian professional income tax (the “Controller”). The Controller’s details are set out in this document.',
               'This Policy is prepared with reference to Russian Federal Law No. 152-FZ of 27 July 2006 on Personal Data and other applicable Russian legislation. It is a public document available on the Website.',
               'The Policy covers catalog visitors, registered users, module authors and persons contacting the Controller. Marketplace is not a hosted server-monitoring service and does not receive user server metrics, processes, network connections or logs from Monitor or agents.',
@@ -276,7 +276,7 @@ export const legal = {
             id: 'retention',
             title: 'Retention, cessation and deletion',
             paragraphs: [
-              'Profiles are retained to operate accounts. Sessions expire after 7 days and OAuth state after 10 minutes; a background process removes expired authentication records. Publication and moderation history is retained for catalog integrity and dispute handling.',
+              'Google user identifiers and display names are stored in the Pulse Marketplace PostgreSQL database for as long as they are needed to maintain the account and Google sign-in, unless deletion is requested or another lawful retention ground applies. Deletion requests follow the procedure in the Google account deletion section below. Other profile data is retained to operate accounts. Sessions expire after 7 days and OAuth state after 10 minutes; a background process removes expired authentication records. Publication and moderation history is retained for catalog integrity and dispute handling.',
               'The database and packages are backed up daily. Retention is currently managed manually by the operator; automatic backup expiry has not been configured. Deleting a primary database record does not itself erase existing backups. The operator must separately account for backups and recovery when handling deletion requests.',
             ],
           },
@@ -292,7 +292,7 @@ export const legal = {
             id: 'protection',
             title: 'Personal data safeguards',
             paragraphs: [
-              'The public Marketplace uses HTTPS. PostgreSQL and the internal API bind only to the server loopback interface and are not exposed as public services. Workspace actions require server-side session and role checks; state-changing requests check Origin and CSRF tokens.',
+              'Google user identifiers and display names receive the same safeguards as other account data. The public Marketplace uses HTTPS. PostgreSQL and the internal API bind only to the server loopback interface and are not exposed as public services. Workspace actions require server-side session and role checks; state-changing requests check Origin and CSRF tokens.',
               'The session cookie uses Secure, HttpOnly and SameSite=Lax. Session tokens are hashed in the database; email passwords use a strong individually salted hash. Google sign-in uses PKCE, state and nonce. File permissions restrict server credentials and backups. These are the implemented safeguards, not a guarantee that every risk is eliminated.',
               'Report suspected disclosure or unauthorized account access to heyhubbabubbapr@gmail.com. Do not attach active passwords, tokens or private keys.',
             ],
@@ -314,7 +314,14 @@ export const legal = {
               'To delete a Google identity link, account or associated data, email heyhubbabubbapr@gmail.com with the subject “Pulse Marketplace — data deletion”. Include the display name and sign-in method; the operator verifies account ownership in a safe and proportionate way. There is currently no self-service deletion button.',
               'After verifying the request, the operator disables the identity being removed, revokes affected sessions and deletes or anonymizes information no longer required to provide the service or meet mandatory retention obligations. Removing the only sign-in method loses account access; arrange an alternative sign-in method beforehand if needed.',
               'Deleting a Google identity link does not revoke licenses already granted for published modules. Necessary decision history may be retained for security and disputes with personal data minimized. Backups are considered separately during deletion and recovery; automatic backup rotation is not yet configured.',
-              'You can also remove Pulse Marketplace access in your Google Account connections settings. Doing so does not erase the record already stored in Marketplace: contact the operator to request its deletion.',
+              [
+                'You can also remove Pulse Marketplace access in your ',
+                {
+                  text: 'Google Account connections settings',
+                  href: 'https://myaccount.google.com/connections',
+                },
+                '. Doing so does not erase the record already stored in Marketplace: contact the operator to request its deletion.',
+              ],
             ],
           },
           {
@@ -385,7 +392,11 @@ export const legal = {
             id: 'modules',
             title: 'Публикации и сохранение версий',
             paragraphs: [
-              'Для Marketplace действуют отдельные правила публикации и модерации. Публикуйте только материалы, на распространение которых у вас есть права. Лицензированный пакет может сохраняться в каталоге после удаления аккаунта автора; это не лишает автора прав и не отменяет требований о защите персональных данных.',
+              [
+                'Для Marketplace действуют отдельные ',
+                { text: 'правила публикации и модерации', document: 'rules' },
+                '. Публикуйте только материалы, на распространение которых у вас есть права. Лицензированный пакет может сохраняться в каталоге после удаления аккаунта автора; это не лишает автора прав и не отменяет требований о защите персональных данных.',
+              ],
               'Одобрение означает решение по конкретному пакету, а не гарантию безопасности. Перед установкой изучите код, требуемый доступ и совместимость. Модуль с доступом к Docker или системе может иметь широкие полномочия.',
             ],
           },
@@ -408,7 +419,11 @@ export const legal = {
             id: 'requests',
             title: 'Данные, изменения и обращения',
             paragraphs: [
-              'Обработка данных описана в политике конфиденциальности. Для удаления аккаунта или сведений напишите на heyhubbabubbapr@gmail.com; для жалобы на модуль или апелляции — на support@hubba-cloud.ru. При изменении условий дата редакции обновляется. Новые условия не отменяют ранее выданные открытые лицензии и обязательные права пользователей.',
+              [
+                'Обработка данных описана в ',
+                { text: 'политике конфиденциальности', document: 'privacy' },
+                '. Для удаления аккаунта или сведений напишите на heyhubbabubbapr@gmail.com; для жалобы на модуль или апелляции — на support@hubba-cloud.ru. При изменении условий дата редакции обновляется. Новые условия не отменяют ранее выданные открытые лицензии и обязательные права пользователей.',
+              ],
             ],
           },
         ],
@@ -452,7 +467,11 @@ export const legal = {
             id: 'modules',
             title: 'Publications and retained versions',
             paragraphs: [
-              'Separate publishing and moderation rules apply to Marketplace. Publish only material you are entitled to distribute. Licensed packages may remain in the catalog after an author account is deleted; this does not remove authorship rights or override personal data requirements.',
+              [
+                'Separate ',
+                { text: 'publishing and moderation rules', document: 'rules' },
+                ' apply to Marketplace. Publish only material you are entitled to distribute. Licensed packages may remain in the catalog after an author account is deleted; this does not remove authorship rights or override personal data requirements.',
+              ],
               'Approval is a decision about an exact package, not a security guarantee. Review the code, permissions and compatibility before installation. Modules with Docker or system access may have extensive privileges.',
             ],
           },
@@ -475,7 +494,11 @@ export const legal = {
             id: 'requests',
             title: 'Data, changes and requests',
             paragraphs: [
-              'Data processing is described in the privacy policy. For account/data deletion, email heyhubbabubbapr@gmail.com; for module complaints or appeals, contact support@hubba-cloud.ru. Changes update the revision date. New terms do not revoke existing open-source licenses or mandatory user rights.',
+              [
+                'Data processing is described in ',
+                { text: 'the privacy policy', document: 'privacy' },
+                '. For account/data deletion, email heyhubbabubbapr@gmail.com; for module complaints or appeals, contact support@hubba-cloud.ru. Changes update the revision date. New terms do not revoke existing open-source licenses or mandatory user rights.',
+              ],
             ],
           },
         ],
@@ -491,9 +514,9 @@ export const legal = {
         sections: [
           {
             id: 'operator',
-            title: 'Владелец сервиса',
+            title: 'Сведения об Операторе',
             paragraphs: [
-              'Владелец и оператор: самозанятый Хабибулин Даниил Олегович, Россия. Pulse — независимый проект с открытым исходным кодом. Упоминание GitHub, Google или Docker не означает их участия в проекте.',
+              'Владельцем Сервиса и оператором персональных данных является Хабибулин Даниил Олегович — самозанятый, плательщик налога на профессиональный доход, Российская Федерация (далее — «Оператор»). ИНН, адрес и контактные данные Оператора приведены в разделе реквизитов настоящей страницы. Pulse является независимым проектом с открытым исходным кодом. Упоминание GitHub, Google и Docker не означает участия указанных организаций в управлении Сервисом или одобрения ими проекта.',
             ],
           },
           {
@@ -512,9 +535,9 @@ export const legal = {
           },
           {
             id: 'availability',
-            title: 'Как отвечаем',
+            title: 'Порядок рассмотрения обращений',
             paragraphs: [
-              'Проект бесплатный, поддержку и модерацию выполняет владелец. Круглосуточной поддержки и гарантированного времени ответа нет. Это не отменяет сроков, установленных применимым законодательством. По уязвимостям пишите на heyhubbabubbapr@gmail.com с темой «Pulse security».',
+              'Рассмотрение обращений, техническую поддержку и модерацию осуществляет Оператор. Сервис предоставляется бесплатно. Круглосуточная поддержка и фиксированный срок ответа на обычные обращения не предусмотрены. Обращения, для которых законодательством установлены обязательные сроки, рассматриваются в пределах таких сроков. Сообщения об уязвимостях направляются на heyhubbabubbapr@gmail.com с темой «Pulse security».',
             ],
           },
         ],
@@ -529,7 +552,7 @@ export const legal = {
             id: 'operator',
             title: 'Service operator',
             paragraphs: [
-              'The service is operated by Daniil Olegovich Khabibulin (Хабибулин Даниил Олегович), a self-employed individual in Russia. Pulse is an independent open-source project. References to GitHub, Google or Docker do not imply their sponsorship or endorsement.',
+              'The Service owner and personal data controller is Daniil Olegovich Khabibulin (Хабибулин Даниил Олегович), a self-employed individual and payer of Russian professional income tax in the Russian Federation (the “Controller”). The Controller’s tax identification number, address and contact details appear in the particulars section on this page. Pulse is an independent open-source project. References to GitHub, Google and Docker do not imply that these organizations operate, sponsor or endorse the Service.',
             ],
           },
           {

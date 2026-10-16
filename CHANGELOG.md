@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-16 — Legal navigation and public policy
+
+- Link privacy and publishing references directly within document paragraphs.
+- Formalize operator contact wording and preserve published particulars.
+- Explicitly identify Pulse Marketplace and Google-data retention/safeguards; permit indexing of public legal pages.
+
 ## 0.1.0 — Frontend milestone
 
 - Add the separate Next.js frontend with Turborepo task orchestration.

@@ -324,3 +324,10 @@
     font-size: 18px;
   }
 }
+
+.legal-body p a {
+  display: inline;
+  font-size: inherit;
+  line-height: inherit;
+  padding: 0;
+}

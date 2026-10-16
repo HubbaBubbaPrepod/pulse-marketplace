@@ -2,6 +2,19 @@ import Link from 'next/link';
 import { legal } from '../lib/legal.mjs';
 import { pathFor as url } from '../lib/copy.mjs';
 
+function LegalText({ paragraph, lang }) {
+  if (typeof paragraph === 'string') return paragraph;
+  return paragraph.map((part, index) =>
+    typeof part === 'string' ? (
+      part
+    ) : (
+      <Link key={index} href={part.document ? url(lang, part.document) : part.href}>
+        {part.text}
+      </Link>
+    ),
+  );
+}
+
 export function LegalPage({ lang, document }) {
   const page = legal.documents[document][lang];
   const labels = legal.labels[lang];
@@ -75,16 +88,18 @@ export function LegalPage({ lang, document }) {
                 {section.title}
               </h2>
               {section.paragraphs.map((paragraph, paragraphIndex) => (
-                <p key={paragraph} className={page.numbered ? 'legal-clause' : undefined}>
+                <p key={paragraphIndex} className={page.numbered ? 'legal-clause' : undefined}>
                   {page.numbered ? (
                     <>
                       <span className="legal-clause-number">
                         {sectionIndex + 1}.{paragraphIndex + 1}.
                       </span>
-                      <span>{paragraph}</span>
+                      <span>
+                        <LegalText paragraph={paragraph} lang={lang} />
+                      </span>
                     </>
                   ) : (
-                    paragraph
+                    <LegalText paragraph={paragraph} lang={lang} />
                   )}
                 </p>
               ))}
