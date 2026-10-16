@@ -1,0 +1,579 @@
+export const legal = {
+  updated: '2026-10-16',
+  documents: {
+    privacy: {
+      ru: {
+        title: 'Политика конфиденциальности',
+        description:
+          'Какие данные обрабатывает Pulse Marketplace, как используются cookies и как обратиться за удалением данных.',
+        sections: [
+          {
+            id: 'scope',
+            title: 'Кто и за что отвечает',
+            paragraphs: [
+              'Эта политика относится к marketplace.hubba-cloud.ru. Оператор: самозанятый Хабибулин Даниил Олегович, Россия. Контакт по персональным данным: heyhubbabubbapr@gmail.com. Поддержка: support@hubba-cloud.ru.',
+              'Marketplace предоставляет каталог модулей и не собирает метрики, процессы, сетевые соединения или журналы серверов из ваших установок Monitor. Модули исполняются на вашем сервере, а не в Marketplace.',
+            ],
+          },
+          {
+            id: 'data',
+            title: 'Какие данные поступают',
+            paragraphs: [
+              'При входе через GitHub или Google сохраняются идентификатор провайдера, отображаемое имя и связь с аккаунтом. Приложение запрашивает read:user у GitHub и openid profile у Google; доступ к Gmail, Drive и закрытым репозиториям не запрашивается. Пароли провайдеров не поступают в Pulse, а полученные для входа токены не сохраняются в базе аккаунтов.',
+              'Если используется вход по email, хранятся адрес, имя, отметка подтверждения и стойкий хеш пароля, а не его открытый текст. В публичной установке регистрация и восстановление по email пока отключены. Для работы сервиса сохраняются роль, дата создания, сессии, временные записи OAuth и ограничения попыток входа.',
+              'При публикации обрабатываются публичные сведения GitHub: владелец и идентификатор репозитория, релизы, исходная ссылка, манифест, платформы и пакет. Решения модерации, комментарии и идентификатор действующего модератора записываются в аудит.',
+            ],
+          },
+          {
+            id: 'purpose',
+            title: 'Для чего нужны данные',
+            paragraphs: [
+              'Данные используются для предоставления запрошенных функций сайта, защиты доступа, рассмотрения обращений и исполнения применимых правовых обязанностей. Для Marketplace это также установление авторства, проверка пакетов, публикация версий, модерация и рассмотрение жалоб. Необходимая для запрошенного сервиса обработка не считается согласием на рекламу. Если для отдельной обработки требуется согласие, оно должно запрашиваться отдельно.',
+            ],
+          },
+          {
+            id: 'storage',
+            title: 'Cookies и локальное хранение',
+            paragraphs: [
+              'В браузере сохраняется выбранная тема в pulse-market.theme.v1. Для входа используется защищённая HttpOnly-cookie __Host-pulse-session сроком до 7 дней; выход отзывает текущую сессию. Cookies pulse-oauth-github и pulse-oauth-google связывают начало и завершение входа и действуют до 10 минут. Не все эти cookies присутствуют одновременно.',
+            ],
+          },
+          {
+            id: 'tracking',
+            title: 'Аналитика и реклама',
+            paragraphs: [
+              'Google Analytics, Яндекс Метрика, рекламные пиксели и маркетинговые рассылки не подключены. Мы не продаём данные аккаунтов и не используем их для рекламного профилирования.',
+            ],
+          },
+          {
+            id: 'recipients',
+            title: 'Публичные сведения и внешние сервисы',
+            paragraphs: [
+              'Каталог публикует владельца модуля, сведения о релизе, исходную ссылку, разрешения и одобренный пакет. Email аккаунта, хеш пароля, сессии и привязки Google не публикуются. Не включайте секреты или чужие персональные данные в распространяемый пакет.',
+              'GitHub и, при включении, Google обрабатывают вход по собственным политикам. Публичные сведения репозиториев поступают через GitHub. Сервер и его хостинг обеспечивают доставку запросов; технические IP-адреса могут присутствовать в системных журналах. Журнал HTTP-доступа virtual host Marketplace отключён. Обработка у внешних провайдеров может происходить за пределами вашей страны.',
+            ],
+          },
+          {
+            id: 'retention',
+            title: 'Хранение и удаление',
+            paragraphs: [
+              'Профиль хранится для работы аккаунта. Сессия истекает через 7 дней, состояние OAuth — через 10 минут; просроченные записи авторизации очищаются фоновым процессом. История публикаций и модерации сохраняется для целостности каталога и рассмотрения спорных ситуаций.',
+              'Резервные копии базы и пакетов создаются ежедневно. Сейчас их ротацией управляет владелец вручную: автоматический срок удаления копий не установлен. Удаление записей из основной базы само по себе не стирает уже созданные резервные копии. При запросе удаления владелец отдельно учитывает их и восстановление данных.',
+            ],
+          },
+          {
+            id: 'rights',
+            title: 'Как управлять своими данными',
+            paragraphs: [
+              'Напишите на heyhubbabubbapr@gmail.com для доступа, исправления, удаления, прекращения обработки или отзыва ранее данного согласия, когда это применимо. Укажите аккаунт или обстоятельства обращения; владелец может запросить соразмерное подтверждение личности. Кнопки самостоятельного удаления аккаунта сейчас нет, запрос обрабатывается вручную.',
+              'Удаление профиля и судьба публичного исходного кода или лицензированных версий — разные вопросы. Опубликованные версии могут сохраняться по условиям лицензии с необходимым авторством; лишние данные профиля не должны сохраняться только ради публикации. Обязательные требования об удалении и жалобы на права рассматриваются отдельно.',
+            ],
+          },
+          {
+            id: 'changes',
+            title: 'Изменения политики',
+            paragraphs: [
+              'Дата редакции указана в начале страницы. При изменении состава данных или внешних сервисов политика обновляется. Существенные новые цели обработки не вводятся задним числом через простую замену текста.',
+            ],
+          },
+        ],
+      },
+      en: {
+        title: 'Privacy policy',
+        description:
+          'What data Pulse Marketplace processes, how cookies are used and how to request access, correction or deletion.',
+        sections: [
+          {
+            id: 'scope',
+            title: 'Operator and scope',
+            paragraphs: [
+              'This policy covers marketplace.hubba-cloud.ru. The operator is Daniil Olegovich Khabibulin (Хабибулин Даниил Олегович), a self-employed individual in Russia. Personal data contact: heyhubbabubbapr@gmail.com. Support: support@hubba-cloud.ru.',
+              'Marketplace provides a module catalog and does not collect metrics, processes, network connections or server logs from your Monitor installations. Modules execute on your server, not in Marketplace.',
+            ],
+          },
+          {
+            id: 'data',
+            title: 'Data received',
+            paragraphs: [
+              'GitHub or Google sign-in stores the provider identifier, display name and account link. The application requests GitHub read:user and Google openid profile, not Gmail, Drive or private repository access. Provider passwords never reach Pulse; tokens received for sign-in are not persisted in the account database.',
+              'Email sign-in stores the address, display name, verification status and a strong password hash, not a plaintext password. Email registration and recovery are currently disabled on the public installation. Roles, creation dates, sessions, temporary OAuth records and sign-in attempt limits are stored to operate the service.',
+              'Publication processing uses public GitHub data: repository owner and ID, releases, source URL, manifest, platforms and package. Moderation decisions, comments and the acting moderator identifier are recorded in the audit trail.',
+            ],
+          },
+          {
+            id: 'purpose',
+            title: 'Purposes',
+            paragraphs: [
+              'Data is used to provide requested site functions, protect access, handle requests and meet applicable legal obligations. Marketplace also uses it to establish authorship, validate packages, publish versions, moderate and handle complaints. Processing necessary for a requested service is not consent to advertising. Any processing requiring separate consent must obtain it separately.',
+            ],
+          },
+          {
+            id: 'storage',
+            title: 'Cookies and local storage',
+            paragraphs: [
+              'Your chosen theme is stored in pulse-market.theme.v1. Sign-in uses the secure HttpOnly __Host-pulse-session cookie for up to 7 days; signing out revokes the current session. The pulse-oauth-github and pulse-oauth-google cookies bind the start and completion of sign-in and last up to 10 minutes. These cookies are not necessarily all present at once.',
+            ],
+          },
+          {
+            id: 'tracking',
+            title: 'Analytics and advertising',
+            paragraphs: [
+              'Google Analytics, Yandex Metrica, advertising pixels and marketing mailings are not enabled. We do not sell account data or use it for advertising profiles.',
+            ],
+          },
+          {
+            id: 'recipients',
+            title: 'Public data and external services',
+            paragraphs: [
+              'The catalog exposes module ownership, release details, source links, permissions and approved packages. Account email, password hashes, sessions and Google identity links are not published. Do not include secrets or other people’s personal data in distributed packages.',
+              'GitHub and, when enabled, Google process authentication under their own policies. Public repository data is retrieved from GitHub. The server and its hosting provider deliver requests; technical IP addresses may appear in system logs. The Marketplace virtual host HTTP access log is disabled. External providers may process data outside your country.',
+            ],
+          },
+          {
+            id: 'retention',
+            title: 'Retention and deletion',
+            paragraphs: [
+              'Profiles are retained to operate accounts. Sessions expire after 7 days and OAuth state after 10 minutes; a background process removes expired authentication records. Publication and moderation history is retained for catalog integrity and dispute handling.',
+              'The database and packages are backed up daily. Retention is currently managed manually by the operator; automatic backup expiry has not been configured. Deleting a primary database record does not itself erase existing backups. The operator must separately account for backups and recovery when handling deletion requests.',
+            ],
+          },
+          {
+            id: 'rights',
+            title: 'Your choices and requests',
+            paragraphs: [
+              'Email heyhubbabubbapr@gmail.com for access, correction, deletion, requests to stop processing or withdrawal of previously given consent where applicable. Identify the account or correspondence; proportionate identity verification may be requested. There is currently no self-service account deletion button; requests are handled manually.',
+              'Profile deletion and the status of public source code or licensed releases are separate matters. Published versions may remain under their licenses with required attribution; unnecessary profile data should not be retained merely because a package was published. Mandatory deletion requests and rights complaints are assessed separately.',
+            ],
+          },
+          {
+            id: 'changes',
+            title: 'Policy changes',
+            paragraphs: [
+              'The revision date appears at the top. The policy is updated when data practices or external services change. Material new processing purposes are not introduced retroactively merely by replacing this text.',
+            ],
+          },
+        ],
+      },
+    },
+    terms: {
+      ru: {
+        title: 'Условия использования',
+        description:
+          'Условия бесплатного использования Pulse Marketplace, лицензии, ответственность и обращения.',
+        sections: [
+          {
+            id: 'operator',
+            title: 'Сервис и владелец',
+            paragraphs: [
+              'Pulse Marketplace предоставляет самозанятый Хабибулин Даниил Олегович, Россия. Связь: support@hubba-cloud.ru, резервный адрес — heyhubbabubbapr@gmail.com. Эти условия относятся к сайту; использование исходного кода регулируется отдельными лицензиями.',
+            ],
+          },
+          {
+            id: 'free',
+            title: 'Бесплатный доступ',
+            paragraphs: [
+              'Сервис сейчас бесплатный: подписки, платежи и комиссия за скачивание не взимаются. Расходы на собственные серверы и сторонние сервисы пользователь несёт самостоятельно. Введение платных функций потребует отдельных явно изложенных условий; эти условия не разрешают автоматическое списание денег.',
+            ],
+          },
+          {
+            id: 'use',
+            title: 'Использование и доступ',
+            paragraphs: [
+              'Просматривать каталог и скачивать одобренные пакеты можно без аккаунта. Для кабинета автора и действий с публикациями необходим вход. Вы отвечаете за доступ к своему аккаунту и не должны выдавать себя за другого автора. Общий email провайдера не служит основанием для автоматического объединения аккаунтов.',
+            ],
+          },
+          {
+            id: 'licenses',
+            title: 'Лицензии и права',
+            paragraphs: [
+              'Код основных проектов Pulse опубликован под MIT; условия конкретного репозитория имеют значение. Сторонние модули и зависимости могут иметь другие открытые лицензии. Проверяйте LICENSE, уведомления об авторстве и ограничения перед использованием и распространением. Эти условия не заменяют и не отзывают уже предоставленные права по лицензиям.',
+            ],
+          },
+          {
+            id: 'modules',
+            title: 'Публикации и сохранение версий',
+            paragraphs: [
+              'Для Marketplace действуют отдельные правила публикации и модерации. Публикуйте только материалы, на распространение которых у вас есть права. Лицензированный пакет может сохраняться в каталоге после удаления аккаунта автора; это не лишает автора прав и не отменяет требований о защите персональных данных.',
+              'Одобрение означает решение по конкретному пакету, а не гарантию безопасности. Перед установкой изучите код, требуемый доступ и совместимость. Модуль с доступом к Docker или системе может иметь широкие полномочия.',
+            ],
+          },
+          {
+            id: 'conduct',
+            title: 'Допустимое поведение',
+            paragraphs: [
+              'Нельзя нарушать права других людей, распространять вредоносные пакеты, скрывать передачу данных, подменять авторство или мешать работе сайта. Владелец может ограничить доступ или отозвать публикацию для защиты сервиса и пользователей, с учётом обстоятельств и применимых требований. Решение можно обжаловать по контактам поддержки.',
+            ],
+          },
+          {
+            id: 'availability',
+            title: 'Доступность и ответственность',
+            paragraphs: [
+              'Проект предоставляется без обещания непрерывной доступности, совместимости с любой системой или отсутствия ошибок. Круглосуточная поддержка и гарантированное время ответа не предусмотрены. Пользователь отвечает за резервные копии и проверку программ в своей инфраструктуре.',
+              'Ограничения гарантий и ответственности действуют только в пределах, разрешённых применимым законодательством. Эти условия не исключают ответственность и права пользователя, которые нельзя исключить договором.',
+            ],
+          },
+          {
+            id: 'requests',
+            title: 'Данные, изменения и обращения',
+            paragraphs: [
+              'Обработка данных описана в политике конфиденциальности. Для удаления аккаунта или сведений напишите на heyhubbabubbapr@gmail.com; для жалобы на модуль или апелляции — на support@hubba-cloud.ru. При изменении условий дата редакции обновляется. Новые условия не отменяют ранее выданные открытые лицензии и обязательные права пользователей.',
+            ],
+          },
+        ],
+      },
+      en: {
+        title: 'Terms of service',
+        description:
+          'Terms for using Pulse Marketplace, including free access, software licensing, responsibilities and support.',
+        sections: [
+          {
+            id: 'operator',
+            title: 'Service and operator',
+            paragraphs: [
+              'Pulse Marketplace is operated by Daniil Olegovich Khabibulin (Хабибулин Даниил Олегович), a self-employed individual in Russia. Contact support@hubba-cloud.ru, or heyhubbabubbapr@gmail.com if delivery fails. These terms cover the website; software use is governed by its separate licenses.',
+            ],
+          },
+          {
+            id: 'free',
+            title: 'Free access',
+            paragraphs: [
+              'The service is currently free, with no subscription, payment or download commission. Users pay for their own infrastructure and external services. Paid features would require separate explicit terms; these terms do not authorize automatic charges.',
+            ],
+          },
+          {
+            id: 'use',
+            title: 'Use and access',
+            paragraphs: [
+              'The catalog and approved downloads are public. Author workspaces and publication actions require sign-in. You are responsible for account access and must not impersonate another author. Matching provider emails do not automatically merge accounts.',
+            ],
+          },
+          {
+            id: 'licenses',
+            title: 'Licenses and rights',
+            paragraphs: [
+              'The core Pulse projects use MIT; consult the specific repository license. Third-party modules and dependencies may use other open-source licenses. Review LICENSE files, attribution requirements and restrictions before use or redistribution. These terms do not replace or revoke rights already granted under those licenses.',
+            ],
+          },
+          {
+            id: 'modules',
+            title: 'Publications and retained versions',
+            paragraphs: [
+              'Separate publishing and moderation rules apply to Marketplace. Publish only material you are entitled to distribute. Licensed packages may remain in the catalog after an author account is deleted; this does not remove authorship rights or override personal data requirements.',
+              'Approval is a decision about an exact package, not a security guarantee. Review the code, permissions and compatibility before installation. Modules with Docker or system access may have extensive privileges.',
+            ],
+          },
+          {
+            id: 'conduct',
+            title: 'Acceptable behavior',
+            paragraphs: [
+              'Do not violate others’ rights, distribute malicious packages, conceal data transfers, impersonate authors or disrupt the site. The operator may restrict access or withdraw publications to protect the service and users, taking circumstances and applicable requirements into account. Decisions can be appealed through support.',
+            ],
+          },
+          {
+            id: 'availability',
+            title: 'Availability and responsibility',
+            paragraphs: [
+              'The project makes no promise of continuous availability, compatibility with every system or error-free operation. There is no 24/7 support or guaranteed response time. Users are responsible for backups and testing software in their own infrastructure.',
+              'Warranty and liability limitations apply only to the extent permitted by applicable law. These terms do not exclude liability or user rights that cannot lawfully be excluded.',
+            ],
+          },
+          {
+            id: 'requests',
+            title: 'Data, changes and requests',
+            paragraphs: [
+              'Data processing is described in the privacy policy. For account/data deletion, email heyhubbabubbapr@gmail.com; for module complaints or appeals, contact support@hubba-cloud.ru. Changes update the revision date. New terms do not revoke existing open-source licenses or mandatory user rights.',
+            ],
+          },
+        ],
+      },
+    },
+    contacts: {
+      ru: {
+        title: 'Контакты и обращения',
+        description:
+          'Кто управляет Pulse, куда писать за поддержкой, по вопросам данных, жалоб и апелляций.',
+        sections: [
+          {
+            id: 'operator',
+            title: 'Владелец сервиса',
+            paragraphs: [
+              'Владелец и оператор: самозанятый Хабибулин Даниил Олегович, Россия. Pulse — независимый проект с открытым исходным кодом. Упоминание GitHub, Google или Docker не означает их участия в проекте.',
+            ],
+          },
+          {
+            id: 'support',
+            title: 'Поддержка и жалобы',
+            paragraphs: [
+              'По работе сайта, модулей, жалобам на публикации и обжалованию решений: support@hubba-cloud.ru. Укажите ссылку на страницу или модуль, версию, описание ситуации и ожидаемый результат. Если письмо не доставляется, используйте heyhubbabubbapr@gmail.com.',
+            ],
+          },
+          {
+            id: 'privacy',
+            title: 'Персональные данные',
+            paragraphs: [
+              'Для доступа к своим данным, исправления, удаления аккаунта или прекращения обработки: heyhubbabubbapr@gmail.com. Укажите способ входа и идентификатор аккаунта. Для защиты от чужих запросов может потребоваться подтверждение владения аккаунтом. Не отправляйте пароль, ключи или копию паспорта без отдельной обоснованной необходимости. Запросы обрабатываются владельцем вручную.',
+            ],
+          },
+          {
+            id: 'availability',
+            title: 'Как отвечаем',
+            paragraphs: [
+              'Проект бесплатный, поддержку и модерацию выполняет владелец. Круглосуточной поддержки и гарантированного времени ответа нет. Это не отменяет сроков, установленных применимым законодательством. По уязвимостям пишите на heyhubbabubbapr@gmail.com с темой «Pulse security».',
+            ],
+          },
+        ],
+      },
+      en: {
+        title: 'Contact and requests',
+        description:
+          'Who operates Pulse and how to contact support, request data deletion or appeal a moderation decision.',
+        sections: [
+          {
+            id: 'operator',
+            title: 'Service operator',
+            paragraphs: [
+              'The service is operated by Daniil Olegovich Khabibulin (Хабибулин Даниил Олегович), a self-employed individual in Russia. Pulse is an independent open-source project. References to GitHub, Google or Docker do not imply their sponsorship or endorsement.',
+            ],
+          },
+          {
+            id: 'support',
+            title: 'Support and complaints',
+            paragraphs: [
+              'For website/module support, publication complaints and moderation appeals: support@hubba-cloud.ru. Include a page or module link, version, explanation and requested outcome. If delivery fails, use heyhubbabubbapr@gmail.com.',
+            ],
+          },
+          {
+            id: 'privacy',
+            title: 'Personal data',
+            paragraphs: [
+              'For access, correction, account deletion or requests to stop processing, email heyhubbabubbapr@gmail.com. State your sign-in method and account identifier. Account ownership may need to be verified to prevent unauthorized requests. Do not send passwords, keys or identity documents without a separate justified need. The operator handles requests manually.',
+            ],
+          },
+          {
+            id: 'availability',
+            title: 'Response availability',
+            paragraphs: [
+              'The project is free and support/moderation are handled by its operator. There is no 24/7 support or guaranteed response time. Applicable statutory deadlines are unaffected. For vulnerabilities, email heyhubbabubbapr@gmail.com with the subject “Pulse security”.',
+            ],
+          },
+        ],
+      },
+    },
+    security: {
+      ru: {
+        title: 'Сообщить об уязвимости',
+        description:
+          'Как безопасно сообщить об уязвимости Pulse, утечке или подозрительном модуле.',
+        sections: [
+          {
+            id: 'report',
+            title: 'Приватное сообщение',
+            paragraphs: [
+              'Напишите на heyhubbabubbapr@gmail.com с темой «Pulse security». Для подозрительного модуля укажите владельца, ID, версию, ссылку и SHA-256, если он известен. При подозрении на вредоносный модуль прекратите его использование.',
+            ],
+          },
+          {
+            id: 'details',
+            title: 'Что приложить',
+            paragraphs: [
+              'Опишите затронутый компонент и версию, условия воспроизведения, ожидаемый и фактический результат. Минимальный пример и обезличенные журналы помогут проверить сообщение. Не публикуйте действующие секреты или чужие персональные данные в публичном issue.',
+            ],
+          },
+          {
+            id: 'testing',
+            title: 'Проверяйте на своей установке',
+            paragraphs: [
+              'Воспроизводите проблему в принадлежащей вам тестовой среде. Эта страница не даёт разрешения на проверку чужих серверов, перебор паролей, выгрузку данных, отказ в обслуживании или изменение чужих модулей. Для проверки публичного сервиса заранее согласуйте границы с владельцем.',
+            ],
+          },
+          {
+            id: 'handling',
+            title: 'После сообщения',
+            paragraphs: [
+              'Владелец проверит сведения и при необходимости запросит уточнения. Опасную публикацию можно отозвать из каталога; это не удаляет копии, которые пользователи уже скачали. Вознаграждение, круглосуточное реагирование и фиксированный срок исправления не обещаются.',
+            ],
+          },
+        ],
+      },
+      en: {
+        title: 'Report a vulnerability',
+        description:
+          'How to privately report a Pulse vulnerability, exposed secret or suspicious module.',
+        sections: [
+          {
+            id: 'report',
+            title: 'Private reporting',
+            paragraphs: [
+              'Email heyhubbabubbapr@gmail.com with the subject “Pulse security”. For suspicious modules, include the owner, ID, version, URL and SHA-256 if known. Stop using a module you suspect is malicious.',
+            ],
+          },
+          {
+            id: 'details',
+            title: 'What to include',
+            paragraphs: [
+              'Describe the affected component/version, reproduction conditions and expected versus actual behavior. A minimal example and redacted logs help verification. Do not post active secrets or other people’s personal data in a public issue.',
+            ],
+          },
+          {
+            id: 'testing',
+            title: 'Use your own test installation',
+            paragraphs: [
+              'Reproduce issues in a test environment you own. This page does not authorize testing other people’s servers, password guessing, data extraction, denial of service or changes to their modules. Agree on scope with the operator before testing the public service.',
+            ],
+          },
+          {
+            id: 'handling',
+            title: 'After reporting',
+            paragraphs: [
+              'The operator reviews reports and may ask for clarification. Unsafe publications can be withdrawn from the catalog; this does not remove copies already downloaded by users. No bounty, around-the-clock response or fixed remediation deadline is promised.',
+            ],
+          },
+        ],
+      },
+    },
+    rules: {
+      ru: {
+        title: 'Правила публикации и модерации',
+        description:
+          'Требования к открытым модулям Pulse, проверки, жалобы, отзывы версий и апелляции.',
+        sections: [
+          {
+            id: 'source',
+            title: 'Открытый код и лицензия',
+            paragraphs: [
+              'Публикуйте исходный код модуля в публичном GitHub-репозитории с явно указанной лицензией, допускающей использование, изучение, изменение и распространение кода. Наличие публичного репозитория само по себе не заменяет лицензию. Укажите лицензии зависимостей и сохраните обязательные уведомления об авторстве.',
+            ],
+          },
+          {
+            id: 'package',
+            title: 'Пакет и разрешения',
+            paragraphs: [
+              'Релиз должен соответствовать опубликованному протоколу Pulse, содержать установочный JSON, сведения о версии, поддерживаемых платформах и необходимых разрешениях. Исходный код должен соответствовать распространяемой сборке. Объясняйте доступ к Docker socket, файлам, сети и повышенным привилегиям; раскрывайте внешние подключения и отправку данных.',
+            ],
+          },
+          {
+            id: 'discovery',
+            title: 'Обнаружение и проверка',
+            paragraphs: [
+              'Marketplace обнаруживает репозитории по topic pulse-module и маркеру протокола. Проверка формата, платформ и контрольных сумм не публикует модуль автоматически: версия поступает на модерацию. Текущая реализация поддерживает персональные репозитории GitHub; публикация от организаций пока не поддерживается.',
+            ],
+          },
+          {
+            id: 'decisions',
+            title: 'Решения модератора',
+            paragraphs: [
+              'Модерацию выполняет владелец проекта. Он может одобрить, отклонить или отозвать версию с объяснением причины. Модератор с ролью moderator не может одобрить собственный модуль; администратор может сделать это с записью в журнал аудита. Одобрение не означает независимый аудит, отсутствие уязвимостей или гарантию совместимости с любой системой.',
+            ],
+          },
+          {
+            id: 'prohibited',
+            title: 'Что не допускается',
+            paragraphs: [
+              'Не допускаются скрытая отправка данных, кража учётных данных, бэкдоры, вредоносные функции, подмена пакета или владельца, нераскрытый майнинг, нарушение чужих лицензий и прав, ложные заявления о проверках и обход ограничений каталога. Законные средства администрирования и безопасности оцениваются по заявленному назначению, прозрачности и поведению.',
+            ],
+          },
+          {
+            id: 'retention',
+            title: 'Версии и удаление аккаунта',
+            paragraphs: [
+              'Одобренные пакеты сохраняются как снимки по SHA-256. Удаление аккаунта не означает автоматическое удаление опубликованных версий: они могут оставаться доступными по условиям их лицензий, с необходимым указанием авторства. Это не даёт права бессрочно хранить ненужные данные профиля. Требования об удалении персональных данных и нарушения прав рассматриваются отдельно.',
+            ],
+          },
+          {
+            id: 'appeals',
+            title: 'Жалобы и апелляции',
+            paragraphs: [
+              'Напишите на support@hubba-cloud.ru, при недоставке — heyhubbabubbapr@gmail.com. Укажите модуль, версию, решение или нарушение, доказательства и желаемое действие. Решение можно обжаловать с новыми фактами или объяснением ошибки. Жалобу и апелляцию рассматривает тот же владелец: отдельной независимой комиссии нет. Фиксированный срок ответа не установлен, кроме обязательных по закону сроков.',
+            ],
+          },
+          {
+            id: 'withdrawal',
+            title: 'Отзыв и новые версии',
+            paragraphs: [
+              'При выявлении угрозы, подмены или нарушения прав версия может быть скрыта или отозвана. Старые скачанные копии автоматически не удаляются и не отключаются. Изменённый пакет требует отдельной проверки; прежнее одобрение не распространяется на новые байты.',
+            ],
+          },
+        ],
+      },
+      en: {
+        title: 'Publishing and moderation rules',
+        description:
+          'Requirements for open-source Pulse modules, review checks, complaints, withdrawals and appeals.',
+        sections: [
+          {
+            id: 'source',
+            title: 'Source and license',
+            paragraphs: [
+              'Publish module source in a public GitHub repository with an explicit license allowing use, study, modification and redistribution. A public repository alone is not a license. Identify dependency licenses and preserve required attribution notices.',
+            ],
+          },
+          {
+            id: 'package',
+            title: 'Package and permissions',
+            paragraphs: [
+              'Releases must follow the published Pulse protocol and include an installation JSON, version, supported platforms and required permissions. Distributed builds must correspond to the published source. Explain access to Docker sockets, files, networks and elevated privileges; disclose external connections and data transfers.',
+            ],
+          },
+          {
+            id: 'discovery',
+            title: 'Discovery and validation',
+            paragraphs: [
+              'Marketplace discovers repositories using the pulse-module topic and protocol marker. Passing format, platform and digest validation does not automatically publish a module: the revision enters moderation. The current implementation supports personally owned GitHub repositories; organization publishing is not yet supported.',
+            ],
+          },
+          {
+            id: 'decisions',
+            title: 'Moderation decisions',
+            paragraphs: [
+              'The project operator moderates revisions and may approve, reject or withdraw them with a reason. A moderator-role user cannot approve their own module; an administrator can do so with an audit record. Approval is not an independent audit, a guarantee of vulnerability-free code or a promise of compatibility with every system.',
+            ],
+          },
+          {
+            id: 'prohibited',
+            title: 'Disallowed content',
+            paragraphs: [
+              'Hidden data transfers, credential theft, backdoors, malicious behavior, package/owner impersonation, undisclosed mining, rights or license violations, false verification claims and catalog restriction bypasses are prohibited. Legitimate administration and security tools are assessed by their stated purpose, transparency and behavior.',
+            ],
+          },
+          {
+            id: 'retention',
+            title: 'Versions and account deletion',
+            paragraphs: [
+              'Approved packages are retained as SHA-256 snapshots. Deleting an account does not automatically delete published versions: they may remain available under their licenses with required attribution. This does not authorize indefinite retention of unnecessary profile data. Personal data deletion requests and rights complaints are considered separately.',
+            ],
+          },
+          {
+            id: 'appeals',
+            title: 'Complaints and appeals',
+            paragraphs: [
+              'Email support@hubba-cloud.ru, or heyhubbabubbapr@gmail.com if delivery fails. Identify the module, version, decision or violation, evidence and requested action. Decisions can be appealed with new facts or an explanation of an error. The same operator handles appeals; there is no independent appeals panel. There is no fixed response SLA, without affecting legally required deadlines.',
+            ],
+          },
+          {
+            id: 'withdrawal',
+            title: 'Withdrawal and new releases',
+            paragraphs: [
+              'A version may be hidden or withdrawn for security threats, tampering or rights violations. Previously downloaded copies are not automatically removed or disabled. Changed packages require a new review; earlier approval does not cover new bytes.',
+            ],
+          },
+        ],
+      },
+    },
+  },
+  labels: {
+    ru: {
+      eyebrow: 'PULSE / ДОКУМЕНТЫ',
+      updated: 'Редакция от 16 октября 2026',
+      contents: 'На этой странице',
+      navigation: 'Документы и контакты',
+      contact: 'Связаться с владельцем',
+    },
+    en: {
+      eyebrow: 'PULSE / DOCUMENTS',
+      updated: 'Updated October 16, 2026',
+      contents: 'On this page',
+      navigation: 'Policies and contacts',
+      contact: 'Contact the operator',
+    },
+  },
+};

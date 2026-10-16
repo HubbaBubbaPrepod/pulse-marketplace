@@ -162,6 +162,18 @@ export function Login({ lang, capabilities = {}, mode = 'login' }) {
             {message}
           </p>
         ) : null}
+        <p className="legal-auth-note">
+          {lang === 'ru'
+            ? 'Перед созданием аккаунта ознакомьтесь с документами: '
+            : 'Before creating an account, read: '}
+          <Link href={pathFor(lang, 'terms')}>
+            {lang === 'ru' ? 'Условия использования' : 'Terms of service'}
+          </Link>
+          {' · '}
+          <Link href={pathFor(lang, 'privacy')}>
+            {lang === 'ru' ? 'Политика конфиденциальности' : 'Privacy policy'}
+          </Link>
+        </p>
         <div className="account-links">
           {mode === 'login' ? (
             <>

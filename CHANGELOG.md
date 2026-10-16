@@ -12,6 +12,8 @@
 
 ## Unreleased — API integration
 
+- Add public RU/EN privacy, terms, contact and security pages with document navigation; publish Marketplace moderation rules and sign-in policy links.
+
 - Document the Linux production deployment, isolated services, HTTPS renewal, request limits and verified database/package recovery.
 
 - Add GitHub Actions checks using ephemeral PostgreSQL settings, pinned actions and read-only repository permissions.

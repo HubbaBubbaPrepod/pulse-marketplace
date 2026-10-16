@@ -1,3 +1,4 @@
+import '../legal.css';
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { Geist, Geist_Mono } from 'next/font/google';

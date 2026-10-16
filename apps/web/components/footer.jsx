@@ -1,3 +1,4 @@
+import { legal } from '../lib/legal.mjs';
 import Link from 'next/link';
 import { Icon } from './icon';
 import { copy, pathFor } from '../lib/copy.mjs';
@@ -43,7 +44,11 @@ export function Footer({ lang }) {
           GitHub
           <Icon name="external" size={13} />
         </a>
-        <Link href={`${pathFor(lang, 'developers')}#trust`}>{t.privacy}</Link>
+        {Object.entries(legal.documents).map(([key, value]) => (
+          <Link key={key} href={pathFor(lang, key)}>
+            {value[lang].title}
+          </Link>
+        ))}
       </nav>
     </footer>
   );
