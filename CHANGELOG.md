@@ -12,6 +12,8 @@
 
 ## Unreleased — API integration
 
+- Document the Linux production deployment, isolated services, HTTPS renewal, request limits and verified database/package recovery.
+
 - Add GitHub Actions checks using ephemeral PostgreSQL settings, pinned actions and read-only repository permissions.
 
 - Skip historical GitHub release commits that predate the discovery marker without aborting newer valid releases.

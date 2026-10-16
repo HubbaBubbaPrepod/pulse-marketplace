@@ -57,7 +57,7 @@ GitHub OAuth has been verified locally; configure your own provider application 
 
 Pulse Monitor includes an opt-in catalog with search, published version selection and verified JSON installation. Manual import remains available. Docker v1.0.3 installation was verified against the local marketplace; existing module IDs require manual updates.
 
-Public deployment, edge request limits and operational backups remain subsequent tasks. Monitor, agent, Docker module and landing page remain separate repositories. Agents never contact the marketplace; no server metrics or logs are uploaded here.
+The public installation uses Nginx and HTTPS, systemd services, request limits and daily backups. See [production operations and recovery](docs/production.md). Monitor, agent, Docker module and landing page remain separate repositories. Agents never contact the marketplace; no server metrics or logs are uploaded here.
 
 ## Repository layout
 
