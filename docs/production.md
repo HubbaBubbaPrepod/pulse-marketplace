@@ -10,7 +10,8 @@ Marketplace работает на Linux через отдельный Nginx virt
 
 ### Файлы и службы
 
-- `/opt/pulse-marketplace/app` — checkout и production-сборка.
+- `/opt/pulse-marketplace/app` — checkout и production-сборка API.
+- `/opt/pulse-marketplace/releases/<commit>/apps/web` — отдельные сборки frontend. Активный каталог: `systemctl show pulse-marketplace-web -p WorkingDirectory --value`. Переключение задаётся в `/etc/systemd/system/pulse-marketplace-web.service.d/release.conf`.
 - `/opt/pulse-marketplace/node/bin/node` — Node.js для непривилегированных служб.
 - `/etc/pulse-marketplace.env` — серверные секреты, доступ только root и группе службы.
 - `/var/lib/pulse-marketplace/packages` — неизменяемые JSON-пакеты по SHA-256.
@@ -22,6 +23,8 @@ sudo systemctl status pulse-marketplace-api pulse-marketplace-web pulse-marketpl
 sudo journalctl -u pulse-marketplace-api -u pulse-marketplace-web --since '30 minutes ago'
 curl --fail https://marketplace.hubba-cloud.ru/api/v1/health/
 ```
+
+Фронтенд собирайте в новом каталоге релиза до переключения службы, сохраняя предыдущую сборку для отката. После изменения systemd override выполните `systemctl daemon-reload` и перезапустите только web. API обновляется отдельно в своём checkout.
 
 При обновлении сначала сделайте резервную копию, изучите changelog и миграции. Выполняйте `npm ci` и последовательную сборку API/web в checkout; миграции запускайте с production env. Перезапускайте только две службы приложения. Не используйте `docker compose down -v`: это удалит данные PostgreSQL. Откат кода при изменённой схеме требует отдельного плана восстановления.
 
@@ -56,12 +59,15 @@ A dedicated Linux Nginx virtual host redirects HTTP 80 to HTTPS 443. Next.js bin
 
 ### Files and services
 
-- `/opt/pulse-marketplace/app`: checkout and production build.
+- `/opt/pulse-marketplace/app`: API checkout and production build.
+- `/opt/pulse-marketplace/releases/<commit>/apps/web`: versioned frontend builds. Read the active directory using `systemctl show pulse-marketplace-web -p WorkingDirectory --value`; `/etc/systemd/system/pulse-marketplace-web.service.d/release.conf` selects it.
 - `/opt/pulse-marketplace/node/bin/node`: Node.js executable for the unprivileged services.
 - `/etc/pulse-marketplace.env`: backend secrets, readable by root and the service group only.
 - `/var/lib/pulse-marketplace/packages`: immutable JSON snapshots addressed by SHA-256.
 - Docker volume `pulse-marketplace_marketplace_database`: accounts, jobs, publications, audit and sessions.
 - `pulse-marketplace-database`, `pulse-marketplace-api`, `pulse-marketplace-web`: enabled systemd services. Application processes run as `pulse-marketplace`.
+
+Build the frontend in a new release directory before switching the service, keeping the previous build for rollback. After editing the systemd override, run `systemctl daemon-reload` and restart only web. Update the API separately in its checkout.
 
 Use the status, journal and health commands above for diagnostics. Before updating, back up the database/packages and review migrations. Run `npm ci`, build the API and web sequentially, apply migrations with the production environment, then restart only the two application services. Never run `docker compose down -v`; it deletes the database. Rolling back code after a schema change requires a separate recovery plan.
 
