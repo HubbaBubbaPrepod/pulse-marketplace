@@ -5,6 +5,7 @@ import { pathFor as url } from '../lib/copy.mjs';
 export function LegalPage({ lang, document }) {
   const page = legal.documents[document][lang];
   const labels = legal.labels[lang];
+  const operator = legal.operator[lang];
   return (
     <article className="legal-page">
       <header className="legal-header">
@@ -13,12 +14,42 @@ export function LegalPage({ lang, document }) {
         <p>{page.description}</p>
         <time dateTime={legal.updated}>{labels.updated}</time>
       </header>
+      {page.showOperator ? (
+        <section className="legal-requisites" aria-label={operator.title}>
+          <h2>{operator.title}</h2>
+          <p className="legal-operator-name">{operator.name}</p>
+          <p className="legal-operator-status">{operator.status}</p>
+          <dl>
+            <div>
+              <dt>{operator.taxLabel}</dt>
+              <dd>{legal.operator.taxId}</dd>
+            </div>
+            <div>
+              <dt>{operator.addressLabel}</dt>
+              <dd>{operator.address}</dd>
+            </div>
+            <div>
+              <dt>{lang === 'ru' ? 'Электронная почта' : 'Email'}</dt>
+              <dd>
+                <a href={`mailto:${legal.operator.supportEmail}`}>{legal.operator.supportEmail}</a>
+              </dd>
+            </div>
+            <div>
+              <dt>{operator.contactLabel}</dt>
+              <dd>
+                <a href={`mailto:${legal.operator.privacyEmail}`}>{legal.operator.privacyEmail}</a>
+              </dd>
+            </div>
+          </dl>
+        </section>
+      ) : null}
       <div className="legal-layout">
         <aside className="legal-rail">
           <nav aria-label={labels.contents}>
             <h2>{labels.contents}</h2>
-            {page.sections.map((section) => (
+            {page.sections.map((section, sectionIndex) => (
               <a key={section.id} href={`#${section.id}`}>
+                {page.numbered ? `${sectionIndex + 1}. ` : ''}
                 {section.title}
               </a>
             ))}
@@ -37,11 +68,25 @@ export function LegalPage({ lang, document }) {
           </nav>
         </aside>
         <div className="legal-body">
-          {page.sections.map((section) => (
+          {page.sections.map((section, sectionIndex) => (
             <section key={section.id} id={section.id} aria-labelledby={`heading-${section.id}`}>
-              <h2 id={`heading-${section.id}`}>{section.title}</h2>
-              {section.paragraphs.map((paragraph) => (
-                <p key={paragraph}>{paragraph}</p>
+              <h2 id={`heading-${section.id}`}>
+                {page.numbered ? `${sectionIndex + 1}. ` : ''}
+                {section.title}
+              </h2>
+              {section.paragraphs.map((paragraph, paragraphIndex) => (
+                <p key={paragraph} className={page.numbered ? 'legal-clause' : undefined}>
+                  {page.numbered ? (
+                    <>
+                      <span className="legal-clause-number">
+                        {sectionIndex + 1}.{paragraphIndex + 1}.
+                      </span>
+                      <span>{paragraph}</span>
+                    </>
+                  ) : (
+                    paragraph
+                  )}
+                </p>
               ))}
             </section>
           ))}

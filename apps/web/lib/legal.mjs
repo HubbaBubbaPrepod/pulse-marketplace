@@ -5,28 +5,61 @@ export const legal = {
       ru: {
         title: 'Политика конфиденциальности',
         description:
-          'Политика Pulse Marketplace: доступ к Google-данным, их использование, передача, защита, хранение и удаление.',
+          'Политика обработки и защиты персональных данных пользователей Pulse Marketplace.',
         sections: [
           {
             id: 'scope',
-            title: 'Кто и за что отвечает',
+            title: 'Общие положения',
             paragraphs: [
-              'Эта политика описывает приложение Pulse Marketplace на marketplace.hubba-cloud.ru. Оператор: самозанятый Хабибулин Даниил Олегович, Россия. Контакт по персональным данным: heyhubbabubbapr@gmail.com. Поддержка: support@hubba-cloud.ru.',
-              'Marketplace предоставляет каталог модулей и не собирает метрики, процессы, сетевые соединения или журналы серверов из ваших установок Monitor. Модули исполняются на вашем сервере, а не в Marketplace.',
+              'Настоящая Политика конфиденциальности и обработки персональных данных (далее — «Политика») определяет цели, состав, порядок обработки и меры защиты персональных данных при использовании сайта https://marketplace.hubba-cloud.ru/ (далее — «Сайт», «Сервис»).',
+              'Оператором персональных данных является Хабибулин Даниил Олегович, самозанятый, плательщик налога на профессиональный доход (далее — «Оператор»). Реквизиты Оператора указаны в настоящем документе.',
+              'Политика подготовлена с учётом Федерального закона от 27.07.2006 № 152-ФЗ «О персональных данных» и иных применимых нормативных правовых актов Российской Федерации. Политика является общедоступным документом и размещается на Сайте.',
+              'Действие Политики распространяется на посетителей каталога, зарегистрированных пользователей, авторов модулей и лиц, направляющих обращения Оператору. Marketplace не является размещённым сервисом мониторинга и не получает метрики, процессы, сетевые соединения или журналы пользовательских серверов из Monitor и агентов.',
+              'Настоящая Политика информирует Пользователя об обработке данных и сама по себе не является согласием на их обработку. Посещение Сайта не означает предоставления согласия на рекламу или иные цели, не связанные с запрошенными функциями Сервиса.',
+            ],
+          },
+          {
+            id: 'definitions',
+            title: 'Основные понятия',
+            paragraphs: [
+              '«Пользователь» — физическое лицо, посещающее Сайт, использующее доступные функции Сервиса либо направляющее обращение Оператору.',
+              '«Персональные данные» — сведения, относящиеся прямо или косвенно к определённому или определяемому физическому лицу.',
+              '«Обработка персональных данных» — действия или совокупность действий с персональными данными, включая сбор, запись, систематизацию, накопление, хранение, уточнение, использование, предоставление, блокирование, удаление и уничтожение.',
+              '«Внешний провайдер» — самостоятельный сервис, участвующий в предоставлении выбранной Пользователем функции: в частности, GitHub, Google, провайдер размещения сайта или электронной почты.',
             ],
           },
           {
             id: 'data',
-            title: 'Какие данные поступают',
+            title: 'Категории субъектов и состав обрабатываемых данных',
             paragraphs: [
-              'При входе через GitHub или Google сохраняются идентификатор провайдера, отображаемое имя и связь с аккаунтом. Приложение запрашивает read:user у GitHub и openid profile у Google; доступ к Gmail, Drive и закрытым репозиториям не запрашивается. Пароли провайдеров не поступают в Pulse, а полученные для входа токены не сохраняются в базе аккаунтов.',
-              'Если используется вход по email, хранятся адрес, имя, отметка подтверждения и стойкий хеш пароля, а не его открытый текст. В публичной установке регистрация и восстановление по email пока отключены. Для работы сервиса сохраняются роль, дата создания, сессии, временные записи OAuth и ограничения попыток входа.',
-              'При публикации обрабатываются публичные сведения GitHub: владелец и идентификатор репозитория, релизы, исходная ссылка, манифест, платформы и пакет. Решения модерации, комментарии и идентификатор действующего модератора записываются в аудит.',
+              'В отношении зарегистрированных пользователей обрабатываются внутренний идентификатор аккаунта, отображаемое имя, роль и дата создания записи. При использовании email-входа также обрабатываются адрес электронной почты, статус его подтверждения и стойкий хеш пароля с индивидуальной солью. Открытый текст пароля не сохраняется. Регистрация и восстановление пароля по email в текущей публичной установке отключены.',
+              'При использовании GitHub-входа обрабатываются идентификатор пользователя GitHub, отображаемое имя и связь с аккаунтом Marketplace. Состав Google-данных и условия их обработки определены в специальных разделах настоящей Политики. Пароли внешних провайдеров Оператору не передаются.',
+              'В отношении авторов модулей обрабатываются общедоступные сведения GitHub о владельце и репозитории, релизах, исходных ссылках, манифесте, платформах и распространяемом пакете. Сохраняются результаты проверок, решения модерации, комментарии и сведения о лице, принявшем решение.',
+              'Для функционирования и защиты Сервиса обрабатываются сессионные записи, временные параметры OAuth, счётчики попыток и технические сведения запросов. IP-адрес может обрабатываться сетевой инфраструктурой и присутствовать в системных журналах. Журнал HTTP-доступа virtual host Marketplace отключён.',
+              'При обращении Оператору обрабатываются адрес электронной почты заявителя, текст обращения, необходимые для его рассмотрения сведения и добровольно приложенные материалы. Пользователь не должен направлять действующие пароли, ключи, токены или избыточные данные третьих лиц.',
+            ],
+          },
+          {
+            id: 'purpose',
+            title: 'Цели обработки персональных данных',
+            paragraphs: [
+              'Обработка осуществляется для предоставления запрошенных функций Сайта, обеспечения его работоспособности, защиты от неправомерного доступа и рассмотрения обращений Пользователей.',
+              'К целям обработки также относятся идентификация аккаунта, предоставление доступа к кабинету с учётом роли, проверка авторства и пакетов модулей, ведение каталога, модерация, рассмотрение жалоб и апелляций.',
+              'Данные могут обрабатываться для выполнения обязанностей, установленных применимым законодательством, и защиты прав Оператора и Пользователей в предусмотренных законом случаях. Объём данных ограничивается сведениями, необходимыми для конкретной цели.',
+            ],
+          },
+          {
+            id: 'legal-basis',
+            title: 'Правовые основания обработки',
+            paragraphs: [
+              'Оператор осуществляет обработку при наличии оснований, предусмотренных законодательством о персональных данных, в том числе когда она необходима для исполнения соглашения с Пользователем или предоставления запрошенной им функции, выполнения установленных законом обязанностей либо осуществляется на основании надлежащим образом полученного согласия.',
+              'Если для конкретной обработки требуется согласие Пользователя, такое согласие оформляется отдельно от настоящей Политики и иных подтверждаемых документов. Ознакомление с Политикой не заменяет получение согласия в случаях, когда оно необходимо.',
+              'Отзыв согласия прекращает обработку, основанную исключительно на таком согласии. Обработка может продолжаться при наличии самостоятельного законного основания. Если без соответствующих данных невозможно предоставить запрошенную функцию, прекращается предоставление именно этой функции, а не автоматически всего Сервиса.',
             ],
           },
           {
             id: 'google-access',
-            title: 'Вход через Google: какие данные доступны',
+            title: 'Доступ к данным Google',
             paragraphs: [
               'Pulse Marketplace использует Google OpenID Connect только для входа в аккаунт и его явной привязки. Запрашиваемые разрешения: openid и profile. Из подтверждённого ID-токена приложение использует уникальный идентификатор Google (sub) и отображаемое имя (name, если Google его предоставил).',
               'Разрешение profile может возвращать и другие базовые сведения профиля, например ссылку на фото. Текущая реализация не сохраняет и не использует фото, дату рождения или пол. Разрешение email не запрашивается, адрес Google-почты для входа не требуется. У приложения нет доступа к Gmail, Google Drive, контактам, календарю, паролю Google или закрытым репозиториям GitHub.',
@@ -35,7 +68,7 @@ export const legal = {
           },
           {
             id: 'google-use',
-            title: 'Для чего используются Google-данные',
+            title: 'Использование данных Google',
             paragraphs: [
               'Идентификатор Google связывает повторные входы с одним аккаунтом Pulse Marketplace. Имя используется для отображения аккаунта в интерфейсе. Привязка к уже существующему аккаунту выполняется отдельным действием пользователя; совпадение email не объединяет аккаунты автоматически.',
               'Эти данные нужны для доступа к кабинету, разрешённым аккаунту действиям и поддержки входа. Google-вход сам по себе не доказывает владение GitHub-репозиторием: авторство модуля проверяется отдельно через GitHub.',
@@ -44,7 +77,7 @@ export const legal = {
           },
           {
             id: 'google-sharing',
-            title: 'Кому доступны Google-данные',
+            title: 'Предоставление и раскрытие данных Google',
             paragraphs: [
               'Google-идентификатор и привязка Google не публикуются в каталоге, не включаются в установочные JSON-пакеты и не передаются авторам модулей, Monitor или агентам. Само отображаемое имя аккаунта не используется как публичное имя владельца GitHub-модуля.',
               'Владелец сервиса может получить доступ к записям аккаунта для администрирования, защиты сервиса и рассмотрения вашего обращения. Инфраструктура сервера хранит базу и резервные копии для работы и восстановления Marketplace. Иных получателей Google-данных для рекламы, аналитики или продажи нет.',
@@ -52,29 +85,12 @@ export const legal = {
             ],
           },
           {
-            id: 'protection',
-            title: 'Как защищаются данные',
+            id: 'processing',
+            title: 'Порядок и способы обработки',
             paragraphs: [
-              'Публичный Marketplace использует HTTPS. База PostgreSQL и внутренний API слушают только локальный интерфейс сервера и не опубликованы как внешние сервисы. Доступ к действиям кабинета проверяется на сервере по сессии и роли, запросы изменения данных проверяют Origin и CSRF-токен.',
-              'Cookie сессии защищена флагами Secure, HttpOnly и SameSite=Lax. В базе хранится хеш токена сессии; для email-пароля — стойкий хеш с индивидуальной солью. Для Google-входа используются PKCE, state и nonce. Серверные реквизиты и резервные копии ограничены файловыми правами. Это описание применяемых мер, а не гарантия отсутствия любых рисков.',
-              'Об утечке или подозрении на доступ к чужому аккаунту сообщайте на heyhubbabubbapr@gmail.com. Не прикладывайте действующие пароли, токены или приватные ключи.',
-            ],
-          },
-          {
-            id: 'google-deletion',
-            title: 'Удаление Google-привязки и аккаунта',
-            paragraphs: [
-              'Чтобы удалить Google-привязку, аккаунт или связанные с ними данные, напишите на heyhubbabubbapr@gmail.com с темой «Pulse Marketplace — удаление данных». Укажите отображаемое имя и способ входа; владелец проверит принадлежность аккаунта безопасным соразмерным способом. Самостоятельной кнопки удаления сейчас нет.',
-              'После подтверждения запроса владелец прекращает доступ через удаляемую привязку, отзывает затронутые сессии и удаляет либо обезличивает сведения, которые больше не нужны для предоставления сервиса или обязательного хранения. Если удаление затрагивает единственный способ входа, доступ к аккаунту будет утрачен; альтернативный способ входа нужно согласовать заранее.',
-              'Удаление Google-привязки не отзывает уже выданные лицензии на опубликованные модули. Необходимая история решений может сохраняться для безопасности и рассмотрения споров с минимизацией персональных данных. Резервные копии рассматриваются отдельно при удалении и восстановлении; автоматический срок их ротации пока не настроен.',
-              'Вы также можете убрать разрешение Pulse Marketplace в настройках подключений Google-аккаунта. Это действие не удаляет уже сохранённую запись из базы Marketplace: для её удаления нужно обратиться к владельцу сервиса.',
-            ],
-          },
-          {
-            id: 'purpose',
-            title: 'Для чего нужны данные',
-            paragraphs: [
-              'Данные используются для предоставления запрошенных функций сайта, защиты доступа, рассмотрения обращений и исполнения применимых правовых обязанностей. Для Marketplace это также установление авторства, проверка пакетов, публикация версий, модерация и рассмотрение жалоб. Необходимая для запрошенного сервиса обработка не считается согласием на рекламу. Если для отдельной обработки требуется согласие, оно должно запрашиваться отдельно.',
+              'Обработка осуществляется с использованием средств автоматизации и без их использования: при работе программного обеспечения Сайта, рассмотрении обращений и, для Marketplace, при модерации публикаций.',
+              'Оператор ограничивает обработку определёнными целями, принимает меры по уточнению недостоверных данных и предоставляет доступ к ним только в объёме, необходимом для выполнения соответствующей задачи.',
+              'Специальные категории и биометрические персональные данные для работы Сервиса не запрашиваются. Пользователю не следует включать такие сведения в публичные пакеты и обращения, если они не требуются для рассмотрения конкретного вопроса.',
             ],
           },
           {
@@ -85,70 +101,137 @@ export const legal = {
             ],
           },
           {
-            id: 'tracking',
-            title: 'Аналитика и реклама',
-            paragraphs: [
-              'Google Analytics, Яндекс Метрика, рекламные пиксели и маркетинговые рассылки не подключены. Мы не продаём данные аккаунтов и не используем их для рекламного профилирования.',
-            ],
-          },
-          {
-            id: 'recipients',
-            title: 'Публичные сведения и внешние сервисы',
-            paragraphs: [
-              'Каталог публикует владельца модуля, сведения о релизе, исходную ссылку, разрешения и одобренный пакет. Email аккаунта, хеш пароля, сессии и привязки Google не публикуются. Не включайте секреты или чужие персональные данные в распространяемый пакет.',
-              'GitHub и, при включении, Google обрабатывают вход по собственным политикам. Публичные сведения репозиториев поступают через GitHub. Сервер и его хостинг обеспечивают доставку запросов; технические IP-адреса могут присутствовать в системных журналах. Журнал HTTP-доступа virtual host Marketplace отключён. Обработка у внешних провайдеров может происходить за пределами вашей страны.',
-            ],
-          },
-          {
             id: 'retention',
-            title: 'Хранение и удаление',
+            title: 'Сроки хранения, прекращение обработки и уничтожение',
             paragraphs: [
               'Профиль хранится для работы аккаунта. Сессия истекает через 7 дней, состояние OAuth — через 10 минут; просроченные записи авторизации очищаются фоновым процессом. История публикаций и модерации сохраняется для целостности каталога и рассмотрения спорных ситуаций.',
               'Резервные копии базы и пакетов создаются ежедневно. Сейчас их ротацией управляет владелец вручную: автоматический срок удаления копий не установлен. Удаление записей из основной базы само по себе не стирает уже созданные резервные копии. При запросе удаления владелец отдельно учитывает их и восстановление данных.',
             ],
           },
           {
-            id: 'rights',
-            title: 'Как управлять своими данными',
+            id: 'recipients',
+            title: 'Внешние сервисы и предоставление данных',
             paragraphs: [
-              'Напишите на heyhubbabubbapr@gmail.com для доступа, исправления, удаления, прекращения обработки или отзыва ранее данного согласия, когда это применимо. Укажите аккаунт или обстоятельства обращения; владелец может запросить соразмерное подтверждение личности. Кнопки самостоятельного удаления аккаунта сейчас нет, запрос обрабатывается вручную.',
-              'Удаление профиля и судьба публичного исходного кода или лицензированных версий — разные вопросы. Опубликованные версии могут сохраняться по условиям лицензии с необходимым авторством; лишние данные профиля не должны сохраняться только ради публикации. Обязательные требования об удалении и жалобы на права рассматриваются отдельно.',
+              'Каталог публикует владельца модуля, сведения о релизе, исходную ссылку, разрешения и одобренный пакет. Email аккаунта, хеш пароля, сессии и привязки Google не публикуются. Не включайте секреты или чужие персональные данные в распространяемый пакет.',
+              'GitHub и, при включении, Google обрабатывают вход по собственным политикам. Публичные сведения репозиториев поступают через GitHub. Сервер и его хостинг обеспечивают доставку запросов; технические IP-адреса могут присутствовать в системных журналах. Журнал HTTP-доступа virtual host Marketplace отключён. Обработка у внешних провайдеров может происходить за пределами вашей страны.',
+            ],
+          },
+          {
+            id: 'protection',
+            title: 'Меры защиты персональных данных',
+            paragraphs: [
+              'Публичный Marketplace использует HTTPS. База PostgreSQL и внутренний API слушают только локальный интерфейс сервера и не опубликованы как внешние сервисы. Доступ к действиям кабинета проверяется на сервере по сессии и роли, запросы изменения данных проверяют Origin и CSRF-токен.',
+              'Cookie сессии защищена флагами Secure, HttpOnly и SameSite=Lax. В базе хранится хеш токена сессии; для email-пароля — стойкий хеш с индивидуальной солью. Для Google-входа используются PKCE, state и nonce. Серверные реквизиты и резервные копии ограничены файловыми правами. Это описание применяемых мер, а не гарантия отсутствия любых рисков.',
+              'Об утечке или подозрении на доступ к чужому аккаунту сообщайте на heyhubbabubbapr@gmail.com. Не прикладывайте действующие пароли, токены или приватные ключи.',
+            ],
+          },
+          {
+            id: 'rights',
+            title: 'Права Пользователя и порядок обращения',
+            paragraphs: [
+              'Пользователь вправе запрашивать сведения об обработке относящихся к нему персональных данных, требовать их уточнения, блокирования или уничтожения в предусмотренных законом случаях, отзывать ранее предоставленное согласие и обжаловать действия Оператора в уполномоченный орган или суд.',
+              'Обращения направляются на heyhubbabubbapr@gmail.com либо support@hubba-cloud.ru. В обращении следует указать сведения, позволяющие определить заявителя и относящиеся к нему данные, суть требования и способ обратной связи. Оператор вправе запросить соразмерное подтверждение принадлежности данных заявителю.',
+              'Обращения рассматриваются Оператором вручную с соблюдением применимых требований и установленных законом сроков. Фиксированный срок обычной технической поддержки и круглосуточное обслуживание не предусмотрены; это не отменяет обязательных сроков рассмотрения требований субъектов персональных данных.',
+              'Удаление аккаунта, Google-привязки и сохранение лицензированных опубликованных версий рассматриваются отдельно. Пользователь вправе обратиться за удалением ненужных данных профиля; наличие опубликованного пакета само по себе не является основанием для бессрочного хранения всех сведений об аккаунте.',
+            ],
+          },
+          {
+            id: 'google-deletion',
+            title: 'Порядок удаления Google-привязки и аккаунта',
+            paragraphs: [
+              'Чтобы удалить Google-привязку, аккаунт или связанные с ними данные, напишите на heyhubbabubbapr@gmail.com с темой «Pulse Marketplace — удаление данных». Укажите отображаемое имя и способ входа; владелец проверит принадлежность аккаунта безопасным соразмерным способом. Самостоятельной кнопки удаления сейчас нет.',
+              'После подтверждения запроса владелец прекращает доступ через удаляемую привязку, отзывает затронутые сессии и удаляет либо обезличивает сведения, которые больше не нужны для предоставления сервиса или обязательного хранения. Если удаление затрагивает единственный способ входа, доступ к аккаунту будет утрачен; альтернативный способ входа нужно согласовать заранее.',
+              'Удаление Google-привязки не отзывает уже выданные лицензии на опубликованные модули. Необходимая история решений может сохраняться для безопасности и рассмотрения споров с минимизацией персональных данных. Резервные копии рассматриваются отдельно при удалении и восстановлении; автоматический срок их ротации пока не настроен.',
+              'Вы также можете убрать разрешение Pulse Marketplace в настройках подключений Google-аккаунта. Это действие не удаляет уже сохранённую запись из базы Marketplace: для её удаления нужно обратиться к владельцу сервиса.',
+            ],
+          },
+          {
+            id: 'obligations',
+            title: 'Обязанности Оператора',
+            paragraphs: [
+              'Оператор обязан использовать персональные данные в пределах заявленных целей и законных оснований, обеспечивать конфиденциальность и принимать необходимые организационные и технические меры защиты.',
+              'Оператор рассматривает обращения субъектов персональных данных, принимает меры по уточнению недостоверных сведений и прекращению неправомерной обработки, а также удалению либо уничтожению данных при наличии предусмотренных законом оснований.',
+              'Предоставление сведений третьим лицам допускается при наличии соответствующего законного основания. Участие внешнего провайдера в выбранном Пользователем способе входа или размещении Сайта не означает разрешения на продажу данных или их использование для рекламы.',
+            ],
+          },
+          {
+            id: 'tracking',
+            title: 'Аналитика и рекламные технологии',
+            paragraphs: [
+              'На дату настоящей редакции Google Analytics, Яндекс Метрика, рекламные пиксели и маркетинговые рассылки не применяются. Продажа персональных данных и рекламное профилирование не осуществляются. Изменение этих условий требует предварительного информирования Пользователей и наличия соответствующего законного основания.',
             ],
           },
           {
             id: 'changes',
-            title: 'Изменения политики',
+            title: 'Изменение Политики и заключительные положения',
             paragraphs: [
-              'Дата редакции указана в начале страницы. При изменении состава данных или внешних сервисов политика обновляется. Существенные новые цели обработки не вводятся задним числом через простую замену текста.',
+              'Актуальная редакция Политики размещается по постоянному адресу страницы конфиденциальности Сайта. Дата редакции указывается в начале документа. При изменении фактического порядка обработки Оператор актуализирует текст Политики.',
+              'Изменение текста Политики или продолжение использования Сайта не заменяют отдельное согласие на новую обработку, если такое согласие требуется. Ранее предоставленные открытые лицензии и обязательные права Пользователей сохраняются.',
+              'Вопросы, не урегулированные Политикой, разрешаются в соответствии с применимым законодательством. Обычные обращения по Сервису направляются на support@hubba-cloud.ru, вопросы обработки данных и безопасности — на heyhubbabubbapr@gmail.com.',
             ],
           },
         ],
+        numbered: true,
+        showOperator: true,
       },
       en: {
         title: 'Privacy policy',
         description:
-          'Pulse Marketplace privacy policy: Google data access, use, sharing, protection, retention and deletion.',
+          'Policy governing the processing and protection of Pulse Marketplace users’ personal data.',
         sections: [
           {
             id: 'scope',
-            title: 'Operator and scope',
+            title: 'General provisions',
             paragraphs: [
-              'This policy covers the Pulse Marketplace application at marketplace.hubba-cloud.ru. The operator is Daniil Olegovich Khabibulin (Хабибулин Даниил Олегович), a self-employed individual in Russia. Personal data contact: heyhubbabubbapr@gmail.com. Support: support@hubba-cloud.ru.',
-              'Marketplace provides a module catalog and does not collect metrics, processes, network connections or server logs from your Monitor installations. Modules execute on your server, not in Marketplace.',
+              'This Privacy and Personal Data Processing Policy (the “Policy”) establishes the purposes, categories, processing procedures and safeguards for personal data processed through https://marketplace.hubba-cloud.ru/ (the “Website” or “Service”).',
+              'The personal data controller is Daniil Olegovich Khabibulin, a self-employed individual paying Russian professional income tax (the “Controller”). The Controller’s details are set out in this document.',
+              'This Policy is prepared with reference to Russian Federal Law No. 152-FZ of 27 July 2006 on Personal Data and other applicable Russian legislation. It is a public document available on the Website.',
+              'The Policy covers catalog visitors, registered users, module authors and persons contacting the Controller. Marketplace is not a hosted server-monitoring service and does not receive user server metrics, processes, network connections or logs from Monitor or agents.',
+              'This Policy informs Users about data processing and does not itself constitute consent. Visiting the Website does not constitute consent to advertising or purposes unrelated to the requested Service functionality.',
+            ],
+          },
+          {
+            id: 'definitions',
+            title: 'Definitions',
+            paragraphs: [
+              '“User” means an individual visiting the Website, using available Service functions or contacting the Controller.',
+              '“Personal data” means information relating directly or indirectly to an identified or identifiable individual.',
+              '“Processing” means operations on personal data, including collection, recording, organization, storage, correction, use, disclosure, restriction, deletion and destruction.',
+              '“External provider” means a separate service involved in delivering a function chosen by the User, including GitHub, Google, website hosting and email providers.',
             ],
           },
           {
             id: 'data',
-            title: 'Data received',
+            title: 'Data subjects and categories of personal data',
             paragraphs: [
-              'GitHub or Google sign-in stores the provider identifier, display name and account link. The application requests GitHub read:user and Google openid profile, not Gmail, Drive or private repository access. Provider passwords never reach Pulse; tokens received for sign-in are not persisted in the account database.',
-              'Email sign-in stores the address, display name, verification status and a strong password hash, not a plaintext password. Email registration and recovery are currently disabled on the public installation. Roles, creation dates, sessions, temporary OAuth records and sign-in attempt limits are stored to operate the service.',
-              'Publication processing uses public GitHub data: repository owner and ID, releases, source URL, manifest, platforms and package. Moderation decisions, comments and the acting moderator identifier are recorded in the audit trail.',
+              'Registered account data comprises the internal account identifier, display name, role and creation date. Email sign-in additionally processes the email address, verification status and a strong individually salted password hash. Plaintext passwords are not stored. Email registration and recovery are disabled on the current public installation.',
+              'GitHub sign-in processes the GitHub user identifier, display name and account association. Google data and its processing are described in dedicated sections of this Policy. External provider passwords are not disclosed to the Controller.',
+              'Module author data includes public GitHub owner/repository details, releases, source links, manifests, platforms and distributed packages. Validation results, moderation decisions, comments and decision-maker identifiers are retained.',
+              'Operating and protecting the Service involves session records, temporary OAuth parameters, attempt counters and technical request information. IP addresses may be processed by network infrastructure and appear in system logs. The Marketplace virtual host HTTP access log is disabled.',
+              'Support correspondence comprises the sender’s email address, message, information necessary for handling it and voluntary attachments. Users must not submit active passwords, keys, tokens or excessive third-party personal data.',
+            ],
+          },
+          {
+            id: 'purpose',
+            title: 'Purposes of processing',
+            paragraphs: [
+              'Personal data is processed to provide requested Website functionality, maintain operation, protect against unauthorized access and handle User requests.',
+              'Processing also supports account identification, role-based workspace access, repository authorship and package validation, catalog management, moderation, complaints and appeals.',
+              'Data may be processed to meet applicable legal obligations and protect Controller/User rights where permitted by law. Processing is limited to information necessary for a specified purpose.',
+            ],
+          },
+          {
+            id: 'legal-basis',
+            title: 'Legal grounds',
+            paragraphs: [
+              'The Controller processes data where a ground under applicable data protection law exists, including necessity to perform an agreement with the User or deliver a requested function, meet legal obligations or act on validly obtained consent.',
+              'Where a specific processing activity requires consent, that consent must be obtained separately from this Policy and other documents being confirmed. Reading the Policy does not replace consent where consent is required.',
+              'Withdrawal ends processing based solely on that consent. Processing may continue where a separate lawful ground exists. If the data is necessary for a requested function, that function may cease; withdrawal does not automatically prohibit use of every part of the Service.',
             ],
           },
           {
             id: 'google-access',
-            title: 'Google sign-in: data accessed',
+            title: 'Access to Google data',
             paragraphs: [
               'Pulse Marketplace uses Google OpenID Connect only to sign in and explicitly link an identity. The requested scopes are openid and profile. From the verified ID token, the application uses the unique Google identifier (sub) and display name (name, if supplied by Google).',
               'The profile scope may return other basic profile information, such as a photo URL. The current implementation does not store or use the photo, date of birth or gender. The email scope is not requested and a Google email address is not required for sign-in. The application cannot access Gmail, Google Drive, contacts, calendars, your Google password or private GitHub repositories.',
@@ -157,7 +240,7 @@ export const legal = {
           },
           {
             id: 'google-use',
-            title: 'How Google data is used',
+            title: 'Use of Google data',
             paragraphs: [
               'The Google identifier associates repeat sign-ins with the same Pulse Marketplace account. The name identifies the account in the interface. Linking an existing account requires a separate user action; matching emails do not automatically merge accounts.',
               'These data support workspace access, authorized account actions and sign-in support. Google sign-in alone does not establish ownership of a GitHub repository: module authorship is checked separately through GitHub.',
@@ -166,7 +249,7 @@ export const legal = {
           },
           {
             id: 'google-sharing',
-            title: 'Who can access Google data',
+            title: 'Disclosure of Google data',
             paragraphs: [
               'The Google identifier and identity link are not published in the catalog, embedded in installation JSON packages or shared with module authors, Monitor or agents. An account display name is not used as the public GitHub module owner name.',
               'The service operator may access account records for administration, service protection and your support requests. Server infrastructure stores the database and backups to operate and recover Marketplace. No other recipients receive Google data for advertising, analytics or sale.',
@@ -174,8 +257,40 @@ export const legal = {
             ],
           },
           {
+            id: 'processing',
+            title: 'Processing procedures and methods',
+            paragraphs: [
+              'Processing uses automated and non-automated means through Website software, handling correspondence and, for Marketplace, publication moderation.',
+              'The Controller limits processing to specified purposes, takes steps to correct inaccurate data and restricts access to what is needed for the relevant task.',
+              'Special-category and biometric personal data are not requested for Service operation. Users should not include such information in public packages or correspondence unless necessary to address a specific request.',
+            ],
+          },
+          {
+            id: 'storage',
+            title: 'Cookies and browser storage',
+            paragraphs: [
+              'Your chosen theme is stored in pulse-market.theme.v1. Sign-in uses the secure HttpOnly __Host-pulse-session cookie for up to 7 days; signing out revokes the current session. The pulse-oauth-github and pulse-oauth-google cookies bind the start and completion of sign-in and last up to 10 minutes. These cookies are not necessarily all present at once.',
+            ],
+          },
+          {
+            id: 'retention',
+            title: 'Retention, cessation and deletion',
+            paragraphs: [
+              'Profiles are retained to operate accounts. Sessions expire after 7 days and OAuth state after 10 minutes; a background process removes expired authentication records. Publication and moderation history is retained for catalog integrity and dispute handling.',
+              'The database and packages are backed up daily. Retention is currently managed manually by the operator; automatic backup expiry has not been configured. Deleting a primary database record does not itself erase existing backups. The operator must separately account for backups and recovery when handling deletion requests.',
+            ],
+          },
+          {
+            id: 'recipients',
+            title: 'External services and data disclosure',
+            paragraphs: [
+              'The catalog exposes module ownership, release details, source links, permissions and approved packages. Account email, password hashes, sessions and Google identity links are not published. Do not include secrets or other people’s personal data in distributed packages.',
+              'GitHub and, when enabled, Google process authentication under their own policies. Public repository data is retrieved from GitHub. The server and its hosting provider deliver requests; technical IP addresses may appear in system logs. The Marketplace virtual host HTTP access log is disabled. External providers may process data outside your country.',
+            ],
+          },
+          {
             id: 'protection',
-            title: 'Data protection measures',
+            title: 'Personal data safeguards',
             paragraphs: [
               'The public Marketplace uses HTTPS. PostgreSQL and the internal API bind only to the server loopback interface and are not exposed as public services. Workspace actions require server-side session and role checks; state-changing requests check Origin and CSRF tokens.',
               'The session cookie uses Secure, HttpOnly and SameSite=Lax. Session tokens are hashed in the database; email passwords use a strong individually salted hash. Google sign-in uses PKCE, state and nonce. File permissions restrict server credentials and backups. These are the implemented safeguards, not a guarantee that every risk is eliminated.',
@@ -183,8 +298,18 @@ export const legal = {
             ],
           },
           {
+            id: 'rights',
+            title: 'User rights and requests',
+            paragraphs: [
+              'Users may request information about processing of their personal data, require correction, restriction or destruction where provided by law, withdraw previously given consent and challenge the Controller’s actions before the competent authority or a court.',
+              'Requests may be sent to heyhubbabubbapr@gmail.com or support@hubba-cloud.ru. Identify the requester and relevant data, specify the request and provide a reply address. The Controller may require proportionate verification that the data belongs to the requester.',
+              'The Controller handles requests manually subject to applicable requirements and statutory time limits. Ordinary technical support has no fixed SLA or 24/7 availability; this does not alter mandatory data subject request deadlines.',
+              'Account deletion, removal of a Google identity and retention of licensed published releases are assessed separately. Users may request deletion of unnecessary profile data; publication alone does not justify indefinite retention of every account detail.',
+            ],
+          },
+          {
             id: 'google-deletion',
-            title: 'Deleting a Google identity link or account',
+            title: 'Deletion of a Google identity and account',
             paragraphs: [
               'To delete a Google identity link, account or associated data, email heyhubbabubbapr@gmail.com with the subject “Pulse Marketplace — data deletion”. Include the display name and sign-in method; the operator verifies account ownership in a safe and proportionate way. There is currently no self-service deletion button.',
               'After verifying the request, the operator disables the identity being removed, revokes affected sessions and deletes or anonymizes information no longer required to provide the service or meet mandatory retention obligations. Removing the only sign-in method loses account access; arrange an alternative sign-in method beforehand if needed.',
@@ -193,58 +318,33 @@ export const legal = {
             ],
           },
           {
-            id: 'purpose',
-            title: 'Purposes',
+            id: 'obligations',
+            title: 'Controller obligations',
             paragraphs: [
-              'Data is used to provide requested site functions, protect access, handle requests and meet applicable legal obligations. Marketplace also uses it to establish authorship, validate packages, publish versions, moderate and handle complaints. Processing necessary for a requested service is not consent to advertising. Any processing requiring separate consent must obtain it separately.',
-            ],
-          },
-          {
-            id: 'storage',
-            title: 'Cookies and local storage',
-            paragraphs: [
-              'Your chosen theme is stored in pulse-market.theme.v1. Sign-in uses the secure HttpOnly __Host-pulse-session cookie for up to 7 days; signing out revokes the current session. The pulse-oauth-github and pulse-oauth-google cookies bind the start and completion of sign-in and last up to 10 minutes. These cookies are not necessarily all present at once.',
+              'The Controller must use personal data within the stated purposes and lawful grounds, maintain confidentiality and implement necessary organizational and technical safeguards.',
+              'The Controller handles data subject requests, corrects inaccurate information, addresses unlawful processing and deletes or destroys information where a legal ground requires it.',
+              'Disclosure to third parties requires an appropriate lawful ground. An external provider’s participation in sign-in or hosting does not authorize sale of data or advertising use.',
             ],
           },
           {
             id: 'tracking',
-            title: 'Analytics and advertising',
+            title: 'Analytics and advertising technologies',
             paragraphs: [
-              'Google Analytics, Yandex Metrica, advertising pixels and marketing mailings are not enabled. We do not sell account data or use it for advertising profiles.',
-            ],
-          },
-          {
-            id: 'recipients',
-            title: 'Public data and external services',
-            paragraphs: [
-              'The catalog exposes module ownership, release details, source links, permissions and approved packages. Account email, password hashes, sessions and Google identity links are not published. Do not include secrets or other people’s personal data in distributed packages.',
-              'GitHub and, when enabled, Google process authentication under their own policies. Public repository data is retrieved from GitHub. The server and its hosting provider deliver requests; technical IP addresses may appear in system logs. The Marketplace virtual host HTTP access log is disabled. External providers may process data outside your country.',
-            ],
-          },
-          {
-            id: 'retention',
-            title: 'Retention and deletion',
-            paragraphs: [
-              'Profiles are retained to operate accounts. Sessions expire after 7 days and OAuth state after 10 minutes; a background process removes expired authentication records. Publication and moderation history is retained for catalog integrity and dispute handling.',
-              'The database and packages are backed up daily. Retention is currently managed manually by the operator; automatic backup expiry has not been configured. Deleting a primary database record does not itself erase existing backups. The operator must separately account for backups and recovery when handling deletion requests.',
-            ],
-          },
-          {
-            id: 'rights',
-            title: 'Your choices and requests',
-            paragraphs: [
-              'Email heyhubbabubbapr@gmail.com for access, correction, deletion, requests to stop processing or withdrawal of previously given consent where applicable. Identify the account or correspondence; proportionate identity verification may be requested. There is currently no self-service account deletion button; requests are handled manually.',
-              'Profile deletion and the status of public source code or licensed releases are separate matters. Published versions may remain under their licenses with required attribution; unnecessary profile data should not be retained merely because a package was published. Mandatory deletion requests and rights complaints are assessed separately.',
+              'As of this revision, Google Analytics, Yandex Metrica, advertising pixels and marketing mailings are not used. Personal data is not sold or used for advertising profiles. Changes require advance User notice and an appropriate lawful ground.',
             ],
           },
           {
             id: 'changes',
-            title: 'Policy changes',
+            title: 'Amendments and final provisions',
             paragraphs: [
-              'The revision date appears at the top. The policy is updated when data practices or external services change. Material new processing purposes are not introduced retroactively merely by replacing this text.',
+              'The current Policy is published at the Website’s permanent privacy policy URL. Its revision date appears at the beginning. The Controller updates the Policy when actual processing practices change.',
+              'Replacing this text or continuing to use the Website does not replace separate consent to new processing where consent is required. Existing open-source licenses and mandatory User rights remain unaffected.',
+              'Matters not addressed in this Policy are governed by applicable law. Ordinary Service requests may be sent to support@hubba-cloud.ru; personal data and security requests to heyhubbabubbapr@gmail.com.',
             ],
           },
         ],
+        numbered: true,
+        showOperator: true,
       },
     },
     terms: {
@@ -312,6 +412,8 @@ export const legal = {
             ],
           },
         ],
+        numbered: true,
+        showOperator: true,
       },
       en: {
         title: 'Terms of service',
@@ -377,6 +479,8 @@ export const legal = {
             ],
           },
         ],
+        numbered: true,
+        showOperator: true,
       },
     },
     contacts: {
@@ -414,6 +518,7 @@ export const legal = {
             ],
           },
         ],
+        showOperator: true,
       },
       en: {
         title: 'Contact and requests',
@@ -449,6 +554,7 @@ export const legal = {
             ],
           },
         ],
+        showOperator: true,
       },
     },
     security: {
@@ -667,5 +773,28 @@ export const legal = {
       navigation: 'Policies and contacts',
       contact: 'Contact the operator',
     },
+  },
+  operator: {
+    ru: {
+      title: 'Оператор персональных данных',
+      name: 'Хабибулин Даниил Олегович',
+      status: 'Самозанятый, плательщик налога на профессиональный доход',
+      taxLabel: 'ИНН',
+      addressLabel: 'Адрес',
+      address: '461332, Крючковка, село Луговая, улица 5, 4',
+      contactLabel: 'Обращения по персональным данным',
+    },
+    en: {
+      title: 'Personal data controller',
+      name: 'Daniil Olegovich Khabibulin (Хабибулин Даниил Олегович)',
+      status: 'Self-employed individual, payer of Russian professional income tax',
+      taxLabel: 'Russian tax identification number (INN)',
+      addressLabel: 'Address as provided by the controller',
+      address: '461332, Крючковка, село Луговая, улица 5, 4',
+      contactLabel: 'Personal data requests',
+    },
+    taxId: '562361007144',
+    privacyEmail: 'heyhubbabubbapr@gmail.com',
+    supportEmail: 'support@hubba-cloud.ru',
   },
 };
