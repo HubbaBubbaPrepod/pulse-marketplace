@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-17 — Google user data disclosure
+
+- Add the explicit Google API Services User Data Policy and Limited Use undertaking in RU/EN privacy policies.
+- Clarify the Google user data fields, human access limits and visible policy revision date.
+
 ## 2026-10-16 — Public marketplace SEO
 
 - Enable indexing for the catalog, developer documentation and published modules while retaining private-page noindex.

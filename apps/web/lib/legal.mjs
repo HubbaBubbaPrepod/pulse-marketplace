@@ -1,5 +1,5 @@
 export const legal = {
-  updated: '2026-10-16',
+  updated: '2026-10-17',
   documents: {
     privacy: {
       ru: {
@@ -59,9 +59,9 @@ export const legal = {
           },
           {
             id: 'google-access',
-            title: 'Доступ к данным Google',
+            title: 'Доступ к данным пользователей Google',
             paragraphs: [
-              'Pulse Marketplace использует Google OpenID Connect только для входа в аккаунт и его явной привязки. Запрашиваемые разрешения: openid и profile. Из подтверждённого ID-токена приложение использует уникальный идентификатор Google (sub) и отображаемое имя (name, если Google его предоставил).',
+              'Pulse Marketplace использует Google OpenID Connect только для входа в аккаунт и его явной привязки. Запрашиваемые разрешения: openid и profile. Данные пользователя Google (Google user data), которые приложение использует и сохраняет, включают уникальный идентификатор Google (sub) и отображаемое имя (name, если Google его предоставил), полученные из подтверждённого ID-токена.',
               'Разрешение profile может возвращать и другие базовые сведения профиля, например ссылку на фото. Текущая реализация не сохраняет и не использует фото, дату рождения или пол. Разрешение email не запрашивается, адрес Google-почты для входа не требуется. У приложения нет доступа к Gmail, Google Drive, контактам, календарю, паролю Google или закрытым репозиториям GitHub.',
               'На время входа сервер проверяет ID-токен и параметры безопасности протокола. Долгосрочное хранение Google access token, refresh token или ID-токена в базе аккаунтов не выполняется. Идентификатор Google и имя сохраняются в базе Pulse Marketplace.',
             ],
@@ -73,6 +73,14 @@ export const legal = {
               'Идентификатор Google связывает повторные входы с одним аккаунтом Pulse Marketplace. Имя используется для отображения аккаунта в интерфейсе. Привязка к уже существующему аккаунту выполняется отдельным действием пользователя; совпадение email не объединяет аккаунты автоматически.',
               'Эти данные нужны для доступа к кабинету, разрешённым аккаунту действиям и поддержки входа. Google-вход сам по себе не доказывает владение GitHub-репозиторием: авторство модуля проверяется отдельно через GitHub.',
               'Google-данные не используются для рекламы, перепродажи, определения кредитоспособности, построения рекламных профилей или обучения моделей искусственного интеллекта. Приложение не использует Google Workspace API. Новые разрешения и другие цели обработки не вводятся без необходимого информирования и разрешения пользователя.',
+              [
+                'Использование приложением Pulse Marketplace информации, полученной из Google API, и её передача любому другому приложению осуществляются в соответствии с ',
+                {
+                  text: 'Google API Services User Data Policy',
+                  href: 'https://developers.google.com/terms/api-services-user-data-policy',
+                },
+                ', включая требования Limited Use (ограниченного использования).',
+              ],
             ],
           },
           {
@@ -80,7 +88,7 @@ export const legal = {
             title: 'Предоставление и раскрытие данных Google',
             paragraphs: [
               'Google-идентификатор и привязка Google не публикуются в каталоге, не включаются в установочные JSON-пакеты и не передаются авторам модулей, Monitor или агентам. Само отображаемое имя аккаунта не используется как публичное имя владельца GitHub-модуля.',
-              'Владелец сервиса может получить доступ к записям аккаунта для администрирования, защиты сервиса и рассмотрения вашего обращения. Инфраструктура сервера хранит базу и резервные копии для работы и восстановления Marketplace. Иных получателей Google-данных для рекламы, аналитики или продажи нет.',
+              'Доступ человека к Google user data допускается с предварительного явного согласия пользователя на просмотр конкретных данных, при необходимости обеспечения безопасности или исполнения применимого закона. Рассмотрение обращения не означает разрешения на произвольный просмотр данных. Инфраструктура сервера хранит базу и резервные копии для работы и восстановления Marketplace. Иных получателей Google-данных для рекламы, аналитики или продажи нет.',
               'Сам Google обрабатывает вход по собственной политике. Сведения могут предоставляться в объёме, который требуется применимым законом или необходим для защиты от злоупотреблений; это не разрешение на произвольную передачу данных. Обработка у внешних провайдеров может происходить за пределами вашей страны.',
             ],
           },
@@ -231,9 +239,9 @@ export const legal = {
           },
           {
             id: 'google-access',
-            title: 'Access to Google data',
+            title: 'Access to Google user data',
             paragraphs: [
-              'Pulse Marketplace uses Google OpenID Connect only to sign in and explicitly link an identity. The requested scopes are openid and profile. From the verified ID token, the application uses the unique Google identifier (sub) and display name (name, if supplied by Google).',
+              'Pulse Marketplace uses Google OpenID Connect only to sign in and explicitly link an identity. The requested scopes are openid and profile. The Google user data used and stored by the application consists of the unique Google identifier (sub) and display name (name, if supplied by Google), received from the verified ID token.',
               'The profile scope may return other basic profile information, such as a photo URL. The current implementation does not store or use the photo, date of birth or gender. The email scope is not requested and a Google email address is not required for sign-in. The application cannot access Gmail, Google Drive, contacts, calendars, your Google password or private GitHub repositories.',
               'During sign-in, the server validates the ID token and protocol security parameters. Google access tokens, refresh tokens and ID tokens are not persisted in the account database. The Google identifier and display name are stored in the Pulse Marketplace database.',
             ],
@@ -245,6 +253,14 @@ export const legal = {
               'The Google identifier associates repeat sign-ins with the same Pulse Marketplace account. The name identifies the account in the interface. Linking an existing account requires a separate user action; matching emails do not automatically merge accounts.',
               'These data support workspace access, authorized account actions and sign-in support. Google sign-in alone does not establish ownership of a GitHub repository: module authorship is checked separately through GitHub.',
               'Google data is not used for advertising, resale, creditworthiness assessment, advertising profiles or training artificial intelligence models. The application does not use Google Workspace APIs. New permissions or processing purposes require the necessary notice and user authorization.',
+              [
+                'Pulse Marketplace’s use and transfer to any other app of information received from Google APIs will adhere to the ',
+                {
+                  text: 'Google API Services User Data Policy',
+                  href: 'https://developers.google.com/terms/api-services-user-data-policy',
+                },
+                ', including the Limited Use requirements.',
+              ],
             ],
           },
           {
@@ -252,7 +268,7 @@ export const legal = {
             title: 'Disclosure of Google data',
             paragraphs: [
               'The Google identifier and identity link are not published in the catalog, embedded in installation JSON packages or shared with module authors, Monitor or agents. An account display name is not used as the public GitHub module owner name.',
-              'The service operator may access account records for administration, service protection and your support requests. Server infrastructure stores the database and backups to operate and recover Marketplace. No other recipients receive Google data for advertising, analytics or sale.',
+              'Human access to Google user data is limited to the user’s prior affirmative agreement to view specific data, security needs or compliance with applicable law. A support request does not authorize unrestricted access to data. Server infrastructure stores the database and backups to operate and recover Marketplace. No other recipients receive Google data for advertising, analytics or sale.',
               'Google processes sign-in under its own privacy policy. Information may be disclosed to the extent required by applicable law or necessary to address abuse; this is not authorization for arbitrary disclosure. External providers may process data outside your country.',
             ],
           },
@@ -784,14 +800,14 @@ export const legal = {
   labels: {
     ru: {
       eyebrow: 'PULSE / ДОКУМЕНТЫ',
-      updated: 'Редакция от 16 октября 2026',
+      updated: 'Редакция от 17 октября 2026',
       contents: 'На этой странице',
       navigation: 'Документы и контакты',
       contact: 'Связаться с владельцем',
     },
     en: {
       eyebrow: 'PULSE / DOCUMENTS',
-      updated: 'Updated October 16, 2026',
+      updated: 'Last updated: October 17, 2026',
       contents: 'On this page',
       navigation: 'Policies and contacts',
       contact: 'Contact the operator',
