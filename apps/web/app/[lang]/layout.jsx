@@ -1,4 +1,5 @@
 import '../legal.css';
+import { origin } from '../../lib/seo.mjs';
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { Geist, Geist_Mono } from 'next/font/google';
@@ -9,6 +10,8 @@ import '../globals.css';
 const sans = Geist({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
 const mono = Geist_Mono({ subsets: ['latin'], variable: '--font-mono', display: 'swap' });
 export const metadata = {
+  metadataBase: new URL(origin),
+  applicationName: 'Pulse Marketplace',
   title: { default: 'Pulse Marketplace', template: '%s · Pulse Marketplace' },
   description: 'Open-source modules for your self-hosted Pulse infrastructure.',
   robots: { index: false, follow: false },

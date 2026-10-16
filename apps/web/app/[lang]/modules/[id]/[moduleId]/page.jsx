@@ -1,20 +1,28 @@
 import Link from 'next/link';
+import { cache } from 'react';
+import { publicMetadata, modulePath, moduleSchema, pageSchema } from '../../../../../lib/seo.mjs';
+import { StructuredData } from '../../../../../components/structured-data';
 import { notFound } from 'next/navigation';
 import { api, ApiError } from '../../../../../lib/server-api';
 import { accountCopy } from '../../../../../lib/account-copy.mjs';
 import { ModuleArt } from '../../../../../components/module-art';
-async function load(owner, id) {
+const load = cache(async (owner, id) => {
   try {
     return await api(`/modules/${encodeURIComponent(owner)}/${encodeURIComponent(id)}`);
   } catch (error) {
     if (error instanceof ApiError && error.status === 404) notFound();
     throw error;
   }
-}
+});
 export async function generateMetadata({ params }) {
-  const { id, moduleId } = await params;
+  const { lang, id, moduleId } = await params;
   const value = await load(id, moduleId);
-  return { title: value.module.name, description: value.module.description };
+  return publicMetadata(
+    lang,
+    modulePath(value.module.owner, value.module.id),
+    value.module.name,
+    value.module.description,
+  );
 }
 export default async function Page({ params }) {
   const { lang, id, moduleId } = await params,
@@ -25,10 +33,19 @@ export default async function Page({ params }) {
   return (
     <div className="page-container">
       <article className="package-detail">
+        <StructuredData
+          data={pageSchema(
+            lang,
+            modulePath(selectedModule.owner, selectedModule.id),
+            selectedModule.name,
+            selectedModule.description,
+          )}
+        />
+        <StructuredData data={moduleSchema(lang, selectedModule)} />
         <Link className="back-link" href={`/${lang}/`}>
           ← {lang === 'ru' ? 'Каталог' : 'Catalog'}
         </Link>
-        <ModuleArt id={selectedModule.id} large />
+        <ModuleArt id={selectedModule.id} large priority />
         <span className="eyebrow">
           {selectedModule.owner} / {selectedModule.id}
         </span>

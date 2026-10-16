@@ -1,4 +1,7 @@
+import { notFound } from 'next/navigation';
 import { ViewTransition } from 'react';
+import { StructuredData } from '../../components/structured-data';
+import { catalogMetadata, pageSchema, seoCopy } from '../../lib/seo.mjs';
 import Link from 'next/link';
 import { Hero } from '../../components/hero';
 import { Catalog } from '../../components/catalog';
@@ -7,22 +10,26 @@ import { catalogRows } from '../../lib/server-api';
 import { catalogModule } from '../../lib/api-catalog.mjs';
 import { accountCopy } from '../../lib/account-copy.mjs';
 import { copy, pathFor } from '../../lib/copy.mjs';
-export async function generateMetadata({ params }) {
+export async function generateMetadata({ params, searchParams }) {
   const { lang } = await params;
-  return { title: copy[lang]?.catalog || 'Catalog' };
+  if (!seoCopy[lang]) return {};
+  return catalogMetadata(lang, await searchParams);
 }
 export default async function Page({ params, searchParams }) {
   const { lang } = await params,
     query = await searchParams;
+  if (!seoCopy[lang]) notFound();
   const filters = parseFilters(
     new URLSearchParams(
       Object.entries(query).flatMap(([k, v]) => (typeof v === 'string' ? [[k, v]] : [])),
     ),
   );
-  let modules = [],
+  let rows = [],
+    modules = [],
     unavailable = false;
   try {
-    modules = (await catalogRows()).map(catalogModule);
+    rows = await catalogRows();
+    modules = rows.map(catalogModule);
   } catch {
     unavailable = true;
   }
@@ -33,6 +40,15 @@ export default async function Page({ params, searchParams }) {
       default="none"
     >
       <div className="page-container">
+        <StructuredData
+          data={pageSchema(
+            lang,
+            '',
+            seoCopy[lang].title,
+            seoCopy[lang].description,
+            unavailable || Object.keys(query).length ? undefined : rows,
+          )}
+        />
         <Hero lang={lang} />
         <section className="service-about" aria-labelledby="service-about-title">
           <h2 id="service-about-title">{copy[lang].serviceTitle}</h2>

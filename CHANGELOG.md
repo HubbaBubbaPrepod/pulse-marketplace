@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-16 — Public marketplace SEO
+
+- Enable indexing for the catalog, developer documentation and published modules while retaining private-page noindex.
+- Add localized canonical/hreflang metadata, Open Graph/Twitter previews and server-rendered JSON-LD.
+- Add robots.txt and a live sitemap sourced exclusively from published modules; exclude query variants and account routes.
+- Deduplicate module metadata/body lookups per request and prioritize detail artwork.
+- Permanently redirect the root to the existing Russian homepage.
+
 ## 2026-10-16 — Legal navigation and public policy
 
 - Link privacy and publishing references directly within document paragraphs.

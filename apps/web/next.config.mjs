@@ -38,7 +38,7 @@ const nextConfig = {
             },
           ]
         : []),
-      { source: '/', destination: '/ru/', permanent: false },
+      { source: '/', destination: '/ru/', permanent: true },
     ];
   },
 };

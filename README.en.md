@@ -70,3 +70,11 @@ The public installation uses Nginx and HTTPS, systemd services, request limits a
 - `docs/frontend-requirements.md` — interface and motion requirements.
 
 Module artwork illustrates the interface; it is not an official logo or an endorsement by the depicted projects.
+
+## Search indexing
+
+The public catalog, published modules, developer documentation and legal pages provide RU/EN canonicals, hreflang, Open Graph and server-rendered JSON-LD. Authentication, recovery, author workspaces and moderation retain `noindex`. Search/filter variants do not create independently indexable catalog copies.
+
+Sitemap: <https://marketplace.hubba-cloud.ru/sitemap.xml>. It uses the current published catalog, excluding pending and withdrawn versions. `lastmod` reflects the version review date or legal revision date, never the time of each request. An unavailable API does not become a successful empty sitemap.
+
+After deployment, submit the sitemap in Search Console and Yandex Webmaster for this domain. Markup guarantees neither rich results nor rankings; ratings and reviews are never invented. Field Core Web Vitals require separate measurement once visitor data is available.
