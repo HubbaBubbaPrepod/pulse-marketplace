@@ -28,6 +28,7 @@ export function modulePath(owner, id) {
 }
 export function publicMetadata(lang, path, title, description, index = true) {
   const canonical = absoluteUrl(lang, path);
+  const brandedTitle = title.includes('Pulse Marketplace') ? title : `${title} · Pulse Marketplace`;
   const images = [
     {
       url: `${origin}/social-preview/`,
@@ -37,7 +38,7 @@ export function publicMetadata(lang, path, title, description, index = true) {
     },
   ];
   return {
-    title,
+    title: { absolute: brandedTitle },
     description,
     alternates: {
       canonical,
@@ -64,7 +65,7 @@ export function publicMetadata(lang, path, title, description, index = true) {
     openGraph: {
       type: 'website',
       siteName: 'Pulse Marketplace',
-      title: `${title} · Pulse Marketplace`,
+      title: brandedTitle,
       description,
       url: canonical,
       locale: lang === 'ru' ? 'ru_RU' : 'en_US',
@@ -73,7 +74,7 @@ export function publicMetadata(lang, path, title, description, index = true) {
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${title} · Pulse Marketplace`,
+      title: brandedTitle,
       description,
       images: [images[0].url],
     },

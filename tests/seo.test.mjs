@@ -28,6 +28,7 @@ test('public pages provide canonical language alternatives and social metadata',
   );
   assert.equal(result?.openGraph.locale, 'en_US');
   assert.equal(result?.twitter.card, 'summary_large_image');
+  assert.equal(result?.title.absolute, 'Build modules · Pulse Marketplace');
 });
 
 test('search and filter variants do not compete with the canonical catalog', () => {
