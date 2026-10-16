@@ -1,15 +1,15 @@
 import { notFound } from 'next/navigation';
 import { ViewTransition } from 'react';
-import { StructuredData } from '../../components/structured-data';
-import { catalogMetadata, pageSchema, seoCopy } from '../../lib/seo.mjs';
+import { StructuredData } from '../../../components/structured-data';
+import { catalogMetadata, pageSchema, seoCopy } from '../../../lib/seo.mjs';
 import Link from 'next/link';
-import { Hero } from '../../components/hero';
-import { Catalog } from '../../components/catalog';
-import { parseFilters } from '../../lib/catalog.mjs';
-import { catalogRows } from '../../lib/server-api';
-import { catalogModule } from '../../lib/api-catalog.mjs';
-import { accountCopy } from '../../lib/account-copy.mjs';
-import { copy, pathFor } from '../../lib/copy.mjs';
+import { Hero } from '../../../components/hero';
+import { Catalog } from '../../../components/catalog';
+import { parseFilters } from '../../../lib/catalog.mjs';
+import { catalogRows } from '../../../lib/server-api';
+import { catalogModule } from '../../../lib/api-catalog.mjs';
+import { accountCopy } from '../../../lib/account-copy.mjs';
+import { copy, pathFor } from '../../../lib/copy.mjs';
 export async function generateMetadata({ params, searchParams }) {
   const { lang } = await params;
   if (!seoCopy[lang]) return {};

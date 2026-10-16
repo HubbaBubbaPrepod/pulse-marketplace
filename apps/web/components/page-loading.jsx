@@ -1,7 +1,7 @@
 'use client';
 import { ViewTransition } from 'react';
 import { useParams } from 'next/navigation';
-import { CatalogSkeleton } from '../../components/skeleton';
+import { CatalogSkeleton } from './skeleton';
 export default function Loading() {
   const params = useParams();
   return (

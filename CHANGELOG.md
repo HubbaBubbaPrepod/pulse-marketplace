@@ -4,6 +4,7 @@
 
 - Add the explicit Google API Services User Data Policy and Limited Use undertaking in RU/EN privacy policies.
 - Clarify the Google user data fields, human access limits and visible policy revision date.
+- Scope interface loading boundaries so legal content is visible in the initial HTML without JavaScript; retain skeletons in application sections.
 
 ## 2026-10-16 — Public marketplace SEO
 
