@@ -15,6 +15,16 @@ import { Database } from '../database/database.service.js';
 import { CONFIG, type Config } from '../config.js';
 import { SnapshotStore } from '../packages/snapshot-store.mjs';
 import type { CatalogModule as PublishedModule } from '@pulse-marketplace/contracts';
+
+// Versions use the package grammar: major.minor.patch with one optional suffix.
+const releaseOrder = `split_part(version,'.',1)::numeric DESC,
+  split_part(version,'.',2)::numeric DESC,
+  split_part(split_part(version,'.',3),'-',1)::numeric DESC,
+  (position('-' in version)=0) DESC,
+  (split_part(version,'-',2) ~ '^[0-9]+$') ASC,
+  CASE WHEN split_part(version,'-',2) ~ '^[0-9]+$' THEN split_part(version,'-',2)::numeric END DESC,
+  split_part(version,'-',2) COLLATE "C" DESC`;
+
 @Controller()
 export class CatalogController {
   private readonly snapshots: SnapshotStore;
@@ -32,7 +42,7 @@ export class CatalogController {
     @Res({ passthrough: true }) response: Response,
   ) {
     const result = await this.db.pool.query(
-      "WITH latest AS (SELECT DISTINCT ON (lower(owner),module_id) * FROM revisions WHERE status='approved' ORDER BY lower(owner),module_id,reviewed_at DESC,id DESC) SELECT r.*,p.size,repo.name AS repository_name FROM latest r JOIN packages p ON p.sha256=r.sha256 JOIN repositories repo ON repo.id=r.repository_id WHERE ($1='' OR r.manifest->>'name' ILIKE $2 OR r.manifest->>'description' ILIKE $2) AND ($3='' OR r.platforms ? $3) AND ($4='' OR r.id::text>$4) ORDER BY r.id LIMIT 31",
+      `WITH latest AS (SELECT DISTINCT ON (lower(owner),module_id) * FROM revisions WHERE status='approved' ORDER BY lower(owner),module_id,${releaseOrder},reviewed_at DESC,id DESC) SELECT r.*,p.size,repo.name AS repository_name FROM latest r JOIN packages p ON p.sha256=r.sha256 JOIN repositories repo ON repo.id=r.repository_id WHERE ($1='' OR r.manifest->>'name' ILIKE $2 OR r.manifest->>'description' ILIKE $2) AND ($3='' OR r.platforms ? $3) AND ($4='' OR r.id::text>$4) ORDER BY r.id LIMIT 31`,
       [
         String(query).slice(0, 128),
         `%${String(query).slice(0, 128)}%`,
@@ -93,7 +103,7 @@ export class CatalogController {
   @Get('modules/:owner/:id')
   async module(@Param('owner') owner: string, @Param('id') id: string) {
     const result = await this.db.pool.query(
-      "SELECT r.*,p.size,repo.name AS repository_name FROM revisions r JOIN packages p ON p.sha256=r.sha256 JOIN repositories repo ON repo.id=r.repository_id WHERE r.status='approved' AND lower(r.owner)=lower($1) AND r.module_id=$2 ORDER BY r.reviewed_at DESC LIMIT 100",
+      `SELECT r.*,p.size,repo.name AS repository_name FROM revisions r JOIN packages p ON p.sha256=r.sha256 JOIN repositories repo ON repo.id=r.repository_id WHERE r.status='approved' AND lower(r.owner)=lower($1) AND r.module_id=$2 ORDER BY ${releaseOrder},r.reviewed_at DESC LIMIT 100`,
       [owner, id],
     );
     if (!result.rowCount) throw new NotFoundException();

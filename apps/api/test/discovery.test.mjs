@@ -69,7 +69,8 @@ test('discovery is durable, idempotent, pinned and creates pending revisions aft
       };
       yield {
         id: '2',
-        tag_name: 'v1.0.2',
+        tag_name: `v${manifest.version}`,
+        prerelease: manifest.version.includes('-'),
         assets: [{ id: '3', name: 'module.json', size: bytes.length }],
       };
     },
@@ -137,6 +138,19 @@ test('discovery is durable, idempotent, pinned and creates pending revisions aft
         .n,
       0,
     );
+    ownerType = 'User';
+    ownerId = '101';
+    manifest.version = '2.0.0-alpha1';
+    bytes = Buffer.from(JSON.stringify(manifest));
+    await db.pool.query('UPDATE discovery_jobs SET next_check_at=now()');
+    assert.equal((await discovery.runOnce()).staged, 1);
+    const preview = (
+      await db.pool.query(
+        "SELECT status,validation_passed FROM revisions WHERE version='2.0.0-alpha1'",
+      )
+    ).rows[0];
+    assert.equal(preview.status, 'pending');
+    assert.equal(preview.validation_passed, true);
     const lock = await db.pool.connect();
     try {
       await lock.query('SELECT pg_advisory_lock(831974002)');

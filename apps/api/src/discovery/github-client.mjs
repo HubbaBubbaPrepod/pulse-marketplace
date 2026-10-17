@@ -89,8 +89,7 @@ export class GitHubClient {
     for (let page = 1; ; page++) {
       const items = await this.json(`${this.path(repository)}/releases?per_page=100&page=${page}`);
       if (!Array.isArray(items)) throw new Error('Invalid release list');
-      for (const item of items)
-        if (!item.draft && !item.prerelease && /^\d+$/.test(String(item.id))) yield item;
+      for (const item of items) if (!item.draft && /^\d+$/.test(String(item.id))) yield item;
       if (items.length < 100) return;
     }
   }

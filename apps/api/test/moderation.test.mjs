@@ -177,6 +177,22 @@ test('moderation binds approvals to digest, checks roles inside the transaction 
         await db.pool.query('UPDATE identities SET user_id=$1 WHERE user_id=$2', [admin, owner]);
       }
     }
+    for (const version of ['2.0.0-alpha1', '1.0.7']) {
+      const next = (
+        await db.pool.query(
+          'INSERT INTO revisions(repository_id,source_owner_id,owner,module_id,version,release_id,asset_id,tag,commit_sha,sha256,manifest,platforms,validation_passed) SELECT repository_id,source_owner_id,owner,module_id,$2,$2,$2,$2,commit_sha,sha256,manifest,platforms,true FROM revisions WHERE id=$1 RETURNING id',
+          [revision, version],
+        )
+      ).rows[0].id;
+      if (version.includes('-'))
+        assert.equal((await (await fetch(`${base}/catalog`)).json()).items[0].version, '1.0.6');
+      await review.decide(admin, next, hash, 'approve', 'Review release channel');
+    }
+    assert.equal((await (await fetch(`${base}/catalog`)).json()).items[0].version, '2.0.0-alpha1');
+    assert.equal(
+      (await (await fetch(`${base}/modules/Owner/docker`)).json()).versions[0].version,
+      '2.0.0-alpha1',
+    );
   } finally {
     if (app) await app.close();
     await pool.query(`DROP SCHEMA "${schema}" CASCADE`);

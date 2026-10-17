@@ -1,3 +1,8 @@
+## Unreleased / Не выпущено
+
+- Discover non-draft preview releases and queue them for the same immutable-package moderation as stable releases. / Предварительные релизы поступают на модерацию наравне со стабильными; черновики пропускаются.
+- Select the newest published version by its version number, not the date of approval. / Последняя опубликованная версия определяется номером, а не датой одобрения.
+
 # Changelog
 
 ## 2026-10-17 — Google user data disclosure

@@ -114,7 +114,6 @@ export class Discovery implements OnModuleInit, OnModuleDestroy {
     for await (const release of this.github.releases(repository)) {
       if (
         release.draft ||
-        release.prerelease ||
         !/^v?[0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9-]+)?$/.test(release.tag_name) ||
         !Array.isArray(release.assets)
       )
