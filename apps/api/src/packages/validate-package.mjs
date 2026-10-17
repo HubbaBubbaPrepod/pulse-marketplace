@@ -1,3 +1,4 @@
+import { validateV2Package } from './validate-v2.mjs';
 import { createHash } from 'node:crypto';
 const idPattern = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/;
 const versionPattern = /^[0-9]+\.[0-9]+\.[0-9]+(?:-[a-zA-Z0-9-]+)?$/;
@@ -75,6 +76,12 @@ export function validatePackage(raw, expected = {}) {
     value = JSON.parse(raw.toString('utf8'));
   } catch {
     return failure('package', 'invalid_json');
+  }
+  if (value?.schemaVersion === 2) {
+    const result = validateV2Package(raw, value, expected, validatePackage);
+    return result.ok
+      ? { ...result, sha256: createHash('sha256').update(raw).digest('hex'), size: raw.length }
+      : result;
   }
   if (
     !keys(value, [

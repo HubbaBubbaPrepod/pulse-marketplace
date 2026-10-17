@@ -98,3 +98,97 @@ test('discovery marker accepts only a simple asset name, never a URL or path', (
     assert.equal(validateMarker({ schemaVersion: 1, moduleId: 'docker', packageAsset }).ok, false);
   }
 });
+function fixtureV2() {
+  const legacy = fixture();
+  return {
+    ...Object.fromEntries(
+      Object.entries(legacy).filter(([k]) => !['fields', 'views', 'binaries'].includes(k)),
+    ),
+    schemaVersion: 2,
+    protocol: 2,
+    components: [
+      {
+        id: 'engine',
+        location: 'agent',
+        protocol: 2,
+        requires: [],
+        fields: [],
+        triggers: [
+          { type: 'interval', seconds: 5 },
+          {
+            type: 'manual',
+            action: 'logs',
+            inputKey: 'containerId',
+            inputFields: [{ key: 'containerId', type: 'text', required: true }],
+            resultView: 'logs',
+          },
+        ],
+        views: [
+          {
+            kind: 'table',
+            key: 'containers',
+            rowKey: 'id',
+            actions: ['logs'],
+            columns: [{ key: 'id' }],
+          },
+        ],
+        binaries: legacy.binaries,
+      },
+    ],
+  };
+}
+test('v2 packages expose component metadata without executable content', () => {
+  const result = validatePackage(bytes(fixtureV2()), { moduleId: 'docker', tag: 'v1.0.2' });
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.platforms, ['linux-amd64']);
+  assert.equal(result.manifest.components[0].location, 'agent');
+  assert.equal(Object.hasOwn(result.manifest.components[0], 'binaries'), false);
+});
+test('v2 rejects invalid grants, triggers, selectors, defaults and binary identity', () => {
+  for (const edit of [
+    (p) => (p.components[0].requires = ['state.*']),
+    (p) => (p.components[0].triggers = [{ type: 'event', events: ['server.offline'] }]),
+    (p) => (p.components[0].triggers[0].seconds = 1),
+    (p) => (p.components[0].views[0].actions = ['undeclared']),
+    (p) => (p.components[0].fields = [{ key: 'token', type: 'password', default: 'secret' }]),
+    (p) => (p.components[0].binaries['linux-amd64'].sha256 = '0'.repeat(64)),
+    (p) => p.components.push({ ...p.components[0] }),
+    (p) => (p.components[0].triggers[1].when = { key: 'state', values: [] }),
+    (p) => (p.components[0].triggers[1].inputKey = 'missing'),
+  ]) {
+    const p = fixtureV2();
+    edit(p);
+    assert.equal(validatePackage(bytes(p)).ok, false);
+  }
+});
+test('v2 rejects duplicate and null members before package interpretation', () => {
+  const raw = bytes(fixtureV2()).toString();
+  assert.equal(
+    validatePackage(
+      Buffer.from(raw.replace('"schemaVersion":2', '"schemaVersion":2,"schemaVersion":2')),
+    ).ok,
+    false,
+  );
+  assert.equal(
+    validatePackage(Buffer.from(raw.replace('"requires":[]', '"requires":null'))).ok,
+    false,
+  );
+});
+test('v2 component identities are unique across case-insensitive filesystems', () => {
+  const p = fixtureV2();
+  p.components.push({ ...p.components[0], id: p.components[0].id.toUpperCase() });
+  assert.equal(validatePackage(bytes(p)).ok, false);
+});
+test('v2 stripped metadata stays within the Monitor private reader bound', () => {
+  const p = fixtureV2();
+  const component = p.components[0];
+  component.fields = Array.from({ length: 32 }, (_, i) => ({
+    key: `field${i}`,
+    type: 'text',
+    default: 'x'.repeat(4096),
+  }));
+  p.components = Array.from({ length: 16 }, (_, i) => ({ ...component, id: `component${i}` }));
+  const result = validatePackage(bytes(p));
+  assert.equal(result.ok, false);
+  assert.equal(result.issues[0].code, 'metadata_too_large');
+});

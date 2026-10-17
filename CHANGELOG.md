@@ -30,7 +30,9 @@
 - Add development-only author and moderation workspaces, local repository drafts, revision checks and preview decision history in RU/EN.
 - No backend API or module protocol changes in this milestone.
 
-## Unreleased — API integration
+## Unreleased
+
+- Validate v2 multi-component packages without execution; retain v1 snapshots, expose runtime/capability metadata and reject ambiguous JSON, case aliases and unreadable manifest sizes. — API integration
 
 - Formalize the RU/EN privacy policies with definitions, legal grounds, numbered clauses and approved operator details while retaining Google disclosures.
 

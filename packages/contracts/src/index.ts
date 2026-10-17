@@ -21,6 +21,10 @@ export interface SessionInfo {
   csrfToken: string | null;
 }
 export interface CatalogModule {
+  schemaVersion?: 1 | 2;
+  runtimes?: Array<'agent' | 'monitor'>;
+  capabilities?: string[];
+  triggers?: Array<'manual' | 'interval' | 'event'>;
   owner: string;
   id: string;
   name: string;

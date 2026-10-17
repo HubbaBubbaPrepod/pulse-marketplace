@@ -54,6 +54,27 @@ export class CatalogController {
   }
   private publicRow(row: Record<string, any>): PublishedModule {
     return {
+      schemaVersion: row.manifest.schemaVersion === 2 ? 2 : 1,
+      ...(row.manifest.schemaVersion === 2
+        ? {
+            runtimes: [...new Set(row.manifest.components.map((c: any) => c.location))] as Array<
+              'agent' | 'monitor'
+            >,
+            capabilities: [
+              ...new Set(
+                row.manifest.components.flatMap((c: any) => [
+                  ...(c.requires || []),
+                  ...(c.triggers.some((t: any) => t.mutating) ? ['actions.execute'] : []),
+                ]),
+              ),
+            ] as string[],
+            triggers: [
+              ...new Set(
+                row.manifest.components.flatMap((c: any) => c.triggers.map((t: any) => t.type)),
+              ),
+            ] as Array<'manual' | 'interval' | 'event'>,
+          }
+        : {}),
       owner: row.owner,
       id: row.module_id,
       name: row.manifest.name,
