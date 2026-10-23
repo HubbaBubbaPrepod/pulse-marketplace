@@ -86,7 +86,9 @@ export class GitHubClient {
     return JSON.parse(bytes.toString('utf8'));
   }
   async *releases(repository) {
-    for (let page = 1; ; page++) {
+    // Retain published versions independently; discovery examines only the
+    // newest 100 GitHub releases instead of downloading unbounded history.
+    for (let page = 1; page <= 1; page++) {
       const items = await this.json(`${this.path(repository)}/releases?per_page=100&page=${page}`);
       if (!Array.isArray(items)) throw new Error('Invalid release list');
       for (const item of items) if (!item.draft && /^\d+$/.test(String(item.id))) yield item;

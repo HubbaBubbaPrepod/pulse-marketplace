@@ -11,6 +11,7 @@ import type { Request, Response } from 'express';
 import { Database } from '../database/database.service.js';
 import { CONFIG, type Config } from '../config.js';
 import { DUMMY_HASH, verifyPassword } from './passwords.mjs';
+import { clientAddress } from './client-address.mjs';
 import type { Actor } from '@pulse-marketplace/contracts';
 export type { Actor } from '@pulse-marketplace/contracts';
 export interface AuthRequest extends Request {
@@ -43,9 +44,15 @@ export class Sessions {
     if (request.headers.origin !== this.config.origin || !request.is('application/json'))
       throw new ForbiddenException('Invalid request origin or content type');
   }
-  async rateLimit(_request: Request, action: string, limit = 30, subject?: string) {
+  async rateLimit(request: Request, action: string, limit = 30, subject?: string) {
+    const source = clientAddress(request, this.config.production);
+    await this.limitKey(digest(`source:${action}:${source}`), limit);
+    if (subject)
+      await this.limitKey(
+        digest(`subject:${action}:${action === 'login' ? source + ':' : ''}${subject}`),
+        limit,
+      );
     await this.limitKey(digest(`global:${action}`), 3000);
-    if (subject) await this.limitKey(digest(`subject:${action}:${subject}`), limit);
   }
   private async limitKey(key: string, limit: number) {
     const result = await this.db.pool.query(

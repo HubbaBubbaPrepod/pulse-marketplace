@@ -14,3 +14,18 @@ test('release discovery includes previews but excludes drafts', async () => {
     releases.push(release.id);
   assert.deepEqual(releases, [1, 2]);
 });
+
+test('release discovery bounds history requests even for repositories with many releases', async () => {
+  const client = new GitHubClient();
+  let pages = 0;
+  client.json = async () => {
+    pages++;
+    if (pages > 10) throw new Error('unbounded release scan');
+    return Array.from({ length: 100 }, (_, i) => ({ id: 100 * pages + i, draft: false }));
+  };
+  const releases = [];
+  for await (const release of client.releases({ fullName: 'owner/module' }))
+    releases.push(release.id);
+  assert.equal(releases.length, 100);
+  assert.equal(pages, 1);
+});

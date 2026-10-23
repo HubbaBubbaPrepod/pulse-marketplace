@@ -129,10 +129,7 @@ test('discovery is durable, idempotent, pinned and creates pending revisions aft
         "SELECT validation_passed,validation_issues FROM revisions WHERE source_owner_id='103'",
       )
     ).rows[0];
-    assert.equal(org.validation_passed, false);
-    assert.ok(
-      org.validation_issues.some((issue) => issue.code === 'organization_review_not_supported'),
-    );
+    assert.equal(org, undefined, 'unsupported owner must not persist package bytes or revisions');
     assert.equal(
       (await db.pool.query("SELECT count(*)::int n FROM revisions WHERE status<>'pending'")).rows[0]
         .n,

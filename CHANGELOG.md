@@ -1,3 +1,9 @@
+## Unreleased — security hardening / Усиление защиты
+
+- Reject invalid GitHub packages before persistence, bound release scans and snapshot disk usage. / Невалидные пакеты отклоняются до записи; ограничены обход релизов и хранилище.
+- Scope login limits by trusted source without locking other sources for the same account; blocked sources cannot exhaust the global budget. / Лимиты входа разделены по доверенному адресу; заблокированный источник не расходует общий бюджет.
+- Add HTML/API security headers and upgrade Next.js to 16.4.2. / Добавлены защитные заголовки HTML/API, Next.js обновлён до 16.4.2.
+
 ## Unreleased / Не выпущено
 
 - Discover non-draft preview releases and queue them for the same immutable-package moderation as stable releases. / Предварительные релизы поступают на модерацию наравне со стабильными; черновики пропускаются.

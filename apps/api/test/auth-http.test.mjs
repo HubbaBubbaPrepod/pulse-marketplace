@@ -7,7 +7,7 @@ import { AppModule } from '../dist/app.module.js';
 import { CONFIG } from '../dist/config.js';
 import { Database } from '../dist/database/database.service.js';
 import { derivePassword } from '../src/auth/passwords.mjs';
-import { digest } from '../dist/auth/session.service.js';
+import { digest, Sessions } from '../dist/auth/session.service.js';
 import { GITHUB_CLIENT } from '../dist/discovery/discovery.service.js';
 test('HTTP sessions enforce origin, CSRF, current roles, logout and repository ownership', async () => {
   const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
@@ -150,10 +150,16 @@ test('HTTP sessions enforce origin, CSRF, current roles, logout and repository o
     assert.equal((await request('/auth/logout', {}, cookie)).status, 403);
     assert.equal((await request('/auth/logout', {}, cookie, session.csrfToken)).status, 204);
     assert.equal((await request('/author/repositories', undefined, cookie)).status, 401);
-    await db.pool.query(
-      "INSERT INTO rate_limits(key,count,expires_at) VALUES ($1,31,now()+interval '15 minutes') ON CONFLICT(key) DO UPDATE SET count=31",
-      [digest('subject:login:author@example.test')],
-    );
+    let limited = false;
+    for (let i = 0; i < 31; i++) {
+      const denied = await request('/auth/login', { email: 'author@example.test', password: '' });
+      if (denied.status === 429) {
+        limited = true;
+        break;
+      }
+      assert.equal(denied.status, 401);
+    }
+    assert.equal(limited, true, 'one source can no longer send unlimited password attempts');
     assert.equal(
       (
         await request('/auth/login', {
@@ -163,6 +169,25 @@ test('HTTP sessions enforce origin, CSRF, current roles, logout and repository o
       ).status,
       429,
     );
+    // Exercise the actual password/session path against PostgreSQL: a
+    // blocked source must not prevent this account logging in elsewhere.
+    const sessions = app.get(Sessions);
+    const distinctSource = {
+      headers: { origin },
+      is: () => true,
+      socket: { remoteAddress: '192.0.2.20' },
+    };
+    assert.deepEqual(
+      await sessions.login(
+        distinctSource,
+        { cookie: () => {} },
+        { email: 'author@example.test', password: 'test-only-password-123' },
+      ),
+      { ok: true },
+    );
+    // This test owns an isolated schema; clear its source budget before the
+    // remaining moderator role assertions use the same loopback connection.
+    await db.pool.query('DELETE FROM rate_limits');
     const modLogin = await request('/auth/login', {
       email: 'mod@example.test',
       password: 'test-only-password-123',

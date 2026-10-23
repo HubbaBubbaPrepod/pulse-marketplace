@@ -142,6 +142,9 @@ export class Discovery implements OnModuleInit, OnModuleDestroy {
       const hash = createHash('sha256').update(bytes).digest('hex');
       const declaredDigestMatches = !asset.digest || asset.digest === `sha256:${hash}`;
       const individualOwner = repository.ownerType === 'User';
+      // Public discovery is untrusted input, not permission to consume disk.
+      // Invalid packages are rejected before saving their bytes or metadata.
+      if (!result.ok || !declaredDigestMatches || !individualOwner) continue;
       await new SnapshotStore(this.config.packageDirectory).put(bytes, hash);
       const [owner, name] = String(repository.fullName).split('/');
       const manifest =
