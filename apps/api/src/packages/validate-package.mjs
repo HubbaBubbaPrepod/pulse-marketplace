@@ -78,11 +78,28 @@ export function validatePackage(raw, expected = {}) {
     return failure('package', 'invalid_json');
   }
   if (value?.schemaVersion === 2) {
-    const result = validateV2Package(raw, value, expected, validatePackage);
+    const result = validateV2Package(raw, value, expected, validateMetadata, validateBinaries);
     return result.ok
       ? { ...result, sha256: createHash('sha256').update(raw).digest('hex'), size: raw.length }
       : result;
   }
+  const metadataResult = validateMetadata(value, expected);
+  if (!metadataResult.ok) return metadataResult;
+  const artifacts = validateBinaries(value.binaries);
+  if (!artifacts.ok) return artifacts;
+  const { permissions, fields, views } = metadataResult.manifest;
+  const { binaries, ...manifest } = value;
+  return {
+    ok: true,
+    manifest: { ...manifest, permissions, fields, views },
+    platforms: Object.keys(binaries),
+    sha256: createHash('sha256').update(raw).digest('hex'),
+    size: raw.length,
+    issues: [],
+  };
+}
+
+function validateMetadata(value, expected) {
   if (
     !keys(value, [
       'schemaVersion',
@@ -162,16 +179,20 @@ export function validatePackage(raw, expected = {}) {
         return failure('views.columns', 'invalid_column');
     }
   }
+  return { ok: true, manifest: { ...value, permissions, fields, views }, issues: [] };
+}
+
+function validateBinaries(binaries, runtime = 'native') {
   if (
-    !object(value.binaries) ||
-    Object.keys(value.binaries).length < 1 ||
-    Object.keys(value.binaries).length > 3
+    !object(binaries) ||
+    Object.keys(binaries).length < 1 ||
+    Object.keys(binaries).length > (runtime === 'wasip1' ? 1 : 3)
   )
     return failure('binaries', 'invalid_binaries');
   let total = 0;
-  for (const [platform, binary] of Object.entries(value.binaries)) {
+  for (const [platform, binary] of Object.entries(binaries)) {
     if (
-      !platforms.includes(platform) ||
+      !(runtime === 'wasip1' ? platform === 'wasip1-wasm' : platforms.includes(platform)) ||
       !keys(binary, ['sha256', 'content']) ||
       !text(binary.sha256, 64, true) ||
       !/^[a-f0-9]{64}$/i.test(binary.sha256) ||
@@ -192,16 +213,13 @@ export function validatePackage(raw, expected = {}) {
       return failure('binaries.content', 'size_limit');
     if (createHash('sha256').update(decoded).digest('hex') !== binary.sha256.toLowerCase())
       return failure('binaries.sha256', 'digest_mismatch');
-    if (!executableMatches(platform, decoded))
+    if (
+      runtime === 'wasip1'
+        ? decoded.length < 8 ||
+          !decoded.subarray(0, 8).equals(Buffer.from([0, 97, 115, 109, 1, 0, 0, 0]))
+        : !executableMatches(platform, decoded)
+    )
       return failure('binaries.content', 'platform_mismatch');
   }
-  const { binaries, ...manifest } = value;
-  return {
-    ok: true,
-    manifest: { ...manifest, permissions, fields, views },
-    platforms: Object.keys(binaries),
-    sha256: createHash('sha256').update(raw).digest('hex'),
-    size: raw.length,
-    issues: [],
-  };
+  return { ok: true, issues: [] };
 }

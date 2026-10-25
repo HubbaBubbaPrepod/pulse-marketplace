@@ -31,7 +31,9 @@ export async function catalogRows() {
   const items = [];
   let cursor = '';
   do {
-    const page = await api(`/catalog${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ''}`);
+    const page = await api(
+      `/catalog?runtime=all${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ''}`,
+    );
     items.push(...page.items);
     if (page.nextCursor === cursor) throw new ApiError(502);
     cursor = page.nextCursor;

@@ -192,3 +192,61 @@ test('v2 stripped metadata stays within the Monitor private reader bound', () =>
   assert.equal(result.ok, false);
   assert.equal(result.issues[0].code, 'metadata_too_large');
 });
+
+function fixtureWASI() {
+  const p = fixtureV2(),
+    artifact = Buffer.from([0, 97, 115, 109, 1, 0, 0, 0]);
+  p.components[0].runtime = 'wasip1';
+  p.components[0].requires = ['docker.read'];
+  p.components[0].optionalCapabilities = ['docker.logs', 'actions.execute', 'docker.control'];
+  p.components[0].triggers[1].requires = ['docker.logs'];
+  p.components[0].binaries = {
+    'wasip1-wasm': {
+      sha256: createHash('sha256').update(artifact).digest('hex'),
+      content: artifact.toString('base64'),
+    },
+  };
+  return p;
+}
+test('WASI metadata and optional grants survive stripping while artifacts remain private', () => {
+  const result = validatePackage(bytes(fixtureWASI()));
+  assert.equal(result.ok, true, JSON.stringify(result.issues));
+  assert.equal(result.manifest.components[0].runtime, 'wasip1');
+  assert.deepEqual(result.manifest.components[0].optionalCapabilities, [
+    'docker.logs',
+    'actions.execute',
+    'docker.control',
+  ]);
+  assert.deepEqual(result.manifest.components[0].triggers[1].requires, ['docker.logs']);
+  assert.equal(Object.hasOwn(result.manifest.components[0], 'binaries'), false);
+  assert.deepEqual(result.platforms, ['linux-amd64', 'linux-arm64', 'windows-amd64']);
+});
+test('WASI refuses mislabeled executables, raw network, undeclared actions and host defaults', () => {
+  for (const edit of [
+    (p) => (p.components[0].runtime = 'unknown'),
+    (p) => (p.components[0].runtime = 'native'),
+    (p) => (p.components[0].binaries = fixtureV2().components[0].binaries),
+    (p) =>
+      (p.components[0].binaries = {
+        'wasip1-wasm': fixtureV2().components[0].binaries['linux-amd64'],
+      }),
+    (p) => p.components[0].optionalCapabilities.push('network.outbound'),
+    (p) => (p.components[0].triggers[1].requires = ['notifications.telegram']),
+    (p) => (p.components[0].fields = [{ key: 'socket', type: 'text' }]),
+    (p) => {
+      p.components[0].location = 'monitor';
+      p.components[0].requires = [];
+      p.components[0].optionalCapabilities = [];
+      p.components[0].triggers = [{ type: 'interval', seconds: 5 }];
+      p.components[0].views = [];
+      p.components[0].fields = [{ key: 'telegramToken', type: 'password', default: 'private' }];
+    },
+  ]) {
+    const p = fixtureWASI();
+    edit(p);
+    assert.equal(validatePackage(bytes(p)).ok, false);
+  }
+  const p = fixtureWASI();
+  p.components[0].binaries['wasip1-wasm'].sha256 = '0'.repeat(64);
+  assert.equal(validatePackage(bytes(p)).ok, false);
+});

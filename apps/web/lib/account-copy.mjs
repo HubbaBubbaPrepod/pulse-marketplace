@@ -1,5 +1,14 @@
 export const accountCopy = {
   ru: {
+    executionRuntime: 'Среда выполнения',
+    nativeRuntime: 'Нативный код · полное доверие',
+    wasiRuntime: 'Изолированный WASI',
+    nativeWarning:
+      'Нативный код работает с правами хоста. Устанавливайте только модули авторов, которым доверяете.',
+    wasiWarning:
+      'WASI не получает прямой доступ к файлам, сети и процессам хоста. Запрошенные операции выполняет посредник после выдачи разрешений. Лимит линейной памяти — 128 MiB; время запуска — до 30 секунд.',
+    brokerCapabilities: 'Разрешения посредника (включая необязательные)',
+
     namePlaceholder: 'Как к вам обращаться',
     emailPlaceholder: 'you@example.com',
     passwordPlaceholder: 'Введите пароль',
@@ -75,6 +84,15 @@ export const accountCopy = {
     other: 'Другие',
   },
   en: {
+    executionRuntime: 'Execution runtime',
+    nativeRuntime: 'Native code · full trust',
+    wasiRuntime: 'Isolated WASI',
+    nativeWarning:
+      'Native code runs with host privileges. Install modules only from publishers you trust.',
+    wasiWarning:
+      'WASI has no direct access to host files, network or processes. A broker performs requested operations after grants are issued. Linear memory is limited to 128 MiB; each invocation runs for up to 30 seconds.',
+    brokerCapabilities: 'Broker capabilities (including optional grants)',
+
     namePlaceholder: 'Your display name',
     emailPlaceholder: 'you@example.com',
     passwordPlaceholder: 'Enter your password',

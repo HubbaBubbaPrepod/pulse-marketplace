@@ -21,6 +21,7 @@ export interface SessionInfo {
   csrfToken: string | null;
 }
 export interface CatalogModule {
+  executionRuntimes?: Array<'native' | 'wasip1'>;
   schemaVersion?: 1 | 2;
   runtimes?: Array<'agent' | 'monitor'>;
   capabilities?: string[];

@@ -274,6 +274,27 @@ export function AccountModeration({ lang, session, records, status = 'pending', 
                 </div>
               </dl>
               <p>{row.manifest.description}</p>
+              <h3>{t.executionRuntime}</h3>
+              {row.manifest.components?.length ? (
+                row.manifest.components.map((component) => (
+                  <div key={component.id}>
+                    <strong>
+                      {component.id} · {component.location} ·{' '}
+                      {component.runtime === 'wasip1' ? t.wasiRuntime : t.nativeRuntime}
+                    </strong>
+                    <p>{component.runtime === 'wasip1' ? t.wasiWarning : t.nativeWarning}</p>
+                    <p>
+                      {t.brokerCapabilities}:{' '}
+                      {[
+                        ...(component.requires ?? []),
+                        ...(component.optionalCapabilities ?? []),
+                      ].join(', ') || '—'}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p>{t.nativeWarning}</p>
+              )}
               <h3>{t.permissions}</h3>
               <ul>
                 {(row.manifest.permissions || []).map((permission) => (

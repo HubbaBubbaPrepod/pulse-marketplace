@@ -1,3 +1,8 @@
+## Unreleased — isolated modules / Изолированные модули
+
+- Validate explicit WASI artifacts and broker grants; preserve runtime metadata for moderation and public trust details. / Проверяются WASI-артефакты и разрешения посредника; runtime виден в модерации и карточках.
+- Default catalog queries to native-compatible versions; updated clients opt in with `runtime=all`. / Каталог сохраняет совместимость со старыми клиентами; новые явно запрашивают `runtime=all`.
+
 ## Unreleased — security hardening / Усиление защиты
 
 - Reject invalid GitHub packages before persistence, bound release scans and snapshot disk usage. / Невалидные пакеты отклоняются до записи; ограничены обход релизов и хранилище.

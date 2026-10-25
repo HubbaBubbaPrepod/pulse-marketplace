@@ -80,7 +80,7 @@ function unambiguousJSON(raw) {
     return false;
   }
 }
-export function validateV2Package(raw, value, expected, validateLegacy) {
+export function validateV2Package(raw, value, expected, validateMetadata, validateBinaries) {
   if (!unambiguousJSON(raw)) return invalid('package', 'ambiguous_json');
   if (
     !keys(value, [
@@ -109,6 +109,8 @@ export function validateV2Package(raw, value, expected, validateLegacy) {
     if (
       !keys(c, [
         'id',
+        'runtime',
+        'optionalCapabilities',
         'location',
         'protocol',
         'requires',
@@ -121,6 +123,7 @@ export function validateV2Package(raw, value, expected, validateLegacy) {
       seen.has(c.id.toLowerCase()) ||
       !['agent', 'monitor'].includes(c.location) ||
       c.protocol !== 2 ||
+      !['native', 'wasip1'].includes(c.runtime ?? 'native') ||
       !names(c.requires ?? []) ||
       !Array.isArray(c.triggers) ||
       !c.triggers.length ||
@@ -128,9 +131,42 @@ export function validateV2Package(raw, value, expected, validateLegacy) {
     )
       return invalid(path);
     seen.add(c.id.toLowerCase());
+    const optional = c.optionalCapabilities ?? [],
+      required = c.requires ?? [];
+    if (c.runtime === 'wasip1') {
+      const allowed = [
+        'state.read',
+        'state.write',
+        'actions.execute',
+        ...(c.location === 'agent'
+          ? ['docker.read', 'docker.logs', 'docker.control']
+          : ['telemetry.read', 'notifications.telegram']),
+      ];
+      if (
+        !names(optional) ||
+        required.length + optional.length > 32 ||
+        [...required, ...optional].some((cap) => !allowed.includes(cap)) ||
+        optional.some((cap) => required.includes(cap))
+      )
+        return invalid(path + '.optionalCapabilities');
+    } else if (!Array.isArray(optional) || optional.length)
+      return invalid(path + '.optionalCapabilities');
+
     if (!Array.isArray(c.fields ?? [])) return invalid(path + '.fields');
     for (const field of c.fields ?? []) {
       if (!object(field)) return invalid(path + '.fields');
+      if (
+        c.runtime === 'wasip1' &&
+        ['socket', 'serverId', 'telegramToken', 'telegramChatId'].includes(field.key)
+      ) {
+        if (
+          field.key === 'socket' ||
+          c.location !== 'monitor' ||
+          field.type !== (field.key === 'telegramToken' ? 'password' : 'text') ||
+          (field.default != null && field.default !== '')
+        )
+          return invalid(path + '.fields', 'invalid_reserved_host_field');
+      }
       if (Object.hasOwn(field, 'default') && field.default !== null) {
         const expectedType = {
           text: 'string',
@@ -151,6 +187,7 @@ export function validateV2Package(raw, value, expected, validateLegacy) {
       if (
         !keys(t, [
           'type',
+          'requires',
           'seconds',
           'events',
           'action',
@@ -164,6 +201,20 @@ export function validateV2Package(raw, value, expected, validateLegacy) {
         !text(t.label ?? '', 128)
       )
         return invalid(path + '.triggers');
+      if (
+        t.requires !== undefined &&
+        (c.runtime !== 'wasip1' ||
+          t.type !== 'manual' ||
+          !names(t.requires) ||
+          t.requires.some((cap) => ![...required, ...optional].includes(cap)))
+      )
+        return invalid(path + '.triggers', 'invalid_action_capabilities');
+      if (
+        c.runtime === 'wasip1' &&
+        t.mutating &&
+        ![...required, ...optional].includes('actions.execute')
+      )
+        return invalid(path + '.triggers', 'undeclared_mutation_capability');
       if (t.type === 'interval') {
         if (
           !Number.isInteger(t.seconds) ||
@@ -240,10 +291,17 @@ export function validateV2Package(raw, value, expected, validateLegacy) {
       binaries: c.binaries,
     };
     delete legacy.components;
-    const result = validateLegacy(Buffer.from(JSON.stringify(legacy)), expected);
+    const result = validateMetadata(legacy, expected);
     if (!result.ok) return invalid(path + '.' + result.issues[0].path, result.issues[0].code);
+    const artifacts = validateBinaries(c.binaries, c.runtime ?? 'native');
+    if (!artifacts.ok)
+      return invalid(path + '.' + artifacts.issues[0].path, artifacts.issues[0].code);
     for (const [target, binary] of Object.entries(c.binaries)) {
-      targets.add(target);
+      if (target === 'wasip1-wasm')
+        ['linux-amd64', 'linux-arm64', 'windows-amd64'].forEach((platform) =>
+          targets.add(platform),
+        );
+      else targets.add(target);
       total += Buffer.from(binary.content, 'base64').length;
     }
     if (total > 48 * 1024 * 1024) return invalid('components', 'size_limit');

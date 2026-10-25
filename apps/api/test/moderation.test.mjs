@@ -193,6 +193,48 @@ test('moderation binds approvals to digest, checks roles inside the transaction 
       (await (await fetch(`${base}/modules/Owner/docker`)).json()).versions[0].version,
       '2.0.0-alpha1',
     );
+    const isolated = (
+      await db.pool.query(
+        `INSERT INTO revisions(repository_id,source_owner_id,owner,module_id,version,release_id,asset_id,tag,commit_sha,sha256,manifest,platforms,validation_passed) SELECT repository_id,source_owner_id,owner,module_id,'3.0.0-alpha1','wasm-release','wasm-asset','v3.0.0-alpha1',commit_sha,sha256,$2,platforms,true FROM revisions WHERE id=$1 RETURNING id`,
+        [
+          revision,
+          JSON.stringify({
+            schemaVersion: 2,
+            name: 'Docker',
+            permissions: [],
+            components: [
+              {
+                location: 'agent',
+                runtime: 'wasip1',
+                requires: ['docker.read'],
+                optionalCapabilities: ['docker.control'],
+                triggers: [{ type: 'interval', seconds: 5 }],
+              },
+            ],
+          }),
+        ],
+      )
+    ).rows[0].id;
+    await review.decide(admin, isolated, hash, 'approve', 'Review isolated fixture');
+    assert.equal((await (await fetch(`${base}/catalog`)).json()).items[0].version, '2.0.0-alpha1');
+    const isolatedCatalog = await (await fetch(`${base}/catalog?runtime=all`)).json();
+    assert.equal(isolatedCatalog.items[0].version, '3.0.0-alpha1');
+    assert.deepEqual(isolatedCatalog.items[0].executionRuntimes, ['wasip1']);
+    assert.deepEqual(isolatedCatalog.items[0].capabilities, ['docker.read', 'docker.control']);
+    assert.equal(
+      (await (await fetch(`${base}/modules/Owner/docker`)).json()).module.version,
+      '2.0.0-alpha1',
+    );
+    assert.equal(
+      (await (await fetch(`${base}/modules/Owner/docker?runtime=all`)).json()).module.version,
+      '3.0.0-alpha1',
+    );
+    assert.equal((await fetch(`${base}/modules/Owner/docker/versions/3.0.0-alpha1`)).status, 404);
+    assert.equal(
+      (await fetch(`${base}/modules/Owner/docker/versions/3.0.0-alpha1?runtime=all`)).status,
+      200,
+    );
+    assert.equal((await fetch(`${base}/catalog?runtime=unknown`)).status, 400);
   } finally {
     if (app) await app.close();
     await pool.query(`DROP SCHEMA "${schema}" CASCADE`);

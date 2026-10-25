@@ -16,6 +16,7 @@ export function catalogModule(row) {
     description: { ru: row.description, en: row.description },
     category: categories[row.id.toLowerCase()] || 'other',
     platforms: row.platforms,
+    executionRuntimes: row.executionRuntimes ?? ['native'],
     version: row.version,
     source: row.sourceUrl,
     sha256: row.sha256,
