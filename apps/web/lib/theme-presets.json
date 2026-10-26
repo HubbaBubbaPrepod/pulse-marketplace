@@ -2,7 +2,7 @@
   {
     "schemaVersion": 1,
     "id": "dark",
-    "name": "РўС‘РјРЅР°СЏ",
+    "name": "Тёмная",
     "mode": "dark",
     "radius": 10,
     "colors": {
@@ -23,7 +23,7 @@
   {
     "schemaVersion": 1,
     "id": "light",
-    "name": "РЎРІРµС‚Р»Р°СЏ",
+    "name": "Светлая",
     "mode": "light",
     "radius": 10,
     "colors": {

@@ -705,7 +705,8 @@
     font-size: 9px;
   }
   .theme-demo-metrics strong {
-    font-size: 20px;
+    font-size: clamp(12px, 4vw, 18px);
+    white-space: nowrap;
   }
   .theme-demo-tabs {
     gap: 6px;
