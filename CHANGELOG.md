@@ -1,3 +1,10 @@
+## 2026-10-26 — Theme catalog / Каталог тем
+
+- Add separately moderated GitHub theme releases, safe palette previews and Monitor-compatible JSON downloads. / Добавлены отдельные публикации тем, безопасный предпросмотр и скачивание JSON для Monitor.
+- Preserve module-only legacy API routes; no additional service or DB schema migration. / Старые API-маршруты остаются только для модулей; новый сервис и миграция БД не требуются.
+- Add RU/EN theme pages, search, mode filters, version selection, SEO and author documentation. / Добавлены RU/EN страницы тем, поиск, фильтры, выбор версии, SEO и документация.
+- Match administrator approval controls to existing server authorization. / Кнопки одобрения администратора приведены в соответствие с действующими серверными правами.
+
 ## Unreleased — dependency security patches / Исправления зависимостей
 
 - Pin patched multer 2.5.0 through the approved override; update body-parser to 2.4.0 and Nodemailer to 10.1.4. / Зафиксированы исправленные multer 2.5.0, body-parser 2.4.0 и Nodemailer 10.1.4.

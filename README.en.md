@@ -1,5 +1,7 @@
 # Pulse Marketplace
 
+[Themes](docs/THEMES.en.md) · [Theme package example](examples/theme/theme.json)
+
 [![CI](https://github.com/HubbaBubbaPrepod/pulse-marketplace/actions/workflows/ci.yml/badge.svg)](https://github.com/HubbaBubbaPrepod/pulse-marketplace/actions/workflows/ci.yml)
 
 [Русский](README.md) · MIT

@@ -1,4 +1,5 @@
 'use client';
+import { themeCopy } from '../lib/theme-catalog.mjs';
 import { useState } from 'react';
 import { Icon } from './icon';
 import { copy } from '../lib/copy.mjs';
@@ -58,6 +59,37 @@ export function Developers({ lang }) {
         <p role="status" className="copy-status">
           {status}
         </p>
+      </section>
+      <section className="surface marker-section" id="themes">
+        <div>
+          <h2>{themeCopy[lang].publish}</h2>
+          <p>{themeCopy[lang].safe}</p>
+          <p>
+            {lang === 'ru'
+              ? 'Экспортируй оформление из Monitor, добавь topic pulse-theme и маркер kind: theme, затем выпусти GitHub Release с JSON-пакетом. Каждая версия проходит модерацию.'
+              : 'Export your Monitor theme, add the pulse-theme topic and kind: theme marker, then publish a GitHub Release with the JSON package. Every version is reviewed.'}
+          </p>
+        </div>
+        <pre>
+          <code>
+            {JSON.stringify(
+              {
+                schemaVersion: 1,
+                kind: 'theme',
+                moduleId: 'pulse-night',
+                packageAsset: 'theme.json',
+              },
+              null,
+              2,
+            )}
+          </code>
+        </pre>
+        <a
+          className="button button-outline"
+          href={`https://github.com/HubbaBubbaPrepod/pulse-marketplace/blob/main/docs/THEMES${lang === 'en' ? '.en' : ''}.md`}
+        >
+          {lang === 'ru' ? 'Формат и пример темы' : 'Theme format and example'} ↗
+        </a>
       </section>
       <section className="trust-section" id="trust">
         <Icon name="shield" size={32} />

@@ -1,3 +1,4 @@
+import { CatalogNavigation } from '../../../components/catalog-navigation';
 import { notFound } from 'next/navigation';
 import { ViewTransition } from 'react';
 import { StructuredData } from '../../../components/structured-data';
@@ -50,6 +51,7 @@ export default async function Page({ params, searchParams }) {
           )}
         />
         <Hero lang={lang} />
+        <CatalogNavigation lang={lang} />
         <section className="service-about" aria-labelledby="service-about-title">
           <h2 id="service-about-title">{copy[lang].serviceTitle}</h2>
           <div>

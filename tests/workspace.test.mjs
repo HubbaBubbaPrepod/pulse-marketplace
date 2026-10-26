@@ -1,3 +1,4 @@
+import * as workspaceRules from '../apps/web/lib/workspace.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { parseRepository, restoreDrafts, decideRevision } from '../apps/web/lib/workspace.mjs';
@@ -75,4 +76,31 @@ test('withdrawal requires an approved revision and rejection does not bypass sta
     'withdrawn',
   );
   assert.equal(decideRevision(revision, 'unknown', 'Comment').error, 'transition');
+});
+
+test('approval controls match server rules for administrators and non-author moderators', () => {
+  const row = { validation_passed: true, status: 'pending', source_owner_id: '101' };
+  assert.equal(
+    workspaceRules.canApproveRevision?.({ role: 'administrator', githubId: null }, row),
+    true,
+  );
+  assert.equal(
+    workspaceRules.canApproveRevision?.({ role: 'moderator', githubId: '102' }, row),
+    true,
+  );
+  assert.equal(
+    workspaceRules.canApproveRevision?.({ role: 'moderator', githubId: '101' }, row),
+    false,
+  );
+  assert.equal(
+    workspaceRules.canApproveRevision?.({ role: 'author', githubId: '102' }, row),
+    false,
+  );
+  assert.equal(
+    workspaceRules.canApproveRevision?.(
+      { role: 'administrator' },
+      { ...row, validation_passed: false },
+    ),
+    false,
+  );
 });

@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "kind": "theme",
+  "id": "pulse-night",
+  "name": "Pulse Night",
+  "version": "1.0.0",
+  "description": "A monochrome dark theme for Pulse Monitor.",
+  "theme": {
+    "schemaVersion": 1,
+    "id": "pulse-night",
+    "name": "Pulse Night",
+    "mode": "dark",
+    "radius": 10,
+    "colors": {
+      "bg": "#0b0b0b",
+      "surface": "#101010",
+      "surface-hover": "#171717",
+      "raised": "#202020",
+      "text": "#f5f5f5",
+      "muted": "#999999",
+      "subtle": "#777777",
+      "border": "#292929",
+      "track": "#252525",
+      "chart-primary": "#f5f5f5",
+      "chart-secondary": "#999999",
+      "chart-tertiary": "#555555"
+    }
+  }
+}

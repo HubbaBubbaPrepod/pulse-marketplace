@@ -63,3 +63,14 @@ export function decideRevision(revision, decision, comment) {
     },
   };
 }
+
+export function canApproveRevision(actor, row) {
+  return (
+    row.status === 'pending' &&
+    row.validation_passed === true &&
+    (actor.role === 'administrator' ||
+      (actor.role === 'moderator' &&
+        Boolean(actor.githubId) &&
+        actor.githubId !== row.source_owner_id))
+  );
+}

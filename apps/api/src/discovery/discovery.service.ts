@@ -137,6 +137,7 @@ export class Discovery implements OnModuleInit, OnModuleDestroy {
         throw new Error('Repository identity changed during discovery');
       const result = validatePackage(bytes, {
         moduleId: markerData.moduleId,
+        kind: markerData.kind ?? 'module',
         tag: release.tag_name,
       });
       const hash = createHash('sha256').update(bytes).digest('hex');

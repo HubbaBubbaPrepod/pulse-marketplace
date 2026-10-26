@@ -36,7 +36,7 @@ export class ModerationController {
       : 'pending';
     const rows = (
       await this.db.pool.query(
-        "SELECT id,owner,module_id,version,status,validation_passed,created_at FROM revisions WHERE status=$1 AND ($2='' OR id::text>$2) ORDER BY id LIMIT 101",
+        "SELECT id,owner,module_id,version,status,validation_passed,created_at,COALESCE(manifest->>'kind','module') AS kind FROM revisions WHERE status=$1 AND ($2='' OR id::text>$2) ORDER BY id LIMIT 101",
         [state, /^[a-f0-9-]{36}$/i.test(cursor) ? cursor : ''],
       )
     ).rows;

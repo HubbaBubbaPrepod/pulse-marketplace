@@ -1,3 +1,4 @@
+import { ThemesModule } from './catalog/themes.controller.js';
 import { Module, Inject, type NestModule, type MiddlewareConsumer } from '@nestjs/common';
 import type { Request, Response, NextFunction } from 'express';
 import { CONFIG, type Config } from './config.js';
@@ -15,6 +16,7 @@ import { DiscoveryModule } from './discovery/discovery.module.js';
     AuthorModule,
     ModerationModule,
     CatalogModule,
+    ThemesModule,
     DiscoveryModule,
   ],
   controllers: [HealthController],

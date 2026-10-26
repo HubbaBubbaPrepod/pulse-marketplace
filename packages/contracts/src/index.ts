@@ -6,6 +6,7 @@ export interface ValidationIssue {
   code: string;
 }
 export interface DiscoveryMarker {
+  kind?: 'module' | 'theme';
   schemaVersion: 1;
   moduleId: string;
   packageAsset: string;
@@ -62,4 +63,41 @@ export interface AuthCapabilities {
   email: boolean;
   emailRegistration: boolean;
   passwordReset: boolean;
+}
+
+export interface ThemeDefinition {
+  schemaVersion: 1;
+  id: string;
+  name: string;
+  mode: 'dark' | 'light';
+  radius: number;
+  colors: Record<string, string>;
+  accent?: string;
+  options?: {
+    font?: 'system' | 'arial' | 'segoe';
+    contentFont?: 'inherit' | 'system' | 'arial' | 'segoe';
+    codeFont?: 'system' | 'consolas' | 'courier';
+    fontSize?: number;
+    codeSize?: number;
+    italic?: boolean;
+    transparent?: boolean;
+    contrast?: number;
+    pointer?: boolean;
+  };
+}
+export interface CatalogTheme {
+  kind: 'theme';
+  owner: string;
+  id: string;
+  name: string;
+  description: string;
+  version: string;
+  mode: 'dark' | 'light';
+  theme: ThemeDefinition;
+  sha256: string;
+  themeSha256: string;
+  size: number;
+  sourceUrl: string;
+  reviewedAt: string;
+  downloadUrl: string;
 }

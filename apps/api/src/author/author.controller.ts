@@ -32,7 +32,7 @@ export class AuthorController {
     return {
       items: (
         await this.db.pool.query(
-          'SELECT r.id,r.owner,r.module_id,r.version,r.status,r.sha256,r.validation_passed,r.validation_issues,r.created_at FROM revisions r JOIN repositories repo ON repo.id=r.repository_id WHERE repo.owner_id=$1 AND r.source_owner_id=$1 ORDER BY r.created_at DESC LIMIT 100',
+          `SELECT r.id,r.owner,r.module_id,r.version,r.status,r.sha256,r.validation_passed,r.validation_issues,r.created_at,COALESCE(r.manifest->>'kind','module') AS kind FROM revisions r JOIN repositories repo ON repo.id=r.repository_id WHERE repo.owner_id=$1 AND r.source_owner_id=$1 ORDER BY r.created_at DESC LIMIT 100`,
           [request.actor!.githubId],
         )
       ).rows,

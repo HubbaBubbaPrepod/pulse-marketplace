@@ -54,7 +54,7 @@ export class CatalogController {
     @Res({ passthrough: true }) response: Response,
   ) {
     const result = await this.db.pool.query(
-      `WITH latest AS (SELECT DISTINCT ON (lower(owner),module_id) * FROM revisions WHERE status='approved' AND ${compatibleRuntime.replace('$RUNTIME', '$5')} ORDER BY lower(owner),module_id,${releaseOrder},reviewed_at DESC,id DESC) SELECT r.*,p.size,repo.name AS repository_name FROM latest r JOIN packages p ON p.sha256=r.sha256 JOIN repositories repo ON repo.id=r.repository_id WHERE ($1='' OR r.manifest->>'name' ILIKE $2 OR r.manifest->>'description' ILIKE $2) AND ($3='' OR r.platforms ? $3) AND ($4='' OR r.id::text>$4) ORDER BY r.id LIMIT 31`,
+      `WITH latest AS (SELECT DISTINCT ON (lower(owner),module_id) * FROM revisions WHERE status='approved' AND COALESCE(manifest->>'kind','module')='module' AND ${compatibleRuntime.replace('$RUNTIME', '$5')} ORDER BY lower(owner),module_id,${releaseOrder},reviewed_at DESC,id DESC) SELECT r.*,p.size,repo.name AS repository_name FROM latest r JOIN packages p ON p.sha256=r.sha256 JOIN repositories repo ON repo.id=r.repository_id WHERE ($1='' OR r.manifest->>'name' ILIKE $2 OR r.manifest->>'description' ILIKE $2) AND ($3='' OR r.platforms ? $3) AND ($4='' OR r.id::text>$4) ORDER BY r.id LIMIT 31`,
       [
         String(query).slice(0, 128),
         `%${String(query).slice(0, 128)}%`,
@@ -124,7 +124,7 @@ export class CatalogController {
     @Query('runtime') runtime: string = 'native',
   ) {
     const result = await this.db.pool.query(
-      `SELECT r.*,p.size,repo.name AS repository_name FROM revisions r JOIN packages p ON p.sha256=r.sha256 JOIN repositories repo ON repo.id=r.repository_id WHERE r.status='approved' AND lower(r.owner)=lower($1) AND r.module_id=$2 AND ${compatibleRuntime.replace('$RUNTIME', '$3')} ORDER BY ${releaseOrder},r.reviewed_at DESC LIMIT 100`,
+      `SELECT r.*,p.size,repo.name AS repository_name FROM revisions r JOIN packages p ON p.sha256=r.sha256 JOIN repositories repo ON repo.id=r.repository_id WHERE r.status='approved' AND COALESCE(r.manifest->>'kind','module')='module' AND lower(r.owner)=lower($1) AND r.module_id=$2 AND ${compatibleRuntime.replace('$RUNTIME', '$3')} ORDER BY ${releaseOrder},r.reviewed_at DESC LIMIT 100`,
       [owner, id, catalogRuntime(runtime)],
     );
     if (!result.rowCount) throw new NotFoundException();
@@ -141,7 +141,7 @@ export class CatalogController {
     @Query('runtime') runtime: string = 'native',
   ) {
     const result = await this.db.pool.query(
-      `SELECT r.*,p.size,repo.name AS repository_name FROM revisions r JOIN packages p ON p.sha256=r.sha256 JOIN repositories repo ON repo.id=r.repository_id WHERE r.status='approved' AND lower(r.owner)=lower($1) AND r.module_id=$2 AND r.version=$3 AND ${compatibleRuntime.replace('$RUNTIME', '$4')} LIMIT 1`,
+      `SELECT r.*,p.size,repo.name AS repository_name FROM revisions r JOIN packages p ON p.sha256=r.sha256 JOIN repositories repo ON repo.id=r.repository_id WHERE r.status='approved' AND COALESCE(r.manifest->>'kind','module')='module' AND lower(r.owner)=lower($1) AND r.module_id=$2 AND r.version=$3 AND ${compatibleRuntime.replace('$RUNTIME', '$4')} LIMIT 1`,
       [owner, id, version, catalogRuntime(runtime)],
     );
     if (!result.rowCount) throw new NotFoundException();
@@ -151,7 +151,7 @@ export class CatalogController {
   async download(@Param('hash') hash: string, @Res() response: Response) {
     if (!/^[a-f0-9]{64}$/.test(hash)) throw new NotFoundException();
     const allowed = await this.db.pool.query(
-      "SELECT 1 FROM revisions WHERE sha256=$1 AND status='approved' LIMIT 1",
+      "SELECT 1 FROM revisions WHERE sha256=$1 AND status='approved' AND COALESCE(manifest->>'kind','module')='module' LIMIT 1",
       [hash],
     );
     if (!allowed.rowCount) throw new NotFoundException();

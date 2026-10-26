@@ -1,3 +1,4 @@
+import { validateThemePackage } from './validate-theme.mjs';
 import { validateV2Package } from './validate-v2.mjs';
 import { createHash } from 'node:crypto';
 const idPattern = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/;
@@ -11,8 +12,9 @@ const keys = (value, allowed) =>
 const failure = (path, code) => ({ ok: false, issues: [{ path, code }] });
 export function validateMarker(value) {
   if (
-    !keys(value, ['schemaVersion', 'moduleId', 'packageAsset']) ||
+    !keys(value, ['schemaVersion', 'kind', 'moduleId', 'packageAsset']) ||
     value.schemaVersion !== 1 ||
+    (value.kind !== undefined && !['module', 'theme'].includes(value.kind)) ||
     !text(value.moduleId, 64, true) ||
     !idPattern.test(value.moduleId) ||
     !text(value.packageAsset, 128, true) ||
@@ -21,7 +23,12 @@ export function validateMarker(value) {
     return failure('marker', 'invalid_marker');
   return {
     ok: true,
-    marker: { schemaVersion: 1, moduleId: value.moduleId, packageAsset: value.packageAsset },
+    marker: {
+      ...(value.kind ? { kind: value.kind } : {}),
+      schemaVersion: 1,
+      moduleId: value.moduleId,
+      packageAsset: value.packageAsset,
+    },
   };
 }
 function executableMatches(target, binary) {
@@ -77,6 +84,13 @@ export function validatePackage(raw, expected = {}) {
   } catch {
     return failure('package', 'invalid_json');
   }
+  if (value?.kind === 'theme') {
+    const result = validateThemePackage(raw, value, expected);
+    return result.ok
+      ? { ...result, sha256: createHash('sha256').update(raw).digest('hex'), size: raw.length }
+      : result;
+  }
+  if (expected.kind === 'theme') return failure('package', 'kind_mismatch');
   if (value?.schemaVersion === 2) {
     const result = validateV2Package(raw, value, expected, validateMetadata, validateBinaries);
     return result.ok

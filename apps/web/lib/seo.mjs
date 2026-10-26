@@ -89,9 +89,9 @@ export function catalogMetadata(lang, query = {}) {
     Object.keys(query).length === 0,
   );
 }
-export function sitemapEntries(rows, documents, updated) {
+export function sitemapEntries(rows, documents, updated, themes = []) {
   const entries = languages.flatMap((lang) =>
-    ['', 'developers', ...documents].map((path) => ({
+    ['', 'themes', 'developers', ...documents].map((path) => ({
       url: absoluteUrl(lang, path),
       ...(documents.includes(path) ? { lastModified: updated } : {}),
     })),
@@ -104,6 +104,15 @@ export function sitemapEntries(rows, documents, updated) {
         lastModified: row.reviewedAt,
       });
   }
+  for (const row of themes)
+    for (const lang of languages)
+      entries.push({
+        url: absoluteUrl(
+          lang,
+          `themes/${encodeURIComponent(row.owner)}/${encodeURIComponent(row.id)}`,
+        ),
+        lastModified: row.reviewedAt,
+      });
   return entries;
 }
 export function moduleSchema(lang, row) {
@@ -145,7 +154,12 @@ export function pageSchema(lang, path, title, description, rows) {
         '@type': 'ListItem',
         position: i + 1,
         name: row.name,
-        url: absoluteUrl(lang, modulePath(row.owner, row.id)),
+        url: absoluteUrl(
+          lang,
+          row.kind === 'theme'
+            ? `themes/${encodeURIComponent(row.owner)}/${encodeURIComponent(row.id)}`
+            : modulePath(row.owner, row.id),
+        ),
       })),
     };
   return {

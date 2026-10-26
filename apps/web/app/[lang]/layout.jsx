@@ -1,4 +1,5 @@
 import '../legal.css';
+import '../themes.css';
 import { origin } from '../../lib/seo.mjs';
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';

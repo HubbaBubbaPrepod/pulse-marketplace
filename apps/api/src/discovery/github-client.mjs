@@ -43,7 +43,18 @@ export class GitHubClient {
     return `/repos/${repository.fullName.split('/').map(encodeURIComponent).join('/')}`;
   }
   async *repositories(start = '2008-01-01', end = new Date().toISOString().slice(0, 10)) {
-    const query = `topic:pulse-module is:public archived:false created:${start}..${end}`;
+    const seen = new Set();
+    for (const topic of ['pulse-module', 'pulse-theme']) {
+      for await (const item of this.topicRepositories(topic, start, end)) {
+        if (!seen.has(item.id)) {
+          seen.add(item.id);
+          yield item;
+        }
+      }
+    }
+  }
+  async *topicRepositories(topic, start, end) {
+    const query = `topic:${topic} is:public archived:false created:${start}..${end}`;
     const prefix = `/search/repositories?q=${encodeURIComponent(query)}&per_page=100`;
     const first = await this.json(`${prefix}&page=1`);
     if (first.incomplete_results || first.total_count > 1000) {
@@ -51,8 +62,12 @@ export class GitHubClient {
         b = Date.parse(end),
         midpoint = a + Math.floor((b - a) / 172800000) * 86400000;
       if (a >= b) throw new Error('GitHub search partition is incomplete');
-      yield* this.repositories(start, new Date(midpoint).toISOString().slice(0, 10));
-      yield* this.repositories(new Date(midpoint + 86400000).toISOString().slice(0, 10), end);
+      yield* this.topicRepositories(topic, start, new Date(midpoint).toISOString().slice(0, 10));
+      yield* this.topicRepositories(
+        topic,
+        new Date(midpoint + 86400000).toISOString().slice(0, 10),
+        end,
+      );
       return;
     }
     for (let page = 1; page <= Math.max(1, Math.ceil(first.total_count / 100)); page++) {

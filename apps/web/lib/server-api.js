@@ -41,3 +41,16 @@ export async function catalogRows() {
   if (cursor) throw new ApiError(503);
   return items;
 }
+
+export async function themeRows() {
+  const items = [];
+  let cursor = '';
+  do {
+    const page = await api(`/themes${cursor ? '?cursor=' + encodeURIComponent(cursor) : ''}`);
+    items.push(...page.items);
+    if (page.nextCursor === cursor) throw new ApiError(502);
+    cursor = page.nextCursor;
+  } while (cursor && items.length < 3000);
+  if (cursor) throw new ApiError(503);
+  return items;
+}

@@ -1,4 +1,5 @@
 'use client';
+import { themeCopy } from '../lib/theme-catalog.mjs';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useSearchParams } from 'next/navigation';
@@ -56,6 +57,13 @@ export function Header({ lang, preview }) {
             onClick={() => setOpen(false)}
           >
             {t.catalog}
+          </Link>
+          <Link
+            href={pathFor(lang, 'themes')}
+            aria-current={pathname.includes('/themes') ? 'page' : undefined}
+            onClick={() => setOpen(false)}
+          >
+            {themeCopy[lang].themes}
           </Link>
           <Link
             href={pathFor(lang, 'developers')}

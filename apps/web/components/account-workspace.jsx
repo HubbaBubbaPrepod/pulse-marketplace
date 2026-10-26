@@ -1,4 +1,7 @@
 'use client';
+import { ThemePreview } from './theme-preview';
+import { themeCopy } from '../lib/theme-catalog.mjs';
+import { canApproveRevision } from '../lib/workspace.mjs';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -220,7 +223,11 @@ export function AccountModeration({ lang, session, records, status = 'pending', 
                   onClick={() => select(item.id)}
                   disabled={busy}
                 >
-                  <ModuleArt id={item.module_id} />
+                  {item.kind === 'theme' ? (
+                    <span className="revision-theme-label">{themeCopy[lang].themes}</span>
+                  ) : (
+                    <ModuleArt id={item.module_id} />
+                  )}
                   <span className="revision-label">
                     <strong>
                       {item.owner}/{item.module_id}
@@ -274,8 +281,16 @@ export function AccountModeration({ lang, session, records, status = 'pending', 
                 </div>
               </dl>
               <p>{row.manifest.description}</p>
-              <h3>{t.executionRuntime}</h3>
-              {row.manifest.components?.length ? (
+              {row.manifest.kind === 'theme' ? (
+                <>
+                  <h3>{themeCopy[lang].preview}</h3>
+                  <ThemePreview theme={row.manifest.theme} lang={lang} />
+                  <p>{themeCopy[lang].safe}</p>
+                </>
+              ) : (
+                <h3>{t.executionRuntime}</h3>
+              )}
+              {row.manifest.kind === 'theme' ? null : row.manifest.components?.length ? (
                 row.manifest.components.map((component) => (
                   <div key={component.id}>
                     <strong>
@@ -335,12 +350,7 @@ export function AccountModeration({ lang, session, records, status = 'pending', 
                           className="button"
                           name="action"
                           value="approve"
-                          disabled={
-                            busy ||
-                            !row.validation_passed ||
-                            !session.user.githubId ||
-                            session.user.githubId === row.source_owner_id
-                          }
+                          disabled={busy || !canApproveRevision(session.user, row)}
                         >
                           {t.approve}
                         </button>

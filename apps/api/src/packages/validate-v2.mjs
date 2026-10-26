@@ -15,7 +15,7 @@ const text = (v, n) => typeof v === 'string' && Buffer.byteLength(v) <= n;
 const invalid = (path, code = 'invalid_v2_component') => ({ ok: false, issues: [{ path, code }] });
 // JSON.parse keeps the last duplicate key. Scan the already syntactically valid
 // document first so a reviewer and an installer cannot interpret different data.
-function unambiguousJSON(raw) {
+export function unambiguousJSON(raw) {
   const source = raw.toString('utf8');
   let i = 0;
   const ws = () => {
