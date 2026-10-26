@@ -1,3 +1,7 @@
+## Unreleased — dependency security patches / Исправления зависимостей
+
+- Pin patched multer 2.5.0 through the approved override; update body-parser to 2.4.0 and Nodemailer to 10.1.4. / Зафиксированы исправленные multer 2.5.0, body-parser 2.4.0 и Nodemailer 10.1.4.
+
 ## Unreleased — isolated modules / Изолированные модули
 
 - Validate explicit WASI artifacts and broker grants; preserve runtime metadata for moderation and public trust details. / Проверяются WASI-артефакты и разрешения посредника; runtime виден в модерации и карточках.
