@@ -9,6 +9,7 @@ import { workspaceCopy } from '../lib/workspace-copy.mjs';
 import { Workspace, Status } from './workspace';
 import { ModuleArt } from './module-art';
 import { accountCopy } from '../lib/account-copy.mjs';
+import { AccountSettings } from './account-settings';
 async function request(path, session, body) {
   const response = await fetch(`/api/v1${path}`, {
     method: body === undefined ? 'GET' : 'POST',
@@ -27,13 +28,62 @@ export function AccountAuthor({
   session,
   repositories,
   revisions,
+  repositoriesCursor = null,
+  revisionsCursor = null,
   capabilities,
+  account,
   linkStatus,
+  mergeStatus,
 }) {
   const t = accountCopy[lang],
     router = useRouter(),
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState('');
+  const [moreRepos, setMoreRepos] = useState([]),
+    [moreRevisions, setMoreRevisions] = useState([]),
+    [repoCursor, setRepoCursor] = useState(repositoriesCursor),
+    [revisionCursor, setRevisionCursor] = useState(revisionsCursor),
+    [feedback, setFeedback] = useState({}),
+    [loadingFeedback, setLoadingFeedback] = useState(null);
+  const allRepos = [
+    ...new Map([...repositories, ...moreRepos].map((row) => [row.id, row])).values(),
+  ];
+  const allRevisions = [
+    ...new Map([...revisions, ...moreRevisions].map((row) => [row.id, row])).values(),
+  ];
+  async function loadMore(kind) {
+    setBusy(true);
+    setMessage('');
+    try {
+      const page = await request(
+        `/author/${kind}?cursor=${encodeURIComponent(kind === 'repositories' ? repoCursor : revisionCursor)}`,
+        session,
+      );
+      if (kind === 'repositories') {
+        setMoreRepos((old) => [...old, ...page.items]);
+        setRepoCursor(page.nextCursor);
+      } else {
+        setMoreRevisions((old) => [...old, ...page.items]);
+        setRevisionCursor(page.nextCursor);
+      }
+    } catch {
+      setMessage(t.offline);
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function loadFeedback(id) {
+    setLoadingFeedback(id);
+    setMessage('');
+    try {
+      const value = await request(`/author/revisions/${encodeURIComponent(id)}`, session);
+      setFeedback((old) => ({ ...old, [id]: value }));
+    } catch {
+      setMessage(t.offline);
+    } finally {
+      setLoadingFeedback(null);
+    }
+  }
   async function submit(event) {
     event.preventDefault();
     const repository = new FormData(event.currentTarget).get('repository');
@@ -55,14 +105,23 @@ export function AccountAuthor({
     try {
       const result = await request('/auth/link/github', session, {});
       window.location.assign(result.url);
-    } catch {
-      setMessage(t.offline);
+    } catch (error) {
+      setMessage(error.status === 409 ? t.confirmRequired : t.offline);
       setBusy(false);
     }
   }
   return (
     <Workspace lang={lang} section="author" live role={session.user.role}>
       <div className="workspace-body account-workspace">
+        {account ? (
+          <AccountSettings
+            lang={lang}
+            session={session}
+            account={account}
+            capabilities={capabilities}
+            mergeStatus={mergeStatus}
+          />
+        ) : null}
         <section className="surface account-panel">
           <h2>{t.repo}</h2>
           {linkStatus === 'conflict' || linkStatus === 'failed' ? (
@@ -101,9 +160,9 @@ export function AccountAuthor({
           )}
           {message ? <p role="status">{message}</p> : null}
           <h3>{t.repo}</h3>
-          {repositories.length ? (
+          {allRepos.length ? (
             <ul className="account-repositories">
-              {repositories.map((repo) => (
+              {allRepos.map((repo) => (
                 <li key={repo.id}>
                   <a
                     href={`https://github.com/${encodeURIComponent(repo.owner)}/${encodeURIComponent(repo.name)}`}
@@ -118,12 +177,21 @@ export function AccountAuthor({
           ) : (
             <p>{t.noRepos}</p>
           )}
+          {repoCursor ? (
+            <button
+              className="button secondary"
+              disabled={busy}
+              onClick={() => loadMore('repositories')}
+            >
+              {busy ? t.busy : t.loadMore}
+            </button>
+          ) : null}
         </section>
         <section className="surface account-panel">
           <h2>{t.versions}</h2>
-          {revisions.length ? (
+          {allRevisions.length ? (
             <div className="revision-list">
-              {revisions.map((row) => (
+              {allRevisions.map((row) => (
                 <article className="account-revision" key={row.id}>
                   <ModuleArt id={row.module_id} />
                   <div>
@@ -133,6 +201,53 @@ export function AccountAuthor({
                     <p>{row.version}</p>
                     <code>{row.sha256}</code>
                     {!row.validation_passed ? <p>{t.checksFailed}</p> : null}
+                    <details
+                      onToggle={(event) => {
+                        if (
+                          event.currentTarget.open &&
+                          !feedback[row.id] &&
+                          loadingFeedback !== row.id
+                        )
+                          void loadFeedback(row.id);
+                      }}
+                    >
+                      <summary>{t.reviewDetails}</summary>
+                      {loadingFeedback === row.id ? <p role="status">{t.busy}</p> : null}
+                      {feedback[row.id] ? (
+                        <>
+                          {feedback[row.id].revision.validation_issues?.length ? (
+                            <ul>
+                              {feedback[row.id].revision.validation_issues.map((issue, index) => (
+                                <li key={index}>
+                                  <code>
+                                    {issue.path}: {issue.code}
+                                  </code>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p>{t.checksPassed}</p>
+                          )}
+                          <h4>{t.history}</h4>
+                          {feedback[row.id].history.length ? (
+                            feedback[row.id].history.map((entry, index) => (
+                              <div key={index}>
+                                <small>
+                                  {new Intl.DateTimeFormat(lang, {
+                                    dateStyle: 'medium',
+                                    timeStyle: 'short',
+                                  }).format(new Date(entry.created_at))}{' '}
+                                  · {entry.action}
+                                </small>
+                                <p>{entry.comment}</p>
+                              </div>
+                            ))
+                          ) : (
+                            <p>{t.noDecisions}</p>
+                          )}
+                        </>
+                      ) : null}
+                    </details>
                   </div>
                   <Status lang={lang} status={row.status} />
                 </article>
@@ -144,6 +259,15 @@ export function AccountAuthor({
               <p>{t.noModulesText}</p>
             </div>
           )}
+          {revisionCursor ? (
+            <button
+              className="button secondary"
+              disabled={busy}
+              onClick={() => loadMore('revisions')}
+            >
+              {busy ? t.busy : t.loadMore}
+            </button>
+          ) : null}
         </section>
       </div>
     </Workspace>

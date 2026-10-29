@@ -10,6 +10,7 @@ export interface DiscoveryMarker {
   schemaVersion: 1;
   moduleId: string;
   packageAsset: string;
+  publishers?: string[];
 }
 export interface Actor {
   id: string;
@@ -45,6 +46,7 @@ export interface CatalogPage {
   revision: string;
 }
 export interface ReviewRevision {
+  publisher_ids?: string[];
   id: string;
   repository_id: string;
   source_owner_id: string;

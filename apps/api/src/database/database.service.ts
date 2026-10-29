@@ -36,6 +36,7 @@ export class Database implements OnModuleInit, OnModuleDestroy {
       'oauth_states',
       'rate_limits',
       'email_outbox',
+      'account_merges',
     ]) {
       await this.pool.query(
         `DELETE FROM ${table} WHERE ctid IN (SELECT ctid FROM ${table} WHERE expires_at<now() LIMIT 1000)`,

@@ -63,6 +63,10 @@ export class Discovery implements OnModuleInit, OnModuleDestroy {
       for (const job of jobs.rows) {
         try {
           const current = await this.github.repository(job.repository_id);
+          await lock.query(
+            "UPDATE repositories SET publisher_ids='[]',owner_type=$2,owner_id=$3 WHERE id=$1",
+            [current.id, current.ownerType, current.ownerId],
+          );
           await lock.query('UPDATE discovery_jobs SET payload=$2 WHERE repository_id=$1', [
             job.repository_id,
             JSON.stringify(current),
@@ -109,7 +113,13 @@ export class Discovery implements OnModuleInit, OnModuleDestroy {
   }
   private async repository(repository: any) {
     const branch = validateMarker(await this.github.marker(repository, repository.defaultBranch));
-    if (!branch.ok) throw new Error('Invalid discovery marker');
+    if (!branch.ok || !('marker' in branch)) throw new Error('Invalid discovery marker');
+    const publisherIds =
+      repository.ownerType === 'Organization' ? branch.marker.publishers || [] : [];
+    await this.db.pool.query(
+      'UPDATE repositories SET publisher_ids=$2,owner_type=$3,updated_at=now() WHERE id=$1',
+      [repository.id, JSON.stringify(publisherIds), repository.ownerType],
+    );
     let staged = 0;
     for await (const release of this.github.releases(repository)) {
       if (
@@ -142,7 +152,9 @@ export class Discovery implements OnModuleInit, OnModuleDestroy {
       });
       const hash = createHash('sha256').update(bytes).digest('hex');
       const declaredDigestMatches = !asset.digest || asset.digest === `sha256:${hash}`;
-      const individualOwner = repository.ownerType === 'User';
+      const individualOwner =
+        repository.ownerType === 'User' ||
+        (repository.ownerType === 'Organization' && publisherIds.length > 0);
       // Public discovery is untrusted input, not permission to consume disk.
       // Invalid packages are rejected before saving their bytes or metadata.
       if (!result.ok || !declaredDigestMatches || !individualOwner) continue;
@@ -155,7 +167,7 @@ export class Discovery implements OnModuleInit, OnModuleDestroy {
       const sourceUrl = `https://github.com/${encodeURIComponent(owner!)}/${encodeURIComponent(name!)}/tree/${commit}`;
       staged += await this.db.transaction(async (client) => {
         await client.query(
-          'INSERT INTO repositories(id,owner_id,owner,name,module_id,asset_name) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT(id) DO UPDATE SET owner_id=EXCLUDED.owner_id,owner=EXCLUDED.owner,name=EXCLUDED.name,module_id=EXCLUDED.module_id,asset_name=EXCLUDED.asset_name,updated_at=now()',
+          'INSERT INTO repositories(id,owner_id,owner,name,module_id,asset_name,owner_type,publisher_ids) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT(id) DO UPDATE SET owner_id=EXCLUDED.owner_id,owner=EXCLUDED.owner,name=EXCLUDED.name,module_id=EXCLUDED.module_id,asset_name=EXCLUDED.asset_name,owner_type=EXCLUDED.owner_type,publisher_ids=EXCLUDED.publisher_ids,updated_at=now()',
           [
             repository.id,
             repository.ownerId,
@@ -163,6 +175,8 @@ export class Discovery implements OnModuleInit, OnModuleDestroy {
             name,
             markerData.moduleId,
             markerData.packageAsset,
+            repository.ownerType,
+            JSON.stringify(publisherIds),
           ],
         );
         await client.query(
@@ -170,7 +184,7 @@ export class Discovery implements OnModuleInit, OnModuleDestroy {
           [hash, bytes.length],
         );
         const inserted = await client.query(
-          'INSERT INTO revisions(repository_id,source_owner_id,owner,module_id,version,release_id,asset_id,tag,commit_sha,sha256,manifest,platforms,validation_passed,validation_issues,source_url) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) ON CONFLICT(repository_id,source_owner_id,release_id,asset_id,tag,commit_sha,sha256) DO NOTHING RETURNING id',
+          'INSERT INTO revisions(repository_id,source_owner_id,owner,module_id,version,release_id,asset_id,tag,commit_sha,sha256,manifest,platforms,validation_passed,validation_issues,source_url,source_publishers) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) ON CONFLICT(repository_id,source_owner_id,release_id,asset_id,tag,commit_sha,sha256) DO NOTHING RETURNING id',
           [
             repository.id,
             repository.ownerId,
@@ -193,6 +207,7 @@ export class Discovery implements OnModuleInit, OnModuleDestroy {
                 : [{ path: 'repository.owner', code: 'organization_review_not_supported' }]),
             ]),
             sourceUrl,
+            JSON.stringify(publisherIds),
           ],
         );
         return inserted.rowCount || 0;

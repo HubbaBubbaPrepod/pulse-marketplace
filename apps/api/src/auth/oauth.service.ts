@@ -11,6 +11,7 @@ import { Database } from '../database/database.service.js';
 import { CONFIG, type Config } from '../config.js';
 import { Sessions, digest, type AuthRequest } from './session.service.js';
 import { Providers } from './providers.js';
+import { Accounts } from './account.service.js';
 @Injectable()
 export class OAuth {
   constructor(
@@ -18,6 +19,7 @@ export class OAuth {
     private readonly sessions: Sessions,
     private readonly providers: Providers,
     @Inject(CONFIG) private readonly config: Config,
+    private readonly accounts: Accounts,
   ) {}
   private cookieName(provider: string) {
     return `pulse-oauth-${provider}`;
@@ -28,7 +30,9 @@ export class OAuth {
     response: Response,
     next: unknown,
     link = false,
+    merge = false,
   ) {
+    if (merge) await this.accounts.requireFresh(request);
     if (!this.providers.available(provider))
       throw new ServiceUnavailableException('Provider unavailable');
     await this.sessions.rateLimit(request, 'oauth-start', 60);
@@ -44,7 +48,7 @@ export class OAuth {
         : '/ru/author/';
     const destination = await this.providers.authorization(provider, flow);
     await this.db.pool.query(
-      "INSERT INTO oauth_states(state_hash,binding_hash,provider,verifier,nonce,next_path,expires_at,link_user_id) VALUES ($1,$2,$3,$4,$5,$6,now()+interval '10 minutes',$7)",
+      "INSERT INTO oauth_states(state_hash,binding_hash,provider,verifier,nonce,next_path,expires_at,link_user_id,merge_requested) VALUES ($1,$2,$3,$4,$5,$6,now()+interval '10 minutes',$7,$8)",
       [
         digest(flow.state),
         digest(binding),
@@ -53,6 +57,7 @@ export class OAuth {
         flow.nonce,
         nextPath,
         link ? request.actor!.id : null,
+        merge,
       ],
     );
     response.cookie(this.cookieName(provider), binding, {
@@ -118,6 +123,17 @@ export class OAuth {
             [provider, identity.id],
           )
         ).rows[0];
+        if (stored.merge_requested) {
+          if (!existing || !stored.link_user_id)
+            throw new ConflictException('Existing account required');
+          await this.accounts.prepareMerge(
+            client,
+            stored.link_user_id,
+            existing.user_id,
+            sessionToken || '',
+          );
+          return null;
+        }
         if (existing) {
           if (stored.link_user_id && existing.user_id !== stored.link_user_id)
             throw new ConflictException('Identity already linked');
@@ -130,19 +146,30 @@ export class OAuth {
               String(identity.displayName || 'Pulse user').slice(0, 32),
             ])
           ).rows[0].id;
+        if (stored.link_user_id) {
+          const fresh = await client.query(
+            "SELECT 1 FROM sessions WHERE token_hash=$1 AND user_id=$2 AND expires_at>now() AND created_at>now()-interval '10 minutes'",
+            [digest(sessionToken || ''), stored.link_user_id],
+          );
+          if (!fresh.rowCount)
+            throw new BadRequestException('Confirm sign-in before adding a provider');
+        }
         await client.query(
           'INSERT INTO identities(provider,provider_id,user_id) VALUES ($1,$2,$3)',
           [provider, identity.id, id],
         );
         return id;
       });
+      if (userId === null) return `${stored.next_path}?merge=ready`;
       await this.sessions.create(userId, response, sessionToken);
       return stored.link_user_id ? `${stored.next_path}?link=connected` : stored.next_path;
     } catch (error) {
       // Only a consumed, browser-bound flow may report a link result. Preserve
       // the signed-in account and never transfer an identity owned by another.
       if (stored.link_user_id)
-        return `${stored.next_path}?link=${error instanceof ConflictException ? 'conflict' : 'failed'}`;
+        return stored.merge_requested
+          ? `${stored.next_path}?merge=failed`
+          : `${stored.next_path}?link=${error instanceof ConflictException ? 'conflict' : 'failed'}`;
       throw error;
     }
   }

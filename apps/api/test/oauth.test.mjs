@@ -93,6 +93,21 @@ test('OAuth state is browser-bound, expiring and one-use; provider email never m
     const current = await (
       await fetch(`${base}/auth/session`, { headers: { cookie: sessionCookie } })
     ).json();
+    await db.pool.query("UPDATE sessions SET created_at=now()-interval '1 hour' WHERE user_id=$1", [
+      current.user.id,
+    ]);
+    const staleLink = await fetch(`${base}/auth/link/github`, {
+      method: 'POST',
+      headers: {
+        cookie: sessionCookie,
+        origin: 'http://127.0.0.1:3100',
+        'content-type': 'application/json',
+        'x-csrf-token': current.csrfToken,
+      },
+      body: '{}',
+    });
+    assert.equal(staleLink.status, 409, 'A stale session cannot attach a new sign-in method');
+    await db.pool.query('UPDATE sessions SET created_at=now() WHERE user_id=$1', [current.user.id]);
     await db.pool.query(
       "INSERT INTO identities(provider,provider_id,user_id) VALUES ('github','provider-user-1',$1)",
       [existing],
@@ -170,6 +185,86 @@ test('OAuth state is browser-bound, expiring and one-use; provider email never m
       providerId,
     ]);
     assert.equal(rejected.rowCount, 0);
+    const privatePost = (path, body, cookie = linkedCookie, csrf = linkedSession.csrfToken) =>
+      fetch(base + path, {
+        method: 'POST',
+        headers: {
+          cookie,
+          origin: 'http://127.0.0.1:3100',
+          'content-type': 'application/json',
+          'x-csrf-token': csrf,
+        },
+        body: JSON.stringify(body),
+        redirect: 'manual',
+      });
+    assert.equal(
+      (await privatePost('/auth/account/merge/confirm', { confirmation: 'MERGE' })).status,
+      409,
+      'A matching email or session alone is not proof of the other account',
+    );
+    assert.equal(
+      (await privatePost('/auth/account/unlink', { provider: 'github', confirmation: 'UNLINK' }))
+        .status,
+      200,
+    );
+    providerId = 'provider-user-1';
+    const merge = await privatePost('/auth/account/merge/github', {});
+    assert.equal(merge.status, 201);
+    const mergeState = new URL((await merge.json()).url).searchParams.get('state');
+    const mergeCallback = await fetch(
+      `${base}/auth/github/callback?state=${mergeState}&code=merge-code`,
+      {
+        headers: { cookie: linkedCookie + '; ' + merge.headers.get('set-cookie').split(';')[0] },
+        redirect: 'manual',
+      },
+    );
+    assert.equal(mergeCallback.headers.get('location'), '/ru/author/?merge=ready');
+    assert.equal(
+      (
+        await db.pool.query(
+          "SELECT user_id FROM identities WHERE provider='github' AND provider_id='provider-user-1'",
+        )
+      ).rows[0].user_id,
+      existing,
+      'OAuth confirmation must not merge accounts before explicit confirmation',
+    );
+    const pending = await (
+      await fetch(`${base}/auth/account`, { headers: { cookie: linkedCookie } })
+    ).json();
+    assert.equal(pending.merge.displayName, 'Existing');
+    const combined = await privatePost('/auth/account/merge/confirm', { confirmation: 'MERGE' });
+    assert.equal(combined.status, 200);
+    const combinedCookie = combined.headers
+      .getSetCookie()
+      .find((x) => x.startsWith('pulse-session='))
+      .split(';')[0];
+    const combinedSession = await (
+      await fetch(`${base}/auth/session`, { headers: { cookie: combinedCookie } })
+    ).json();
+    assert.equal(combinedSession.user.id, current.user.id);
+    assert.equal(combinedSession.user.githubId, 'provider-user-1');
+    assert.equal(
+      (await (await fetch(`${base}/auth/session`, { headers: { cookie: linkedCookie } })).json())
+        .user,
+      null,
+    );
+    assert.equal(
+      (await db.pool.query('SELECT email,display_name FROM users WHERE id=$1', [existing])).rows[0]
+        .display_name,
+      'Deleted user',
+    );
+    assert.equal(
+      (
+        await privatePost(
+          '/auth/account/merge/confirm',
+          { confirmation: 'MERGE' },
+          combinedCookie,
+          combinedSession.csrfToken,
+        )
+      ).status,
+      409,
+      'Merge proof is single-use',
+    );
   } finally {
     if (app) await app.close();
     await pool.query(`DROP SCHEMA "${schema}" CASCADE`);

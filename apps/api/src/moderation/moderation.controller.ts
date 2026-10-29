@@ -46,7 +46,10 @@ export class ModerationController {
   async revision(@Req() request: AuthRequest, @Param('id') id: string) {
     if (!['moderator', 'administrator'].includes(request.actor!.role))
       throw new ForbiddenException();
-    const result = await this.db.pool.query('SELECT * FROM revisions WHERE id::text=$1', [id]);
+    const result = await this.db.pool.query(
+      'SELECT r.*,r.source_publishers||repo.publisher_ids AS publisher_ids FROM revisions r JOIN repositories repo ON repo.id=r.repository_id WHERE r.id::text=$1',
+      [id],
+    );
     if (!result.rowCount) throw new NotFoundException();
     return {
       revision: result.rows[0] || null,

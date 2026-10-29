@@ -61,11 +61,31 @@ export class ThemesController {
     @Query('query') query = '',
     @Query('mode') mode = '',
     @Query('cursor') cursor = '',
+    @Query('browse') browse = '',
+    @Query('page') page = '0',
     @Res({ passthrough: true }) response: Response,
   ) {
     if (!['', 'dark', 'light'].includes(mode)) throw new BadRequestException('Invalid theme mode');
+    if (browse === '1') {
+      if (!/^[0-9]{1,5}$/.test(page)) throw new BadRequestException('Invalid theme page');
+      const result = await this.db.pool.query(
+        `WITH latest AS (SELECT DISTINCT ON(lower(owner),module_id) * FROM revisions WHERE ${approved} ORDER BY lower(owner),module_id,${order},reviewed_at DESC,id DESC) SELECT r.*,p.size,count(*) OVER() AS total FROM latest r JOIN packages p ON p.sha256=r.sha256 WHERE ($1='' OR r.manifest->>'name' ILIKE $2 OR r.manifest->>'description' ILIKE $2 OR r.owner ILIKE $2) AND ($3='' OR r.manifest->'theme'->>'mode'=$3) ORDER BY lower(r.manifest->>'name') COLLATE "C",r.id LIMIT 31 OFFSET $4`,
+        [
+          String(query).trim().slice(0, 128),
+          `%${String(query).trim().slice(0, 128)}%`,
+          mode,
+          Number(page) * 30,
+        ],
+      );
+      response.setHeader('Cache-Control', 'no-cache');
+      return {
+        items: result.rows.slice(0, 30).map((row) => this.publicRow(row)),
+        total: Number(result.rows[0]?.total ?? 0),
+        nextPage: result.rows.length > 30 ? Number(page) + 1 : null,
+      };
+    }
     const result = await this.db.pool.query(
-      `WITH latest AS (SELECT DISTINCT ON(lower(owner),module_id) * FROM revisions WHERE ${approved} ORDER BY lower(owner),module_id,${order},reviewed_at DESC,id DESC) SELECT r.*,p.size FROM latest r JOIN packages p ON p.sha256=r.sha256 WHERE ($1='' OR r.manifest->>'name' ILIKE $2 OR r.manifest->>'description' ILIKE $2) AND ($3='' OR r.manifest->'theme'->>'mode'=$3) AND ($4='' OR r.id::text>$4) ORDER BY r.id LIMIT 31`,
+      `WITH latest AS (SELECT DISTINCT ON(lower(owner),module_id) * FROM revisions WHERE ${approved} ORDER BY lower(owner),module_id,${order},reviewed_at DESC,id DESC) SELECT r.*,p.size FROM latest r JOIN packages p ON p.sha256=r.sha256 WHERE ($1='' OR r.manifest->>'name' ILIKE $2 OR r.manifest->>'description' ILIKE $2 OR r.owner ILIKE $2) AND ($3='' OR r.manifest->'theme'->>'mode'=$3) AND ($4='' OR r.id::text>$4) ORDER BY r.id LIMIT 31`,
       [
         String(query).slice(0, 128),
         `%${String(query).slice(0, 128)}%`,

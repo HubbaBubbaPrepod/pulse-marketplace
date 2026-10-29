@@ -71,6 +71,7 @@ export function canApproveRevision(actor, row) {
     (actor.role === 'administrator' ||
       (actor.role === 'moderator' &&
         Boolean(actor.githubId) &&
-        actor.githubId !== row.source_owner_id))
+        actor.githubId !== row.source_owner_id &&
+        !(row.publisher_ids || []).includes(actor.githubId)))
   );
 }

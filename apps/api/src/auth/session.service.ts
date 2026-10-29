@@ -80,6 +80,11 @@ export class Sessions {
   async create(userId: string, response: Response, oldToken?: string | null) {
     const token = randomBytes(32).toString('base64url');
     await this.db.transaction(async (client) => {
+      const user = await client.query(
+        'SELECT id FROM users u WHERE id=$1 AND (EXISTS (SELECT 1 FROM identities i WHERE i.user_id=u.id) OR (u.password_hash IS NOT NULL AND u.email_verified)) FOR SHARE',
+        [userId],
+      );
+      if (!user.rowCount) throw new UnauthorizedException('Account no longer available');
       if (oldToken)
         await client.query('DELETE FROM sessions WHERE token_hash=$1', [digest(oldToken)]);
       await client.query(

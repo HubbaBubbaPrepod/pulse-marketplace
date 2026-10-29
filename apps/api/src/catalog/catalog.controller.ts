@@ -51,8 +51,42 @@ export class CatalogController {
     @Query('platform') platform: string = '',
     @Query('cursor') cursor: string = '',
     @Query('runtime') runtime: string = 'native',
+    @Query('browse') browse = '',
+    @Query('page') page = '0',
+    @Query('sort') sort = 'name',
+    @Query('category') category = 'all',
     @Res({ passthrough: true }) response: Response,
   ) {
+    if (browse === '1') {
+      if (
+        !/^[0-9]{1,5}$/.test(page) ||
+        !['name', 'name-desc'].includes(sort) ||
+        !['all', 'containers', 'databases', 'web', 'system', 'storage', 'other'].includes(
+          category,
+        ) ||
+        !['', 'all', 'linux', 'windows'].includes(platform)
+      )
+        throw new BadRequestException('Invalid catalog page');
+      const order = sort === 'name-desc' ? 'DESC' : 'ASC';
+      const result = await this.db.pool.query(
+        `WITH latest AS (SELECT DISTINCT ON(lower(owner),module_id) * FROM revisions WHERE status='approved' AND COALESCE(manifest->>'kind','module')='module' AND ${compatibleRuntime.replace('$RUNTIME', '$1')} ORDER BY lower(owner),module_id,${releaseOrder},reviewed_at DESC,id DESC)
+         SELECT r.*,p.size,repo.name AS repository_name,count(*) OVER() AS total FROM latest r JOIN packages p ON p.sha256=r.sha256 JOIN repositories repo ON repo.id=r.repository_id WHERE ($2='' OR r.manifest->>'name' ILIKE $3 OR r.manifest->>'description' ILIKE $3) AND ($4 IN ('','all') OR ($4='linux' AND r.platforms ?| ARRAY['linux-amd64','linux-arm64']) OR ($4='windows' AND r.platforms ? 'windows-amd64')) AND ($5='all' OR CASE lower(r.module_id) WHEN 'docker' THEN 'containers' WHEN 'postgresql' THEN 'databases' WHEN 'redis' THEN 'databases' WHEN 'nginx' THEN 'web' WHEN 'systemd' THEN 'system' WHEN 'backup' THEN 'storage' ELSE 'other' END=$5) ORDER BY lower(r.manifest->>'name') COLLATE "C" ${order},r.id LIMIT 31 OFFSET $6`,
+        [
+          catalogRuntime(runtime),
+          String(query).trim().slice(0, 200),
+          `%${String(query).trim().slice(0, 200)}%`,
+          platform,
+          category,
+          Number(page) * 30,
+        ],
+      );
+      response.setHeader('Cache-Control', 'no-cache');
+      return {
+        items: result.rows.slice(0, 30).map((row) => this.publicRow(row)),
+        total: Number(result.rows[0]?.total ?? 0),
+        nextPage: result.rows.length > 30 ? Number(page) + 1 : null,
+      };
+    }
     const result = await this.db.pool.query(
       `WITH latest AS (SELECT DISTINCT ON (lower(owner),module_id) * FROM revisions WHERE status='approved' AND COALESCE(manifest->>'kind','module')='module' AND ${compatibleRuntime.replace('$RUNTIME', '$5')} ORDER BY lower(owner),module_id,${releaseOrder},reviewed_at DESC,id DESC) SELECT r.*,p.size,repo.name AS repository_name FROM latest r JOIN packages p ON p.sha256=r.sha256 JOIN repositories repo ON repo.id=r.repository_id WHERE ($1='' OR r.manifest->>'name' ILIKE $2 OR r.manifest->>'description' ILIKE $2) AND ($3='' OR r.platforms ? $3) AND ($4='' OR r.id::text>$4) ORDER BY r.id LIMIT 31`,
       [

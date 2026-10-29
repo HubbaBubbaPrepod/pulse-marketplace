@@ -25,7 +25,7 @@ PUBLIC_ORIGIN/api/v1/auth/github/callback/
 PUBLIC_ORIGIN/api/v1/auth/google/callback/
 ```
 
-For example: `http://127.0.0.1:3100/api/v1/auth/github/callback/`. GitHub uses only `read:user`, Google uses `openid profile`. No provider access/refresh token is retained. An email/password account can explicitly link GitHub from its author dashboard; matching provider email never links accounts automatically. Organization publishing is held back until organizational authorship can be verified.
+For example: `http://127.0.0.1:3100/api/v1/auth/github/callback/`. GitHub uses only `read:user`, Google uses `openid profile`. No provider access/refresh token is retained. An email/password account can explicitly link GitHub from its author dashboard; matching provider email never links accounts automatically. Organization publishing requires an explicit publishers list of numeric GitHub IDs in the organization-controlled default-branch marker. Delegation is refreshed during discovery and expires for private workspace access after 35 minutes without a successful refresh; it does not grant moderation rights.
 
 SMTP examples: `smtps://user:URL_ENCODED_PASSWORD@mail.example.com:465` or `smtp://user:URL_ENCODED_PASSWORD@mail.example.com:587`. Email registration/recovery require SMTP, sender and `MAIL_TOKEN_KEY`. Links expire after 24 hours for confirmation or 15 minutes for reset. Outbox retries up to five attempts, five minutes apart. SMTP acceptance is not proof of inbox delivery. Rotating the key invalidates pending links; back it up securely.
 
@@ -79,14 +79,28 @@ Private responses use `Cache-Control: no-store`. Catalog responses exclude embed
 
 Back up **both** PostgreSQL and `data/packages/`, along with protected environment secrets. Take a consistent pair while discovery/moderation writes are stopped. `docker compose stop` preserves the volume; `docker compose down -v` destroys it. Migration files are checksummed and transactional; never edit an already applied migration.
 
-Current local deployment is for development. Production needs a domain, HTTPS ingress, a supervised API/web process, stable package storage, database backups and trusted ingress request limits. API binds loopback; a remote database needs its own TLS/network policy. No production deployment or Monitor integration is implied by this bootstrap.
+Local scripts are for development. The public deployment and its supervised services, HTTPS ingress, database/package backups and request limits are documented in production.md. API binds loopback; a remote database needs its own TLS/network policy. Monitor integration remains optional for each self-hosted operator.
 
-The initial operator command refuses an existing email or credential file. To change a role, an operator can use a controlled SQL change to `users.role` (`author`, `moderator`, `administrator`); the next request observes it. No browser endpoint grants administrator rights. There is no account-deletion or administrative password-reset UI in this milestone.
+The initial operator command refuses an existing email or credential file. To change a role, an operator can use a controlled SQL change to `users.role` (`author`, `moderator`, `administrator`); the next request observes it. No browser endpoint grants administrator rights. The author workspace supports explicit provider linking/unlinking, password re-confirmation, account anonymization/deletion and merging ordinary author accounts after OAuth proof of the second account and an explicit confirmation. Sensitive actions require a sign-in confirmed within ten minutes. Last sign-in methods and the last administrator are protected. Administrator/moderator accounts cannot be merged. Published artifacts and audit history are retained; previous sessions are revoked. Email-based password recovery remains unavailable when SMTP is disabled.
 
 ## Verification limits
 
 Integration tests use real PostgreSQL with isolated temporary schemas and fake provider/GitHub/mail transports. They cover session revocation, role/ownership checks, CSRF, OAuth state binding/expiry/replay, email token replay/reset, snapshot integrity, concurrent moderation, pagination and changed source ownership. Real provider consent, inbox delivery, real organizational authorship and cross-language Go installer fixture execution remain unverified. Tests do not run uploaded native modules.
 
-The current lockfile audit reports five high findings in the **development ESLint/fast-glob/micromatch/braces chain**. The suggested automatic fix downgrades Next ESLint configuration incompatibly; it has not been applied. This is not a clean-audit claim.
+## Current production status (2026-10-29)
 
-Browser automation was blocked by the browser tool URL policy during this task. HTTP/SSR checks and isolated API integration tests are separate evidence; they do not establish a completed visual/browser QA pass for the connected workspaces.
+GitHub and Google are configured in the public deployment; SMTP is intentionally disabled. Public module/theme pages use 30-item server-side filtering and pagination. Author repositories and revisions have 100-item cursor pages; revision details expose validation paths/codes and moderator comments only to authorized publishers. See production.md for offsite backups. Fresh verification commands are recorded in the changelog; old bootstrap limitations are not a statement about the current public deployment.
+
+## Account and browsing API additions
+
+- `GET /auth/account`: private sign-in methods, recent-auth state and any session-bound pending merge.
+- `POST /auth/account/confirm`: verify the current password without changing it.
+- `POST /auth/account/unlink`: explicit `UNLINK` confirmation and provider; preserve a remaining sign-in method.
+- `POST /auth/account/delete`: explicit `DELETE` confirmation; anonymize profile, remove identities and revoke sessions without deleting packages or audit.
+- `POST /auth/account/merge/:provider`: recent target session plus browser-bound OAuth proof of the source account.
+- `POST /auth/account/merge/confirm`: explicit `MERGE`, one-use proof, no duplicate providers or service-role transfers, revoke both accounts’ prior sessions.
+- `GET /author/revisions/:id`: authorized publisher validation issues and review comments.
+- `GET /catalog?browse=1&runtime=all&query=&platform=all|linux|windows&category=&sort=name|name-desc&page=0`: 30-item pages, `total` and `nextPage`. Legacy cursor requests are unchanged.
+- `GET /themes?browse=1&query=&mode=&page=0`: equivalent bounded theme pages.
+
+Every account mutation requires the existing exact Origin, JSON and CSRF checks. Linking a new sign-in method requires recent authentication; re-confirming an already linked provider remains available after that window.

@@ -93,6 +93,13 @@ test('approval controls match server rules for administrators and non-author mod
     false,
   );
   assert.equal(
+    workspaceRules.canApproveRevision?.(
+      { role: 'moderator', githubId: '777' },
+      { ...row, publisher_ids: ['777'] },
+    ),
+    false,
+  );
+  assert.equal(
     workspaceRules.canApproveRevision?.({ role: 'author', githubId: '102' }, row),
     false,
   );

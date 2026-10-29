@@ -11,10 +11,11 @@ export default async function Page({ params, searchParams }) {
   if (!accountCopy[lang]) notFound();
   const session = await requireSession(lang, 'author');
   const query = await searchParams;
-  const [repos, revisions, capabilities] = await Promise.all([
+  const [repos, revisions, capabilities, account] = await Promise.all([
     api('/author/repositories', true),
     api('/author/revisions', true),
     api('/auth/capabilities'),
+    api('/auth/account', true),
   ]);
   return (
     <div className="page-container">
@@ -23,8 +24,12 @@ export default async function Page({ params, searchParams }) {
         session={session}
         repositories={repos.items}
         revisions={revisions.items}
+        repositoriesCursor={repos.nextCursor}
+        revisionsCursor={revisions.nextCursor}
         capabilities={capabilities}
+        account={account}
         linkStatus={typeof query.link === 'string' ? query.link : ''}
+        mergeStatus={typeof query.merge === 'string' ? query.merge : ''}
       />
     </div>
   );

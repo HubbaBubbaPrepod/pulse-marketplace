@@ -1,5 +1,41 @@
 export const accountCopy = {
   ru: {
+    mergeConflict:
+      'Не удалось объединить аккаунты. Подтверди текущий вход и второй аккаунт заново. Одинаковые провайдеры или два email-входа нужно разрешить отдельно; служебные аккаунты объединять нельзя.',
+    mergeDone: 'Аккаунты объединены. Предыдущие сессии отозваны.',
+    mergeAccounts: 'Объединить аккаунты',
+    mergeExplanation:
+      'Если Google и GitHub создали разные профили, сначала подтверди текущий вход, затем войди во второй аккаунт через его провайдера. Автоматического объединения по email нет. Служебные аккаунты не объединяются; одинаковые способы входа в двух профилях нужно разрешить отдельно.',
+    verifyOther: 'Подтвердить второй аккаунт через',
+    mergeReady: 'Второй аккаунт подтверждён:',
+    mergeWarning:
+      'Способы входа второго аккаунта перейдут в текущий. Имя текущего профиля сохранится, второй профиль будет обезличен, все прежние сессии обоих аккаунтов отозваны. Публикации сохранятся. Действие нельзя отменить.',
+    accountSettings: 'Способы входа и аккаунт',
+    accountSafety:
+      'Для отвязки и удаления нужен вход, подтверждённый за последние 10 минут. Подтверди пароль или снова пройди вход через уже подключённого провайдера.',
+    connected: 'Подключён',
+    notConnected: 'Не подключён',
+    confirmProvider: 'Подтвердить вход',
+    connectProvider: 'Подключить',
+    unlinkProvider: 'Отвязать',
+    confirmAccount: 'Подтвердить пароль',
+    accountVerified: 'Вход подтверждён.',
+    confirmRequired: 'Подтверди вход перед изменением способов входа или удалением аккаунта.',
+    deleteAccount: 'Удалить аккаунт',
+    deleteWarning:
+      'Профиль, способы входа и сессии будут удалены. Опубликованные пакеты, их авторство и история решений сохранятся. Действие нельзя отменить.',
+    unlinkWarning:
+      'Провайдер будет отвязан, остальные сессии отозваны. Последний доступный способ входа удалить нельзя.',
+    typeConfirmation: 'Для подтверждения введи',
+    confirmAction: 'Подтвердить действие',
+    cancelAction: 'Отмена',
+    accountSaved: 'Изменение сохранено.',
+    accountConflict:
+      'Действие недоступно: подтверди вход заново и сохрани хотя бы один способ входа. Для удаления администратора должен остаться другой администратор.',
+    loadMore: 'Показать ещё',
+    reviewDetails: 'Результаты проверки и решения',
+    checksPassed: 'Автоматические проверки пройдены.',
+    noDecisions: 'Решений модератора пока нет.',
     executionRuntime: 'Среда выполнения',
     nativeRuntime: 'Нативный код · полное доверие',
     wasiRuntime: 'Изолированный WASI',
@@ -89,6 +125,42 @@ export const accountCopy = {
     other: 'Другие',
   },
   en: {
+    mergeConflict:
+      'Accounts could not be merged. Confirm your current sign-in and the other account again. Duplicate providers or two email sign-ins need separate resolution; service accounts cannot be merged.',
+    mergeDone: 'Accounts merged. Previous sessions were revoked.',
+    mergeAccounts: 'Merge accounts',
+    mergeExplanation:
+      'If Google and GitHub created separate profiles, confirm your current sign-in, then authenticate to the other account with its provider. Email matching never merges accounts. Service accounts cannot be merged; duplicate sign-in methods need separate resolution.',
+    verifyOther: 'Verify the other account with',
+    mergeReady: 'Other account verified:',
+    mergeWarning:
+      'The other account’s sign-in methods will move to the current account. The current name stays; the other profile is anonymized and all previous sessions on both accounts are revoked. Publications are retained. This cannot be undone.',
+    accountSettings: 'Sign-in methods and account',
+    accountSafety:
+      'Unlinking and deletion require sign-in confirmed within the last 10 minutes. Confirm your password or sign in again with an already linked provider.',
+    connected: 'Connected',
+    notConnected: 'Not connected',
+    confirmProvider: 'Confirm sign-in',
+    connectProvider: 'Connect',
+    unlinkProvider: 'Unlink',
+    confirmAccount: 'Confirm password',
+    accountVerified: 'Sign-in confirmed.',
+    confirmRequired: 'Confirm sign-in before changing methods or deleting the account.',
+    deleteAccount: 'Delete account',
+    deleteWarning:
+      'Your profile, sign-in methods and sessions will be removed. Published packages, attribution and decision history are retained. This cannot be undone.',
+    unlinkWarning:
+      'The provider will be unlinked and other sessions revoked. You cannot remove your last sign-in method.',
+    typeConfirmation: 'To confirm, enter',
+    confirmAction: 'Confirm action',
+    cancelAction: 'Cancel',
+    accountSaved: 'Change saved.',
+    accountConflict:
+      'Action unavailable: confirm sign-in again and keep at least one sign-in method. Another administrator must remain before an administrator can be deleted.',
+    loadMore: 'Load more',
+    reviewDetails: 'Validation and review decisions',
+    checksPassed: 'Automatic checks passed.',
+    noDecisions: 'No moderator decisions yet.',
     executionRuntime: 'Execution runtime',
     nativeRuntime: 'Native code · full trust',
     wasiRuntime: 'Isolated WASI',

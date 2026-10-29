@@ -1,7 +1,14 @@
 'use client';
 import Link from 'next/link';
-import { useRef, useState, useEffect, useDeferredValue, ViewTransition } from 'react';
-import { useSearchParams } from 'next/navigation';
+import {
+  useRef,
+  useState,
+  useEffect,
+  useDeferredValue,
+  useTransition,
+  ViewTransition,
+} from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { Icon } from './icon';
@@ -12,17 +19,27 @@ import { copy, pathFor, moduleCount } from '../lib/copy.mjs';
 import { accountCopy } from '../lib/account-copy.mjs';
 import { transitionName } from '../lib/api-catalog.mjs';
 gsap.registerPlugin(useGSAP);
-export function Catalog({ lang, modules, initialFilters }) {
+export function Catalog({
+  lang,
+  modules,
+  initialFilters,
+  pageMode = false,
+  total = modules.length,
+  page = 0,
+  nextPage = null,
+}) {
   const t = copy[lang],
     scope = useRef(null),
     search = useRef(null);
   const params = useSearchParams();
+  const router = useRouter(),
+    [pending, startTransition] = useTransition();
   const [state, setState] = useState(() => ({ url: params.toString(), filters: initialFilters }));
   const reconciled = syncFilterState(state, params.toString());
   if (reconciled !== state) setState(reconciled);
   const filters = reconciled.filters;
   const deferredFilters = useDeferredValue(filters);
-  const visible = filterModules(modules, deferredFilters),
+  const visible = pageMode ? modules : filterModules(modules, deferredFilters),
     identity = visible.map((m) => m.id).join(',');
   useGSAP(
     () => {
@@ -62,8 +79,26 @@ export function Catalog({ lang, modules, initialFilters }) {
     const next = { ...filters, ...patch };
     setState({ ...reconciled, filters: next });
     const query = filterQuery(next);
-    window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}`);
+    if (!pageMode)
+      window.history.replaceState(
+        null,
+        '',
+        `${window.location.pathname}${query ? `?${query}` : ''}`,
+      );
   }
+  const nextQuery = filterQuery(filters),
+    initialQuery = filterQuery(initialFilters);
+  useEffect(() => {
+    if (!pageMode || nextQuery === initialQuery) return;
+    const timer = setTimeout(
+      () =>
+        startTransition(() =>
+          router.replace(`/${lang}/${nextQuery ? '?' + nextQuery : ''}`, { scroll: false }),
+        ),
+      250,
+    );
+    return () => clearTimeout(timer);
+  }, [pageMode, nextQuery, initialQuery, lang, router]);
   function reset() {
     update({ query: '', platform: 'all', category: 'all', sort: 'name' });
   }
@@ -145,11 +180,16 @@ export function Catalog({ lang, modules, initialFilters }) {
             </Link>
           </div>
         </aside>
-        <div className="catalog-results">
+        <div
+          className="catalog-results"
+          aria-busy={pageMode && (pending || nextQuery !== initialQuery)}
+        >
           <div className="results-heading">
             <span>{t.categories[filters.category]}</span>
             <span role="status" aria-live="polite">
-              {moduleCount(visible.length, lang)}
+              {pending
+                ? accountCopy[lang].busy
+                : moduleCount(pageMode ? total : visible.length, lang)}
             </span>
           </div>
           {visible.length ? (
@@ -196,10 +236,10 @@ export function Catalog({ lang, modules, initialFilters }) {
             </div>
           ) : (
             <div className="empty-state">
-              <Icon name={modules.length ? 'search' : 'box'} size={40} />
-              <h2>{modules.length ? t.emptyTitle : t.unpublishedTitle}</h2>
-              <p>{modules.length ? t.emptyText : t.unpublishedText}</p>
-              {modules.length ? (
+              <Icon name={modules.length || nextQuery || page > 0 ? 'search' : 'box'} size={40} />
+              <h2>{modules.length || nextQuery || page > 0 ? t.emptyTitle : t.unpublishedTitle}</h2>
+              <p>{modules.length || nextQuery || page > 0 ? t.emptyText : t.unpublishedText}</p>
+              {modules.length || nextQuery || page > 0 ? (
                 <button className="button button-outline" onClick={reset}>
                   {t.reset}
                   <Icon name="arrow" size={16} />
@@ -212,6 +252,31 @@ export function Catalog({ lang, modules, initialFilters }) {
               )}
             </div>
           )}
+          {pageMode && (page > 0 || nextPage !== null) ? (
+            <nav
+              className="account-actions"
+              aria-label={lang === 'ru' ? 'Страницы каталога' : 'Catalog pages'}
+            >
+              {page > 0 ? (
+                <Link
+                  className="button button-outline"
+                  href={`/${lang}/?${initialQuery}${initialQuery ? '&' : ''}page=${page - 1}`}
+                  scroll={false}
+                >
+                  {lang === 'ru' ? '← Назад' : '← Previous'}
+                </Link>
+              ) : null}
+              {nextPage !== null ? (
+                <Link
+                  className="button button-outline"
+                  href={`/${lang}/?${initialQuery}${initialQuery ? '&' : ''}page=${nextPage}`}
+                  scroll={false}
+                >
+                  {lang === 'ru' ? 'Дальше →' : 'Next →'}
+                </Link>
+              ) : null}
+            </nav>
+          ) : null}
         </div>
       </div>
       <AuthorCallout lang={lang} />

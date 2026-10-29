@@ -16,6 +16,8 @@ test('HTTP sessions enforce origin, CSRF, current roles, logout and repository o
   const url = new URL(process.env.DATABASE_URL);
   url.searchParams.set('options', `-c search_path=${schema}`);
   let app;
+  let githubOwnerType = 'User',
+    githubPublishers = [];
   try {
     const module = await Test.createTestingModule({ imports: [AppModule] })
       .overrideProvider(CONFIG)
@@ -31,7 +33,7 @@ test('HTTP sessions enforce origin, CSRF, current roles, logout and repository o
         async json() {
           return {
             id: 123,
-            owner: { id: 101, type: 'User' },
+            owner: { id: githubOwnerType === 'User' ? 101 : 202, type: githubOwnerType },
             full_name: 'Author/module',
             default_branch: 'main',
             private: false,
@@ -39,7 +41,12 @@ test('HTTP sessions enforce origin, CSRF, current roles, logout and repository o
           };
         },
         async marker() {
-          return { schemaVersion: 1, moduleId: 'module', packageAsset: 'module.json' };
+          return {
+            schemaVersion: 1,
+            moduleId: 'module',
+            packageAsset: 'module.json',
+            ...(githubPublishers.length ? { publishers: githubPublishers } : {}),
+          };
         },
       })
       .compile();
@@ -147,6 +154,32 @@ test('HTTP sessions enforce origin, CSRF, current roles, logout and repository o
       1,
     );
     assert.equal((await request('/moderation/revisions', undefined, cookie)).status, 403);
+    githubOwnerType = 'Organization';
+    assert.equal(
+      (
+        await request(
+          '/author/repositories',
+          { repository: 'Org/module' },
+          cookie,
+          session.csrfToken,
+        )
+      ).status,
+      404,
+    );
+    githubPublishers = ['101'];
+    assert.equal(
+      (
+        await request(
+          '/author/repositories',
+          { repository: 'Org/module' },
+          cookie,
+          session.csrfToken,
+        )
+      ).status,
+      202,
+    );
+    githubOwnerType = 'User';
+    githubPublishers = [];
     assert.equal((await request('/auth/logout', {}, cookie)).status, 403);
     assert.equal((await request('/auth/logout', {}, cookie, session.csrfToken)).status, 204);
     assert.equal((await request('/author/repositories', undefined, cookie)).status, 401);
@@ -223,8 +256,173 @@ test('HTTP sessions enforce origin, CSRF, current roles, logout and repository o
       0,
     );
     assert.equal((await request('/moderation/revisions', undefined, modCookie)).status, 200);
+    await db.pool.query(
+      "INSERT INTO repositories(id,owner_id,owner,name,module_id,asset_name) VALUES ('123','101','Author','module','module','module.json')",
+    );
+    await db.pool.query(
+      "INSERT INTO revisions(repository_id,source_owner_id,owner,module_id,version,release_id,asset_id,tag,commit_sha,sha256,manifest,platforms,validation_passed,validation_issues,status) SELECT '123','101','Author','module','2.0.'||n::text,n::text,n::text,'v2.0.'||n::text,$1,$2,'{\"name\":\"Module\"}','[]',false,'[{\"path\":\"components.0\",\"code\":\"invalid_binary\"}]','rejected' FROM generate_series(1,101) n",
+      ['b'.repeat(40), 'f'.repeat(64)],
+    );
+    const authorLogin = await request('/auth/login', {
+      email: 'author@example.test',
+      password: 'test-only-password-123',
+    });
+    const authorCookie = authorLogin.headers.get('set-cookie').split(';')[0];
+    const authorPage = await (await request('/author/revisions', undefined, authorCookie)).json();
+    assert.equal(authorPage.items.length, 100);
+    assert.ok(authorPage.nextCursor, 'Authors must be able to reach versions after the first 100');
+    const authorNext = await (
+      await request('/author/revisions?cursor=' + authorPage.nextCursor, undefined, authorCookie)
+    ).json();
+    assert.equal(authorNext.items.length, 1);
+    assert.equal(authorNext.nextCursor, null);
+    assert.equal(new Set([...authorPage.items, ...authorNext.items].map((x) => x.id)).size, 101);
+    const ownRevision = authorPage.items[0].id;
+    await db.pool.query(
+      "INSERT INTO audit_events(actor_id,revision_id,action,comment) VALUES ($1,$2,'reject','Please fix the binary format')",
+      [moderator.id, ownRevision],
+    );
+    const feedbackResponse = await request(
+      '/author/revisions/' + ownRevision,
+      undefined,
+      authorCookie,
+    );
+    assert.equal(feedbackResponse.status, 200);
+    const feedback = await feedbackResponse.json();
+    assert.equal(feedback.revision.validation_issues[0].code, 'invalid_binary');
+    assert.equal(feedback.history[0].comment, 'Please fix the binary format');
+    assert.equal(
+      (await request('/author/revisions/' + first.items[0].id, undefined, authorCookie)).status,
+      404,
+    );
+    assert.equal((await request('/author/revisions/' + ownRevision)).status, 401);
     await db.pool.query("UPDATE users SET role='author' WHERE id=$1", [moderator.id]);
     assert.equal((await request('/moderation/revisions', undefined, modCookie)).status, 403);
+    const account = await request('/auth/account', undefined, authorCookie);
+    assert.equal(account.status, 200);
+    assert.deepEqual((await account.json()).providers, ['github']);
+    const authorSession = await (await request('/auth/session', undefined, authorCookie)).json();
+    assert.equal(
+      (
+        await request(
+          '/auth/account/unlink',
+          { provider: 'github', confirmation: 'UNLINK' },
+          authorCookie,
+        )
+      ).status,
+      403,
+    );
+    await db.pool.query("UPDATE sessions SET created_at=now()-interval '1 hour' WHERE user_id=$1", [
+      user.id,
+    ]);
+    assert.equal(
+      (
+        await request(
+          '/auth/account/unlink',
+          { provider: 'github', confirmation: 'UNLINK' },
+          authorCookie,
+          authorSession.csrfToken,
+        )
+      ).status,
+      409,
+    );
+    assert.equal(
+      (
+        await request(
+          '/auth/account/confirm',
+          { password: 'wrong' },
+          authorCookie,
+          authorSession.csrfToken,
+        )
+      ).status,
+      401,
+    );
+    assert.equal(
+      (
+        await request(
+          '/auth/account/confirm',
+          { password: 'test-only-password-123' },
+          authorCookie,
+          authorSession.csrfToken,
+        )
+      ).status,
+      200,
+    );
+    assert.equal(
+      (
+        await request(
+          '/auth/account/unlink',
+          { provider: 'github', confirmation: 'UNLINK' },
+          authorCookie,
+          authorSession.csrfToken,
+        )
+      ).status,
+      200,
+    );
+    assert.equal(
+      (await db.pool.query('SELECT 1 FROM identities WHERE user_id=$1', [user.id])).rowCount,
+      0,
+    );
+    await db.pool.query("UPDATE users SET role='administrator' WHERE id=$1", [moderator.id]);
+    const modSession = await (await request('/auth/session', undefined, modCookie)).json();
+    assert.equal(
+      (
+        await request(
+          '/auth/account/delete',
+          { confirmation: 'DELETE' },
+          modCookie,
+          modSession.csrfToken,
+        )
+      ).status,
+      409,
+      'The last administrator cannot delete their account',
+    );
+    assert.equal(
+      (
+        await request(
+          '/auth/account/delete',
+          { confirmation: 'wrong' },
+          authorCookie,
+          authorSession.csrfToken,
+        )
+      ).status,
+      400,
+    );
+    assert.equal(
+      (
+        await request(
+          '/auth/account/delete',
+          { confirmation: 'DELETE' },
+          authorCookie,
+          authorSession.csrfToken,
+        )
+      ).status,
+      200,
+    );
+    assert.equal((await request('/author/revisions', undefined, authorCookie)).status, 401);
+    const removed = (
+      await db.pool.query('SELECT email,password_hash,display_name FROM users WHERE id=$1', [
+        user.id,
+      ])
+    ).rows[0];
+    assert.equal(removed.email, null);
+    assert.equal(removed.password_hash, null);
+    assert.equal(removed.display_name, 'Deleted user');
+    await assert.rejects(
+      () =>
+        sessions.create(user.id, {
+          cookie: () => {
+            throw new Error('Deleted account must not receive a cookie');
+          },
+        }),
+      (error) => error.status === 401,
+    );
+    assert.equal(
+      (await db.pool.query("SELECT count(*)::int n FROM revisions WHERE repository_id='123'"))
+        .rows[0].n,
+      101,
+      'Account deletion must preserve released versions',
+    );
   } finally {
     if (app) await app.close();
     await pool.query(`DROP SCHEMA "${schema}" CASCADE`);

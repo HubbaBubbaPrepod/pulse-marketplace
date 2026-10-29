@@ -9,3 +9,4 @@ artifacts/
 *.log
 dist/
 data/
+__pycache__/

@@ -87,6 +87,14 @@ test('moderation binds approvals to digest, checks roles inside the transaction 
       () => review.decide(mod, revision, hash, 'approve', ''),
       (error) => error.status === 400,
     );
+    await db.pool.query('UPDATE revisions SET source_publishers=\'["102"]\' WHERE id=$1', [
+      revision,
+    ]);
+    await assert.rejects(
+      () => review.decide(mod, revision, hash, 'approve', 'Delegated author self review'),
+      (error) => error.status === 403,
+    );
+    await db.pool.query("UPDATE revisions SET source_publishers='[]' WHERE id=$1", [revision]);
     const decisions = await Promise.allSettled([
       review.decide(mod, revision, hash, 'approve', 'Reviewed immutable snapshot'),
       review.decide(mod, revision, hash, 'approve', 'Concurrent decision'),
@@ -235,6 +243,34 @@ test('moderation binds approvals to digest, checks roles inside the transaction 
       200,
     );
     assert.equal((await fetch(`${base}/catalog?runtime=unknown`)).status, 400);
+    await db.pool.query(
+      "INSERT INTO revisions(repository_id,source_owner_id,owner,module_id,version,release_id,asset_id,tag,commit_sha,sha256,manifest,platforms,validation_passed,status) SELECT '1','101','Owner','sample-'||n::text,'1.0.0','page-'||n::text,'page-'||n::text,'v1.0.0',$1,$2,jsonb_build_object('name','Sample '||lpad(n::text,3,'0'),'description','pagination fixture'),'[\"windows-amd64\"]',true,'approved' FROM generate_series(1,35) n",
+      ['c'.repeat(40), hash],
+    );
+    const browse = await (
+      await fetch(`${base}/catalog?runtime=all&browse=1&query=Sample&platform=windows&sort=name`)
+    ).json();
+    assert.equal(browse.items.length, 30);
+    assert.equal(browse.items[0].name, 'Sample 001');
+    assert.equal(browse.total, 35);
+    assert.equal(browse.nextPage, 1);
+    const remaining = await (
+      await fetch(
+        `${base}/catalog?runtime=all&browse=1&query=Sample&platform=windows&sort=name&page=1`,
+      )
+    ).json();
+    assert.equal(remaining.items.length, 5);
+    assert.equal(remaining.items.at(-1).name, 'Sample 035');
+    assert.equal(remaining.nextPage, null);
+    assert.equal(
+      (
+        await (
+          await fetch(`${base}/catalog?runtime=all&browse=1&query=Sample&platform=linux`)
+        ).json()
+      ).items.length,
+      0,
+    );
+    assert.equal((await fetch(`${base}/catalog?browse=1&page=-1`)).status, 400);
   } finally {
     if (app) await app.close();
     await pool.query(`DROP SCHEMA "${schema}" CASCADE`);

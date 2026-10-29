@@ -221,6 +221,22 @@ test('WASI metadata and optional grants survive stripping while artifacts remain
   assert.equal(Object.hasOwn(result.manifest.components[0], 'binaries'), false);
   assert.deepEqual(result.platforms, ['linux-amd64', 'linux-arm64', 'windows-amd64']);
 });
+test('organization delegation markers accept bounded numeric GitHub IDs only', () => {
+  const marker = {
+    schemaVersion: 1,
+    moduleId: 'docker',
+    packageAsset: 'module.json',
+    publishers: ['777'],
+  };
+  assert.equal(validateMarker(marker).ok, true);
+  for (const publishers of [
+    ['777', '777'],
+    ['username'],
+    [777],
+    Array.from({ length: 21 }, (_, i) => String(i + 1)),
+  ])
+    assert.equal(validateMarker({ ...marker, publishers }).ok, false);
+});
 test('WASI refuses mislabeled executables, raw network, undeclared actions and host defaults', () => {
   for (const edit of [
     (p) => (p.components[0].runtime = 'unknown'),

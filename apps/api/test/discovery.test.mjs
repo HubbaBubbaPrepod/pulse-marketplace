@@ -44,7 +44,8 @@ test('discovery is durable, idempotent, pinned and creates pending revisions aft
     ownerId = '101',
     listed = true,
     ownerType = 'User',
-    reads = [];
+    reads = [],
+    publishers = [];
   const fake = {
     async repository(id) {
       return { id, ownerId, ownerType, fullName: 'Owner/module', defaultBranch: 'main' };
@@ -59,7 +60,12 @@ test('discovery is durable, idempotent, pinned and creates pending revisions aft
         throw Object.assign(new Error('Marker did not exist in this historical release'), {
           status: 404,
         });
-      return { schemaVersion: 1, moduleId: 'docker', packageAsset: 'module.json' };
+      return {
+        schemaVersion: 1,
+        moduleId: 'docker',
+        packageAsset: 'module.json',
+        ...(publishers.length ? { publishers } : {}),
+      };
     },
     async *releases() {
       yield {
@@ -130,6 +136,27 @@ test('discovery is durable, idempotent, pinned and creates pending revisions aft
       )
     ).rows[0];
     assert.equal(org, undefined, 'unsupported owner must not persist package bytes or revisions');
+    publishers = ['777'];
+    await db.pool.query('UPDATE discovery_jobs SET next_check_at=now()');
+    assert.equal(
+      (await discovery.runOnce()).staged,
+      1,
+      'A marker controlled by an organization can explicitly delegate publishing',
+    );
+    assert.deepEqual(
+      (await db.pool.query("SELECT publisher_ids FROM repositories WHERE id='1'")).rows[0]
+        .publisher_ids,
+      ['777'],
+    );
+    publishers = [];
+    await db.pool.query('UPDATE discovery_jobs SET next_check_at=now()');
+    await discovery.runOnce();
+    assert.deepEqual(
+      (await db.pool.query("SELECT publisher_ids FROM repositories WHERE id='1'")).rows[0]
+        .publisher_ids,
+      [],
+      'Removing the delegation must revoke access',
+    );
     assert.equal(
       (await db.pool.query("SELECT count(*)::int n FROM revisions WHERE status<>'pending'")).rows[0]
         .n,

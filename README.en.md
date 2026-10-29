@@ -55,7 +55,7 @@ API tests require PostgreSQL and `.env`. They create and remove isolated tempora
 
 ## Current boundaries
 
-GitHub OAuth has been verified locally; configure your own provider application for your installation. Google OAuth and SMTP require separate credentials and their live flows remain unverified. Email may remain disabled. Publication currently supports personal GitHub repositories. Organization-owned revisions fail validation until organizational authorship/self-review checks are implemented. Approval does not guarantee native code safety.
+GitHub and Google are enabled in the public deployment; configure your own OAuth applications when self-hosting. SMTP remains optional: email registration and password recovery are disabled without it. The workspace includes review feedback, pagination, recent sign-in confirmation, provider unlinking, profile deletion and explicit merging of ordinary author accounts. Organization publishing requires repository-controlled delegation: [ORGANIZATIONS.en.md](docs/ORGANIZATIONS.en.md). Approval does not guarantee code safety. Offsite backup scripts use only Python standard library and OpenSSH.
 
 Pulse Monitor includes an opt-in catalog with search, published version selection and verified JSON installation. Manual import remains available. Docker v1.0.3 installation was verified against the local marketplace; existing module IDs require manual updates.
 

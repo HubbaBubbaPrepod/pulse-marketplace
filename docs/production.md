@@ -10,7 +10,7 @@ Marketplace работает на Linux через отдельный Nginx virt
 
 ### Файлы и службы
 
-- `/opt/pulse-marketplace/app` — checkout и production-сборка API.
+- `/opt/pulse-marketplace/releases/<commit>/apps/api` — сборка API выбранного релиза. `/opt/pulse-marketplace/app` сохраняет конфигурацию Docker для базы.
 - `/opt/pulse-marketplace/releases/<commit>/apps/web` — отдельные сборки frontend. Активный каталог: `systemctl show pulse-marketplace-web -p WorkingDirectory --value`. Переключение задаётся в `/etc/systemd/system/pulse-marketplace-web.service.d/release.conf`.
 - `/opt/pulse-marketplace/node/bin/node` — Node.js для непривилегированных служб.
 - `/etc/pulse-marketplace.env` — серверные секреты, доступ только root и группе службы.
@@ -24,13 +24,13 @@ sudo journalctl -u pulse-marketplace-api -u pulse-marketplace-web --since '30 mi
 curl --fail https://marketplace.hubba-cloud.ru/api/v1/health/
 ```
 
-Фронтенд собирайте в новом каталоге релиза до переключения службы, сохраняя предыдущую сборку для отката. После изменения systemd override выполните `systemctl daemon-reload` и перезапустите только web. API обновляется отдельно в своём checkout.
+API и frontend собирайте в новом каталоге релиза до переключения обеих служб, сохраняя предыдущую сборку для отката. Активные каталоги проверяйте через `systemctl show ... -p WorkingDirectory`. Секреты остаются в `/etc/pulse-marketplace.env`; не копируйте их в Git или каталог frontend.
 
 При обновлении сначала сделайте резервную копию, изучите changelog и миграции. Выполняйте `npm ci` и последовательную сборку API/web в checkout; миграции запускайте с production env. Перезапускайте только две службы приложения. Не используйте `docker compose down -v`: это удалит данные PostgreSQL. Откат кода при изменённой схеме требует отдельного плана восстановления.
 
 ### Резервные копии
 
-`pulse-marketplace-backup.timer` ежедневно запускает `/opt/pulse-marketplace/backup.sh`. Копия в `/opt/pulse-marketplace/backups/marketplace-<UTC>` содержит `database.dump`, `packages.tar.gz` и `SHA256SUMS`; `backups/latest` указывает на последнюю копию. Копии содержат чувствительные данные и доступны только root. Автоматического удаления старых копий пока нет: следите за местом. Это копии на том же сервере; для защиты от потери диска переносите их в отдельное хранилище.
+`pulse-marketplace-backup.timer` ежедневно запускает `/opt/pulse-marketplace/backup.sh`. Копия в `/opt/pulse-marketplace/backups/marketplace-<UTC>` содержит `database.dump`, `packages.tar.gz` и `SHA256SUMS`; `backups/latest` указывает на последнюю копию. Копии содержат чувствительные данные и доступны только root. После проверки копия передаётся по SSH на отдельный узел в `/var/backups/pulse-marketplace`. Выделенный ключ допускает только приём трёх файлов; shell, port forwarding и чтение удалённых файлов недоступны. Получатель сверяет имена, типы файлов, размер и SHA-256 перед атомарной публикацией. Хранение: 14 дней локально и 30 на втором узле, но не менее двух последних копий. При ошибке передачи локальная очистка не выполняется. Настройка конкретного второго узла относится к этой установке; при самостоятельном развёртывании нужен собственный SSH-получатель.
 
 ```sh
 sudo systemctl start pulse-marketplace-backup.service
@@ -47,7 +47,7 @@ DNS: A-запись `marketplace` указывает на публичный IPv
 sudo certbot renew --cert-name marketplace.hubba-cloud.ru --dry-run
 ```
 
-GitHub OAuth callback: `https://marketplace.hubba-cloud.ru/api/v1/auth/github/callback/`. Секреты провайдера находятся только в серверном env. После переноса вход выполняется заново; прежние аккаунты сохраняются. Google, регистрация по email и сброс пароля недоступны до настройки соответствующего провайдера/SMTP. Вход существующего email-администратора работает без отправки писем.
+GitHub OAuth callback: `https://marketplace.hubba-cloud.ru/api/v1/auth/github/callback/`. Секреты провайдера находятся только в серверном env. После переноса вход выполняется заново; прежние аккаунты сохраняются. В текущей установке Google и GitHub включены. Регистрация по email и сброс пароля остаются выключенными без SMTP. Вход существующего email-администратора работает без отправки писем.
 
 Nginx ограничивает запросы этого virtual host до 20 запросов/с на IP с burst 60 и возвращает 429 при превышении; тело запроса ограничено 1 MiB. Access log этого хоста отключён, чтобы не сохранять OAuth-коды и одноразовые ссылки. В API остаются собственные ограничения входа и проверка Origin/CSRF.
 
@@ -67,13 +67,13 @@ A dedicated Linux Nginx virtual host redirects HTTP 80 to HTTPS 443. Next.js bin
 - Docker volume `pulse-marketplace_marketplace_database`: accounts, jobs, publications, audit and sessions.
 - `pulse-marketplace-database`, `pulse-marketplace-api`, `pulse-marketplace-web`: enabled systemd services. Application processes run as `pulse-marketplace`.
 
-Build the frontend in a new release directory before switching the service, keeping the previous build for rollback. After editing the systemd override, run `systemctl daemon-reload` and restart only web. Update the API separately in its checkout.
+Build API and web in a new release directory before switching their systemd working directories. Keep the previous release for rollback. Check active paths with `systemctl show ... -p WorkingDirectory`. Secrets remain in `/etc/pulse-marketplace.env`, outside Git and frontend assets.
 
 Use the status, journal and health commands above for diagnostics. Before updating, back up the database/packages and review migrations. Run `npm ci`, build the API and web sequentially, apply migrations with the production environment, then restart only the two application services. Never run `docker compose down -v`; it deletes the database. Rolling back code after a schema change requires a separate recovery plan.
 
 ### Backups
 
-`pulse-marketplace-backup.timer` runs `/opt/pulse-marketplace/backup.sh` daily. Each root-only directory under `/opt/pulse-marketplace/backups/marketplace-<UTC>` contains `database.dump`, `packages.tar.gz` and `SHA256SUMS`. `backups/latest` records the latest path. Backups contain sensitive data. Retention is currently manual; monitor disk usage. These backups share the application server: copy them to independent storage to survive disk loss.
+`pulse-marketplace-backup.timer` runs `/opt/pulse-marketplace/backup.sh` daily. Each root-only directory under `/opt/pulse-marketplace/backups/marketplace-<UTC>` contains `database.dump`, `packages.tar.gz` and `SHA256SUMS`. `backups/latest` records the latest path. Backups contain sensitive data. Verified pairs are sent over SSH to a separate node under `/var/backups/pulse-marketplace`. The dedicated forced-command key allows only backup reception, without shell or forwarding. The receiver validates names, file types, byte limits and SHA-256 before atomic publication. Retention is 14 days locally and 30 remotely, preserving at least the two newest copies. A failed transfer prevents local pruning. Self-hosted deployments must configure their own receiver; the destination used by this installation is not a shared backup service.
 
 Verify checksums, restore with PostgreSQL 18 `pg_restore --single-transaction --exit-on-error --no-owner --no-privileges` into a separate empty database, unpack snapshots separately, and verify each file against its SHA-256 filename. Compare accounts/publications/files before planning a switch. Never restore over the live database. A real restore of both parts was checked during initial deployment; local temporary authentication records were excluded from the migration.
 
@@ -81,6 +81,6 @@ Verify checksums, restore with PostgreSQL 18 `pg_restore --single-transaction --
 
 The `marketplace` A record points to the server's public IPv4. Let's Encrypt HTTP-01 uses `/var/www/pulse-marketplace-acme`; keep port 80 and the challenge route reachable. `certbot.timer` handles renewal. A dedicated deployment hook validates/reloads Nginx after Marketplace certificate renewal. Use the dry-run command above to verify renewal.
 
-Configure the GitHub callback as `https://marketplace.hubba-cloud.ru/api/v1/auth/github/callback/`. Provider secrets stay in the backend environment. Existing accounts are preserved; sign in again after migration. Google, email registration and password recovery remain unavailable until their provider/SMTP is configured. Existing administrator password sign-in does not require email delivery.
+Configure the GitHub callback as `https://marketplace.hubba-cloud.ru/api/v1/auth/github/callback/`. Provider secrets stay in the backend environment. Existing accounts are preserved; sign in again after migration. Google and GitHub are enabled in this deployment. Email registration and password recovery remain disabled without SMTP. Existing administrator password sign-in does not require email delivery.
 
 This virtual host limits traffic to 20 requests/second per IP with burst 60 and returns 429 above that limit; request bodies are capped at 1 MiB. Access logging is disabled to avoid retaining OAuth codes and one-time links. API authentication throttling and Origin/CSRF checks remain active.

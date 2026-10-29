@@ -32,6 +32,17 @@
 
 # Changelog
 
+## 2026-10-29 — Publication workspaces, account controls and operations
+
+- Show authors validation paths/codes and review comments behind ownership checks; paginate repositories and versions.
+- Serve public module/theme browsing in 30-item filtered pages with crawlable navigation; preserve legacy cursor/runtime negotiation for Monitor.
+- Add CSRF-protected account controls with recent sign-in checks, last-method/last-administrator protection, session revocation and profile anonymization while retaining publications/audit.
+- Add explicit, session-bound OAuth proof and confirmation before merging ordinary author accounts; never merge by email or transfer service roles.
+- Extend discovery markers with bounded `publishers` GitHub ID lists for organization-controlled delegation. Record original publishers and block delegated moderator self-approval.
+- Add migrations 006 and 007 for expiring merge proofs and organization delegation; existing migrations remain unchanged.
+- Add verified SSH offsite backup reception, atomic publication and bounded retention, with a forced-command key and no remote shell.
+- Update RU/EN operations, account and publication documentation. SMTP remains optional and disabled in this deployment.
+
 ## 2026-10-17 — Google user data disclosure
 
 - Add the explicit Google API Services User Data Policy and Limited Use undertaking in RU/EN privacy policies.

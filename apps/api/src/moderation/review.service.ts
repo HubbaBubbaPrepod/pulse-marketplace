@@ -61,7 +61,18 @@ export class ReviewService {
               [actorId],
             )
           ).rows[0];
-          if (!github || github.provider_id === revision.source_owner_id)
+          const publishers =
+            (
+              await client.query('SELECT publisher_ids FROM repositories WHERE id=$1', [
+                revision.repository_id,
+              ])
+            ).rows[0]?.publisher_ids || [];
+          if (
+            !github ||
+            github.provider_id === revision.source_owner_id ||
+            publishers.includes(github.provider_id) ||
+            (revision.source_publishers || []).includes(github.provider_id)
+          )
             throw new ForbiddenException('A linked non-author GitHub identity is required');
         }
         if (!revision.validation_passed) throw new ConflictException('Automatic validation failed');

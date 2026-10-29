@@ -96,6 +96,12 @@ export function Developers({ lang }) {
         <div>
           <h2>{t.trustTitle}</h2>
           <p>{t.trustText}</p>
+          <a
+            className="text-link"
+            href={`https://github.com/HubbaBubbaPrepod/pulse-marketplace/blob/main/docs/ORGANIZATIONS${lang === 'en' ? '.en' : ''}.md`}
+          >
+            {lang === 'ru' ? 'Публикация от организации' : 'Organization publishing'} ↗
+          </a>
         </div>
       </section>
     </div>

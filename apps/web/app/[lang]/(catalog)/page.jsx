@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { Hero } from '../../../components/hero';
 import { Catalog } from '../../../components/catalog';
 import { parseFilters } from '../../../lib/catalog.mjs';
-import { catalogRows } from '../../../lib/server-api';
+import { catalogPage } from '../../../lib/server-api';
 import { catalogModule } from '../../../lib/api-catalog.mjs';
 import { accountCopy } from '../../../lib/account-copy.mjs';
 import { copy, pathFor } from '../../../lib/copy.mjs';
@@ -27,9 +27,16 @@ export default async function Page({ params, searchParams }) {
   );
   let rows = [],
     modules = [],
+    total = 0,
+    nextPage = null,
     unavailable = false;
+  const page =
+    typeof query.page === 'string' && /^[0-9]{1,5}$/.test(query.page) ? Number(query.page) : 0;
   try {
-    rows = await catalogRows();
+    const result = await catalogPage(filters, page);
+    rows = result.items;
+    total = result.total;
+    nextPage = result.nextPage;
     modules = rows.map(catalogModule);
   } catch {
     unavailable = true;
@@ -72,7 +79,16 @@ export default async function Page({ params, searchParams }) {
             <p>{accountCopy[lang].apiUnavailableText}</p>
           </section>
         ) : (
-          <Catalog lang={lang} modules={modules} initialFilters={filters} />
+          <Catalog
+            key={JSON.stringify(query)}
+            lang={lang}
+            modules={modules}
+            initialFilters={filters}
+            pageMode
+            total={total}
+            page={page}
+            nextPage={nextPage}
+          />
         )}
       </div>
     </ViewTransition>

@@ -42,6 +42,28 @@ export async function catalogRows() {
   return items;
 }
 
+export async function catalogPage(filters, page = 0) {
+  const params = new URLSearchParams({
+    runtime: 'all',
+    browse: '1',
+    query: filters.query,
+    platform: filters.platform,
+    category: filters.category,
+    sort: filters.sort,
+    page: String(page),
+  });
+  return api('/catalog?' + params);
+}
+export async function themesPage(filters, page = 0) {
+  const params = new URLSearchParams({
+    browse: '1',
+    query: filters.query,
+    mode: filters.mode === 'all' ? '' : filters.mode,
+    page: String(page),
+  });
+  return api('/themes?' + params);
+}
+
 export async function themeRows() {
   const items = [];
   let cursor = '';

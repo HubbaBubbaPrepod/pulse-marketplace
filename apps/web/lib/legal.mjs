@@ -1,5 +1,5 @@
 export const legal = {
-  updated: '2026-10-17',
+  updated: '2026-10-29',
   documents: {
     privacy: {
       ru: {
@@ -113,7 +113,7 @@ export const legal = {
             title: 'Сроки хранения, прекращение обработки и уничтожение',
             paragraphs: [
               'Идентификатор Google и отображаемое имя хранятся в базе PostgreSQL Pulse Marketplace, пока они необходимы для работы аккаунта и Google-входа, если не поступил запрос на удаление или не возникло иное законное основание хранения. Порядок удаления указан в разделе об удалении Google-привязки ниже. Другие данные профиля хранятся для работы аккаунта. Сессия истекает через 7 дней, состояние OAuth — через 10 минут; просроченные записи авторизации очищаются фоновым процессом. История публикаций и модерации сохраняется для целостности каталога и рассмотрения спорных ситуаций.',
-              'Резервные копии базы и пакетов создаются ежедневно. Сейчас их ротацией управляет владелец вручную: автоматический срок удаления копий не установлен. Удаление записей из основной базы само по себе не стирает уже созданные резервные копии. При запросе удаления владелец отдельно учитывает их и восстановление данных.',
+              'Резервные копии базы и пакетов создаются ежедневно. Локальные копии очищаются после 14 дней, копии на отдельном узле — после 30 дней; сохраняются как минимум две последние копии. При сбоях резервного копирования старые копии могут сохраняться дольше. Удаление записей из основной базы само по себе не стирает уже созданные резервные копии. При запросе удаления владелец отдельно учитывает их и восстановление данных.',
             ],
           },
           {
@@ -147,9 +147,9 @@ export const legal = {
             id: 'google-deletion',
             title: 'Порядок удаления Google-привязки и аккаунта',
             paragraphs: [
-              'Чтобы удалить Google-привязку, аккаунт или связанные с ними данные, напишите на heyhubbabubbapr@gmail.com с темой «Pulse Marketplace — удаление данных». Укажите отображаемое имя и способ входа; владелец проверит принадлежность аккаунта безопасным соразмерным способом. Самостоятельной кнопки удаления сейчас нет.',
+              'Чтобы удалить Google-привязку, аккаунт или связанные с ними данные, напишите на heyhubbabubbapr@gmail.com с темой «Pulse Marketplace — удаление данных». Укажите отображаемое имя и способ входа; владелец проверит принадлежность аккаунта безопасным соразмерным способом. Удаление профиля и отвязка провайдера доступны в кабинете после повторного подтверждения входа. Обращение по email остаётся доступным для дополнительных требований и помощи.',
               'После подтверждения запроса владелец прекращает доступ через удаляемую привязку, отзывает затронутые сессии и удаляет либо обезличивает сведения, которые больше не нужны для предоставления сервиса или обязательного хранения. Если удаление затрагивает единственный способ входа, доступ к аккаунту будет утрачен; альтернативный способ входа нужно согласовать заранее.',
-              'Удаление Google-привязки не отзывает уже выданные лицензии на опубликованные модули. Необходимая история решений может сохраняться для безопасности и рассмотрения споров с минимизацией персональных данных. Резервные копии рассматриваются отдельно при удалении и восстановлении; автоматический срок их ротации пока не настроен.',
+              'Удаление Google-привязки не отзывает уже выданные лицензии на опубликованные модули. Необходимая история решений может сохраняться для безопасности и рассмотрения споров с минимизацией персональных данных. Резервные копии рассматриваются отдельно при удалении и восстановлении; настроена ротация 14 дней локально и 30 дней на отдельном узле с сохранением как минимум двух последних копий. После удаления аккаунта не восстанавливайте его данные в действующий сервис без отдельного основания.',
               'Вы также можете убрать разрешение Pulse Marketplace в настройках подключений Google-аккаунта. Это действие не удаляет уже сохранённую запись из базы Marketplace: для её удаления нужно обратиться к владельцу сервиса.',
             ],
           },
@@ -293,7 +293,7 @@ export const legal = {
             title: 'Retention, cessation and deletion',
             paragraphs: [
               'Google user identifiers and display names are stored in the Pulse Marketplace PostgreSQL database for as long as they are needed to maintain the account and Google sign-in, unless deletion is requested or another lawful retention ground applies. Deletion requests follow the procedure in the Google account deletion section below. Other profile data is retained to operate accounts. Sessions expire after 7 days and OAuth state after 10 minutes; a background process removes expired authentication records. Publication and moderation history is retained for catalog integrity and dispute handling.',
-              'The database and packages are backed up daily. Retention is currently managed manually by the operator; automatic backup expiry has not been configured. Deleting a primary database record does not itself erase existing backups. The operator must separately account for backups and recovery when handling deletion requests.',
+              'The database and packages are backed up daily. Local backups rotate after 14 days and offsite backups after 30 days, preserving at least two latest copies. Backup failures may retain older copies longer. Deleting a primary database record does not itself erase existing backups. The operator must separately account for backups and recovery when handling deletion requests.',
             ],
           },
           {
@@ -327,9 +327,9 @@ export const legal = {
             id: 'google-deletion',
             title: 'Deletion of a Google identity and account',
             paragraphs: [
-              'To delete a Google identity link, account or associated data, email heyhubbabubbapr@gmail.com with the subject “Pulse Marketplace — data deletion”. Include the display name and sign-in method; the operator verifies account ownership in a safe and proportionate way. There is currently no self-service deletion button.',
+              'To delete a Google identity link, account or associated data, email heyhubbabubbapr@gmail.com with the subject “Pulse Marketplace — data deletion”. Include the display name and sign-in method; the operator verifies account ownership in a safe and proportionate way. Profile deletion and provider unlinking are available in the account workspace after sign-in re-confirmation. Email remains available for additional requests and assistance.',
               'After verifying the request, the operator disables the identity being removed, revokes affected sessions and deletes or anonymizes information no longer required to provide the service or meet mandatory retention obligations. Removing the only sign-in method loses account access; arrange an alternative sign-in method beforehand if needed.',
-              'Deleting a Google identity link does not revoke licenses already granted for published modules. Necessary decision history may be retained for security and disputes with personal data minimized. Backups are considered separately during deletion and recovery; automatic backup rotation is not yet configured.',
+              'Deleting a Google identity link does not revoke licenses already granted for published modules. Necessary decision history may be retained for security and disputes with personal data minimized. Backups are considered separately during deletion and recovery; rotation is configured for 14 days locally and 30 days on a separate node, preserving at least two latest copies. Backup failures can extend retention.',
               [
                 'You can also remove Pulse Marketplace access in your ',
                 {
@@ -692,7 +692,7 @@ export const legal = {
             id: 'discovery',
             title: 'Обнаружение и проверка',
             paragraphs: [
-              'Marketplace обнаруживает репозитории по topic pulse-module и маркеру протокола. Проверка формата, платформ и контрольных сумм не публикует модуль автоматически: версия поступает на модерацию. Текущая реализация поддерживает персональные репозитории GitHub; публикация от организаций пока не поддерживается.',
+              'Marketplace обнаруживает репозитории по topic pulse-module и маркеру протокола. Проверка формата, платформ и контрольных сумм не публикует модуль автоматически: версия поступает на модерацию. Поддерживаются персональные репозитории GitHub и репозитории организаций с явным списком числовых GitHub ID издателей в маркере основной ветки. Делегирование не отменяет проверку каждой версии и не даёт права одобрять собственную работу как модератор.',
             ],
           },
           {
@@ -755,7 +755,7 @@ export const legal = {
             id: 'discovery',
             title: 'Discovery and validation',
             paragraphs: [
-              'Marketplace discovers repositories using the pulse-module topic and protocol marker. Passing format, platform and digest validation does not automatically publish a module: the revision enters moderation. The current implementation supports personally owned GitHub repositories; organization publishing is not yet supported.',
+              'Marketplace discovers repositories using the pulse-module topic and protocol marker. Passing format, platform and digest validation does not automatically publish a module: the revision enters moderation. Personal GitHub repositories and organization repositories with explicitly delegated numeric GitHub publisher IDs in the default-branch marker are supported. Delegation does not bypass version review or allow a moderator to approve their own work.',
             ],
           },
           {
@@ -800,14 +800,14 @@ export const legal = {
   labels: {
     ru: {
       eyebrow: 'PULSE / ДОКУМЕНТЫ',
-      updated: 'Редакция от 17 октября 2026',
+      updated: 'Редакция от 29 октября 2026',
       contents: 'На этой странице',
       navigation: 'Документы и контакты',
       contact: 'Связаться с владельцем',
     },
     en: {
       eyebrow: 'PULSE / DOCUMENTS',
-      updated: 'Last updated: October 17, 2026',
+      updated: 'Last updated: October 29, 2026',
       contents: 'On this page',
       navigation: 'Policies and contacts',
       contact: 'Contact the operator',

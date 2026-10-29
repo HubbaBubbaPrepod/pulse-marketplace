@@ -17,6 +17,7 @@ import { Providers } from './providers.js';
 import { OAuth } from './oauth.service.js';
 import { EmailAccounts } from './email.service.js';
 import type { AuthCapabilities } from '@pulse-marketplace/contracts';
+import { Accounts } from './account.service.js';
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -24,7 +25,68 @@ export class AuthController {
     private readonly providers: Providers,
     private readonly oauth: OAuth,
     private readonly email: EmailAccounts,
+    private readonly accounts: Accounts,
   ) {}
+  @Get('account')
+  @UseGuards(SessionGuard)
+  account(@Req() request: AuthRequest, @Res({ passthrough: true }) response: Response) {
+    response.setHeader('Cache-Control', 'no-store');
+    return this.accounts.current(request);
+  }
+  @Post('account/confirm')
+  @HttpCode(200)
+  @UseGuards(SessionGuard)
+  confirmAccount(@Req() request: AuthRequest, @Body() body: unknown) {
+    return this.accounts.confirm(request, body);
+  }
+  @Post('account/unlink')
+  @HttpCode(200)
+  @UseGuards(SessionGuard)
+  unlinkAccount(@Req() request: AuthRequest, @Body() body: unknown) {
+    return this.accounts.change(request, body);
+  }
+  @Post('account/delete')
+  @HttpCode(200)
+  @UseGuards(SessionGuard)
+  async deleteAccount(
+    @Req() request: AuthRequest,
+    @Body() body: unknown,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const result = await this.accounts.change(request, body, true);
+    await this.sessions.logout(request, response);
+    return result;
+  }
+  @Post('account/merge/confirm')
+  @HttpCode(200)
+  @UseGuards(SessionGuard)
+  async mergeAccounts(
+    @Req() request: AuthRequest,
+    @Body() body: unknown,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const result = await this.accounts.merge(request, body);
+    await this.sessions.create(request.actor!.id, response, request.sessionToken);
+    return result;
+  }
+  @Post('account/merge/:provider')
+  @UseGuards(SessionGuard)
+  async startMerge(
+    @Param('provider') provider: string,
+    @Req() request: AuthRequest,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    return {
+      url: await this.oauth.start(
+        provider,
+        request,
+        response,
+        request.body?.lang === 'en' ? '/en/author/' : '/ru/author/',
+        true,
+        true,
+      ),
+    };
+  }
   @Get('session')
   async current(@Req() request: Request, @Res({ passthrough: true }) response: Response) {
     response.setHeader('Cache-Control', 'no-store');
@@ -89,7 +151,17 @@ export class AuthController {
     @Req() request: AuthRequest,
     @Res({ passthrough: true }) response: Response,
   ) {
-    return { url: await this.oauth.start(provider, request, response, '/ru/author/', true) };
+    if (!(await this.accounts.current(request)).providers.includes(provider))
+      await this.accounts.requireFresh(request);
+    return {
+      url: await this.oauth.start(
+        provider,
+        request,
+        response,
+        request.body?.lang === 'en' ? '/en/author/' : '/ru/author/',
+        true,
+      ),
+    };
   }
   @Post('login')
   @HttpCode(200)

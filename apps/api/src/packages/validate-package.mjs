@@ -12,7 +12,12 @@ const keys = (value, allowed) =>
 const failure = (path, code) => ({ ok: false, issues: [{ path, code }] });
 export function validateMarker(value) {
   if (
-    !keys(value, ['schemaVersion', 'kind', 'moduleId', 'packageAsset']) ||
+    !keys(value, ['schemaVersion', 'kind', 'moduleId', 'packageAsset', 'publishers']) ||
+    (value.publishers !== undefined &&
+      (!Array.isArray(value.publishers) ||
+        value.publishers.length > 20 ||
+        value.publishers.some((id) => typeof id !== 'string' || !/^[1-9][0-9]{0,19}$/.test(id)) ||
+        new Set(value.publishers).size !== value.publishers.length)) ||
     value.schemaVersion !== 1 ||
     (value.kind !== undefined && !['module', 'theme'].includes(value.kind)) ||
     !text(value.moduleId, 64, true) ||
@@ -28,6 +33,7 @@ export function validateMarker(value) {
       schemaVersion: 1,
       moduleId: value.moduleId,
       packageAsset: value.packageAsset,
+      ...(value.publishers ? { publishers: value.publishers } : {}),
     },
   };
 }
