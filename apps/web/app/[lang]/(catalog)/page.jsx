@@ -29,6 +29,7 @@ export default async function Page({ params, searchParams }) {
     modules = [],
     total = 0,
     nextPage = null,
+    categoryCounts = {},
     unavailable = false;
   const page =
     typeof query.page === 'string' && /^[0-9]{1,5}$/.test(query.page) ? Number(query.page) : 0;
@@ -37,6 +38,7 @@ export default async function Page({ params, searchParams }) {
     rows = result.items;
     total = result.total;
     nextPage = result.nextPage;
+    categoryCounts = result.categoryCounts;
     modules = rows.map(catalogModule);
   } catch {
     unavailable = true;
@@ -88,6 +90,7 @@ export default async function Page({ params, searchParams }) {
             total={total}
             page={page}
             nextPage={nextPage}
+            categoryCounts={categoryCounts}
           />
         )}
       </div>

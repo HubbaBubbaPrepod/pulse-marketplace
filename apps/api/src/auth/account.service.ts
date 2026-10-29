@@ -71,8 +71,8 @@ export class Accounts {
       'SELECT id,role FROM users WHERE id=ANY($1::uuid[]) ORDER BY id FOR UPDATE',
       [[target, source]],
     );
-    if (users.rowCount !== 2 || users.rows.some((row: any) => row.role !== 'author'))
-      throw new ConflictException('Service accounts cannot be merged');
+    if (users.rowCount !== 2 || users.rows.find((row: any) => row.id === source)?.role !== 'author')
+      throw new ConflictException('A service account cannot be merged into another account');
     const fresh = await client.query(
       "SELECT 1 FROM sessions WHERE token_hash=$1 AND user_id=$2 AND expires_at>now() AND created_at>now()-interval '10 minutes'",
       [digest(token), target],
@@ -102,8 +102,8 @@ export class Accounts {
       ).rows;
       const target = rows.find((row) => row.id === proof.target_user_id),
         source = rows.find((row) => row.id === proof.source_user_id);
-      if (!source || !target || source.role !== 'author' || target.role !== 'author')
-        throw new ConflictException('Service accounts cannot be merged');
+      if (!source || !target || source.role !== 'author')
+        throw new ConflictException('A service account cannot be merged into another account');
       const fresh = await client.query(
         "SELECT 1 FROM sessions WHERE token_hash=$1 AND user_id=$2 AND expires_at>now() AND created_at>now()-interval '10 minutes' FOR UPDATE",
         [digest(request.sessionToken!), target.id],

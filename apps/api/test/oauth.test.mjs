@@ -208,6 +208,23 @@ test('OAuth state is browser-bound, expiring and one-use; provider email never m
       200,
     );
     providerId = 'provider-user-1';
+    await db.pool.query("UPDATE users SET role='administrator' WHERE id=$1", [current.user.id]);
+    await db.pool.query("UPDATE users SET role='administrator' WHERE id=$1", [existing]);
+    const blocked = await privatePost('/auth/account/merge/github', {});
+    const blockedState = new URL((await blocked.json()).url).searchParams.get('state');
+    const blockedCallback = await fetch(
+      `${base}/auth/github/callback?state=${blockedState}&code=blocked-merge`,
+      {
+        headers: { cookie: linkedCookie + '; ' + blocked.headers.get('set-cookie').split(';')[0] },
+        redirect: 'manual',
+      },
+    );
+    assert.equal(
+      blockedCallback.headers.get('location'),
+      '/ru/author/?merge=failed',
+      'The source cannot transfer administrative privileges',
+    );
+    await db.pool.query("UPDATE users SET role='author' WHERE id=$1", [existing]);
     const merge = await privatePost('/auth/account/merge/github', {});
     assert.equal(merge.status, 201);
     const mergeState = new URL((await merge.json()).url).searchParams.get('state');
@@ -242,6 +259,11 @@ test('OAuth state is browser-bound, expiring and one-use; provider email never m
       await fetch(`${base}/auth/session`, { headers: { cookie: combinedCookie } })
     ).json();
     assert.equal(combinedSession.user.id, current.user.id);
+    assert.equal(
+      combinedSession.user.role,
+      'administrator',
+      'The confirmed destination keeps its own role; roles are never copied from the source',
+    );
     assert.equal(combinedSession.user.githubId, 'provider-user-1');
     assert.equal(
       (await (await fetch(`${base}/auth/session`, { headers: { cookie: linkedCookie } })).json())

@@ -20,6 +20,7 @@ export default async function Page({ params, searchParams }) {
   return (
     <div className="page-container">
       <AccountAuthor
+        key={`${session.user.id}:${session.user.githubId ?? 'none'}:${session.csrfToken}`}
         lang={lang}
         session={session}
         repositories={repos.items}

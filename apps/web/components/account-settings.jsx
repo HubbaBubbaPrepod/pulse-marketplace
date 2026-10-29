@@ -103,7 +103,7 @@ export function AccountSettings({ lang, session, account, capabilities, mergeSta
             {account.providers.includes(name) ? (
               <button
                 className="button button-outline"
-                disabled={busy || !fresh}
+                disabled={busy || !fresh || (account.providers.length < 2 && !account.password)}
                 onClick={() => {
                   setIntent({ type: 'unlink', provider: name });
                   setConfirmation('');
@@ -115,6 +115,7 @@ export function AccountSettings({ lang, session, account, capabilities, mergeSta
           </li>
         ))}
       </ul>
+      {account.providers.length < 2 && !account.password ? <p>{t.keepSignIn}</p> : null}
       {account.password ? (
         <form className="auth-fields" onSubmit={verify}>
           <label>
@@ -134,43 +135,41 @@ export function AccountSettings({ lang, session, account, capabilities, mergeSta
         </form>
       ) : null}
       <p role="status">{fresh ? t.accountVerified : t.confirmRequired}</p>
-      {session.user.role === 'author' ? (
-        <>
-          <h3>{t.mergeAccounts}</h3>
-          <p>{t.mergeExplanation}</p>
-          <div className="account-actions">
-            {['github', 'google']
-              .filter((name) => capabilities[name])
-              .map((name) => (
-                <button
-                  key={name}
-                  className="button button-outline"
-                  disabled={busy || !fresh}
-                  onClick={() => provider(name, true)}
-                >
-                  {t.verifyOther} {name === 'github' ? 'GitHub' : 'Google'}
-                </button>
-              ))}
-          </div>
-          {account.merge ? (
-            <div role="status">
-              <p>
-                {t.mergeReady} <strong>{account.merge.displayName}</strong>
-              </p>
+      <div>
+        <h3>{t.mergeAccounts}</h3>
+        <p>{t.mergeExplanation}</p>
+        <div className="account-actions">
+          {['github', 'google']
+            .filter((name) => capabilities[name])
+            .map((name) => (
               <button
-                className="button"
+                key={name}
+                className="button button-outline"
                 disabled={busy || !fresh}
-                onClick={() => {
-                  setIntent({ type: 'merge/confirm' });
-                  setConfirmation('');
-                }}
+                onClick={() => provider(name, true)}
               >
-                {t.mergeAccounts}
+                {t.verifyOther} {name === 'github' ? 'GitHub' : 'Google'}
               </button>
-            </div>
-          ) : null}
-        </>
-      ) : null}
+            ))}
+        </div>
+        {account.merge ? (
+          <div role="status">
+            <p>
+              {t.mergeReady} <strong>{account.merge.displayName}</strong>
+            </p>
+            <button
+              className="button"
+              disabled={busy || !fresh}
+              onClick={() => {
+                setIntent({ type: 'merge/confirm' });
+                setConfirmation('');
+              }}
+            >
+              {t.mergeAccounts}
+            </button>
+          </div>
+        ) : null}
+      </div>
       <button
         className="button button-outline"
         disabled={busy || !fresh}

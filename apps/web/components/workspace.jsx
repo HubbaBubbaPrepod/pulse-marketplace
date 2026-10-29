@@ -36,7 +36,7 @@ export function Workspace({ lang, section, children, live = false, role = 'autho
   return (
     <ViewTransition enter="auto" exit="auto" default="none">
       <div className="workspace" ref={scope}>
-        <nav className="workspace-nav" aria-label={t.workspace}>
+        <nav className="workspace-nav" aria-label={live ? t.author : t.workspace}>
           <Link
             href={pathFor(lang, 'author')}
             aria-current={section === 'author' ? 'page' : undefined}

@@ -253,6 +253,11 @@ test('moderation binds approvals to digest, checks roles inside the transaction 
     assert.equal(browse.items.length, 30);
     assert.equal(browse.items[0].name, 'Sample 001');
     assert.equal(browse.total, 35);
+    assert.equal(
+      browse.categoryCounts.other,
+      35,
+      'Category totals must describe all matches, not only the first page',
+    );
     assert.equal(browse.nextPage, 1);
     const remaining = await (
       await fetch(

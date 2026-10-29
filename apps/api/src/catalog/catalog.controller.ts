@@ -30,6 +30,7 @@ const releaseOrder = `split_part(version,'.',1)::numeric DESC,
 const compatibleRuntime = `( $RUNTIME = 'all' OR NOT EXISTS (
   SELECT 1 FROM jsonb_array_elements(COALESCE(manifest->'components','[]'::jsonb)) component
   WHERE component->>'runtime'='wasip1'))`;
+const categorySQL = `CASE lower(r.module_id) WHEN 'docker' THEN 'containers' WHEN 'postgresql' THEN 'databases' WHEN 'redis' THEN 'databases' WHEN 'nginx' THEN 'web' WHEN 'systemd' THEN 'system' WHEN 'backup' THEN 'storage' ELSE 'other' END`;
 function catalogRuntime(value: string) {
   if (!['native', 'all'].includes(value))
     throw new BadRequestException('Unsupported runtime filter');
@@ -68,6 +69,19 @@ export class CatalogController {
       )
         throw new BadRequestException('Invalid catalog page');
       const order = sort === 'name-desc' ? 'DESC' : 'ASC';
+      const facets = await this.db.pool.query(
+        `WITH latest AS (SELECT DISTINCT ON(lower(owner),module_id) * FROM revisions WHERE status='approved' AND COALESCE(manifest->>'kind','module')='module' AND ${compatibleRuntime.replace('$RUNTIME', '$1')} ORDER BY lower(owner),module_id,${releaseOrder},reviewed_at DESC,id DESC) SELECT ${categorySQL} AS category,count(*) AS count FROM latest r WHERE ($2='' OR r.manifest->>'name' ILIKE $3 OR r.manifest->>'description' ILIKE $3) AND ($4 IN ('','all') OR ($4='linux' AND r.platforms ?| ARRAY['linux-amd64','linux-arm64']) OR ($4='windows' AND r.platforms ? 'windows-amd64')) GROUP BY 1`,
+        [
+          catalogRuntime(runtime),
+          String(query).trim().slice(0, 200),
+          `%${String(query).trim().slice(0, 200)}%`,
+          platform,
+        ],
+      );
+      const categoryCounts: Record<string, number> = Object.fromEntries(
+        facets.rows.map((row) => [row.category, Number(row.count)]),
+      );
+      categoryCounts.all = facets.rows.reduce((sum, row) => sum + Number(row.count), 0);
       const result = await this.db.pool.query(
         `WITH latest AS (SELECT DISTINCT ON(lower(owner),module_id) * FROM revisions WHERE status='approved' AND COALESCE(manifest->>'kind','module')='module' AND ${compatibleRuntime.replace('$RUNTIME', '$1')} ORDER BY lower(owner),module_id,${releaseOrder},reviewed_at DESC,id DESC)
          SELECT r.*,p.size,repo.name AS repository_name,count(*) OVER() AS total FROM latest r JOIN packages p ON p.sha256=r.sha256 JOIN repositories repo ON repo.id=r.repository_id WHERE ($2='' OR r.manifest->>'name' ILIKE $3 OR r.manifest->>'description' ILIKE $3) AND ($4 IN ('','all') OR ($4='linux' AND r.platforms ?| ARRAY['linux-amd64','linux-arm64']) OR ($4='windows' AND r.platforms ? 'windows-amd64')) AND ($5='all' OR CASE lower(r.module_id) WHEN 'docker' THEN 'containers' WHEN 'postgresql' THEN 'databases' WHEN 'redis' THEN 'databases' WHEN 'nginx' THEN 'web' WHEN 'systemd' THEN 'system' WHEN 'backup' THEN 'storage' ELSE 'other' END=$5) ORDER BY lower(r.manifest->>'name') COLLATE "C" ${order},r.id LIMIT 31 OFFSET $6`,
@@ -83,7 +97,8 @@ export class CatalogController {
       response.setHeader('Cache-Control', 'no-cache');
       return {
         items: result.rows.slice(0, 30).map((row) => this.publicRow(row)),
-        total: Number(result.rows[0]?.total ?? 0),
+        total: categoryCounts[category] ?? 0,
+        categoryCounts,
         nextPage: result.rows.length > 30 ? Number(page) + 1 : null,
       };
     }

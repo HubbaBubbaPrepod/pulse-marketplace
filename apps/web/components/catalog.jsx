@@ -27,6 +27,7 @@ export function Catalog({
   total = modules.length,
   page = 0,
   nextPage = null,
+  categoryCounts = {},
 }) {
   const t = copy[lang],
     scope = useRef(null),
@@ -161,9 +162,11 @@ export function Catalog({
               <Icon name={category} />
               <span>{t.categories[category]}</span>
               <small>
-                {category === 'all'
-                  ? modules.length
-                  : modules.filter((m) => m.category === category).length}
+                {pageMode
+                  ? (categoryCounts[category] ?? 0)
+                  : category === 'all'
+                    ? modules.length
+                    : modules.filter((m) => m.category === category).length}
               </small>
             </button>
           ))}

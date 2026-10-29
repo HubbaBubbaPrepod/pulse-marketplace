@@ -1,11 +1,12 @@
 export const accountCopy = {
   ru: {
+    keepSignIn: 'Последний способ входа отвязать нельзя. Сначала подключи другой.',
     mergeConflict:
-      'Не удалось объединить аккаунты. Подтверди текущий вход и второй аккаунт заново. Одинаковые провайдеры или два email-входа нужно разрешить отдельно; служебные аккаунты объединять нельзя.',
+      'Не удалось объединить аккаунты. Подтверди текущий вход и второй аккаунт заново. Одинаковые провайдеры или два email-входа нужно разрешить отдельно; служебный аккаунт нужно оставить основным, его роль не переносится из второго профиля.',
     mergeDone: 'Аккаунты объединены. Предыдущие сессии отозваны.',
     mergeAccounts: 'Объединить аккаунты',
     mergeExplanation:
-      'Если Google и GitHub создали разные профили, сначала подтверди текущий вход, затем войди во второй аккаунт через его провайдера. Автоматического объединения по email нет. Служебные аккаунты не объединяются; одинаковые способы входа в двух профилях нужно разрешить отдельно.',
+      'Подтверди текущий вход, затем войди во второй профиль через его провайдера. Роль текущего аккаунта сохранится. Совпадение email не объединяет профили. Второй профиль должен быть обычным аккаунтом автора; одинаковые способы входа нужно разрешить отдельно.',
     verifyOther: 'Подтвердить второй аккаунт через',
     mergeReady: 'Второй аккаунт подтверждён:',
     mergeWarning:
@@ -125,12 +126,13 @@ export const accountCopy = {
     other: 'Другие',
   },
   en: {
+    keepSignIn: 'You cannot unlink the last sign-in method. Connect another method first.',
     mergeConflict:
-      'Accounts could not be merged. Confirm your current sign-in and the other account again. Duplicate providers or two email sign-ins need separate resolution; service accounts cannot be merged.',
+      'Accounts could not be merged. Confirm your current sign-in and the other account again. Duplicate providers or two email sign-ins need separate resolution; keep the service account as the destination; roles are never copied from the other profile.',
     mergeDone: 'Accounts merged. Previous sessions were revoked.',
     mergeAccounts: 'Merge accounts',
     mergeExplanation:
-      'If Google and GitHub created separate profiles, confirm your current sign-in, then authenticate to the other account with its provider. Email matching never merges accounts. Service accounts cannot be merged; duplicate sign-in methods need separate resolution.',
+      'Confirm your current sign-in, then authenticate to the other profile with its provider. The current account keeps its role. Email matching never merges profiles. The other profile must be an ordinary author account; duplicate sign-in methods need separate resolution.',
     verifyOther: 'Verify the other account with',
     mergeReady: 'Other account verified:',
     mergeWarning:

@@ -2766,6 +2766,22 @@ tr:last-child td {
   padding: 28px;
   min-width: 0;
 }
+.account-versions {
+  grid-column: 1 / -1;
+}
+.account-versions .account-revision {
+  align-items: flex-start;
+}
+.account-versions details p {
+  white-space: pre-wrap;
+}
+.account-panel .button {
+  max-width: 100%;
+  white-space: normal;
+}
+.account-repositories a {
+  overflow-wrap: anywhere;
+}
 .account-panel h2 {
   margin-bottom: 24px;
 }

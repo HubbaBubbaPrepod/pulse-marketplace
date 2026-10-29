@@ -187,7 +187,7 @@ export function AccountAuthor({
             </button>
           ) : null}
         </section>
-        <section className="surface account-panel">
+        <section className="surface account-panel account-versions">
           <h2>{t.versions}</h2>
           {allRevisions.length ? (
             <div className="revision-list">

@@ -36,6 +36,7 @@
 
 - Show authors validation paths/codes and review comments behind ownership checks; paginate repositories and versions.
 - Serve public module/theme browsing in 30-item filtered pages with crawlable navigation; preserve legacy cursor/runtime negotiation for Monitor.
+- Count category matches across all result pages and keep author review history at full workspace width.
 - Add CSRF-protected account controls with recent sign-in checks, last-method/last-administrator protection, session revocation and profile anonymization while retaining publications/audit.
 - Add explicit, session-bound OAuth proof and confirmation before merging ordinary author accounts; never merge by email or transfer service roles.
 - Extend discovery markers with bounded `publishers` GitHub ID lists for organization-controlled delegation. Record original publishers and block delegated moderator self-approval.
