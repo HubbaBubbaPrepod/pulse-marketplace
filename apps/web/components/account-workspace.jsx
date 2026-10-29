@@ -22,7 +22,14 @@ async function request(path, session, body) {
   if (!response.ok) throw Object.assign(new Error(), { status: response.status });
   return response.json();
 }
-export function AccountAuthor({ lang, session, repositories, revisions, capabilities }) {
+export function AccountAuthor({
+  lang,
+  session,
+  repositories,
+  revisions,
+  capabilities,
+  linkStatus,
+}) {
   const t = accountCopy[lang],
     router = useRouter(),
     [busy, setBusy] = useState(false),
@@ -44,6 +51,7 @@ export function AccountAuthor({ lang, session, repositories, revisions, capabili
   }
   async function link() {
     setBusy(true);
+    setMessage('');
     try {
       const result = await request('/auth/link/github', session, {});
       window.location.assign(result.url);
@@ -57,6 +65,13 @@ export function AccountAuthor({ lang, session, repositories, revisions, capabili
       <div className="workspace-body account-workspace">
         <section className="surface account-panel">
           <h2>{t.repo}</h2>
+          {linkStatus === 'conflict' || linkStatus === 'failed' ? (
+            <p role="alert">
+              {linkStatus === 'conflict' ? t.githubAlreadyLinked : t.githubLinkFailed}
+            </p>
+          ) : linkStatus === 'connected' ? (
+            <p role="status">{t.githubLinked}</p>
+          ) : null}
           {session.user.githubId ? (
             <form onSubmit={submit} className="auth-fields">
               <label>
@@ -70,8 +85,14 @@ export function AccountAuthor({ lang, session, repositories, revisions, capabili
           ) : (
             <>
               <p>{t.githubRequired}</p>
-              <button className="button" onClick={link} disabled={busy || !capabilities.github}>
-                {t.linkGithub}
+              <button
+                type="button"
+                className="button"
+                onClick={link}
+                disabled={busy || !capabilities.github}
+                aria-busy={busy}
+              >
+                {busy ? t.busy : t.linkGithub}
               </button>
               {!capabilities.github ? (
                 <p className="workspace-small">{t.providerUnavailable}</p>

@@ -1,3 +1,8 @@
+## 2026-10-29 — OAuth linking feedback / Результат привязки OAuth
+
+- Return linking conflicts and failures to the author dashboard with visible RU/EN feedback; keep existing identities and sessions unchanged on conflict. / Конфликты и ошибки привязки показаны в кабинете на RU/EN; существующие привязки и сессия при конфликте сохраняются.
+- Preserve OAuth errors across the signed-in login redirect; show pending and successful linking states. / Ошибка OAuth сохраняется при возврате в кабинет; показаны ожидание и успешная привязка.
+
 ## 2026-10-26 — Theme catalog / Каталог тем
 
 - Add separately moderated GitHub theme releases, safe palette previews and Monitor-compatible JSON downloads. / Добавлены отдельные публикации тем, безопасный предпросмотр и скачивание JSON для Monitor.

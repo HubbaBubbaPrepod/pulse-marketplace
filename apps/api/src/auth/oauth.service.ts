@@ -89,54 +89,61 @@ export class OAuth {
       sameSite: 'lax',
       path: '/',
     });
-    const identity = await this.providers.identity(provider, url, {
-      state,
-      verifier: stored.verifier,
-      nonce: stored.nonce,
-    });
-    if (typeof identity.id !== 'string' || !identity.id || identity.id.length > 255)
-      throw new BadRequestException('Invalid provider identity');
-    const sessionToken = this.sessions.token(request);
-    const userId = await this.db.transaction(async (client) => {
-      await client.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))', [
-        `${provider}:${identity.id}`,
-      ]);
-      if (stored.link_user_id) {
-        const session = (
+    try {
+      const identity = await this.providers.identity(provider, url, {
+        state,
+        verifier: stored.verifier,
+        nonce: stored.nonce,
+      });
+      if (typeof identity.id !== 'string' || !identity.id || identity.id.length > 255)
+        throw new BadRequestException('Invalid provider identity');
+      const sessionToken = this.sessions.token(request);
+      const userId = await this.db.transaction(async (client) => {
+        await client.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))', [
+          `${provider}:${identity.id}`,
+        ]);
+        if (stored.link_user_id) {
+          const session = (
+            await client.query(
+              'SELECT user_id FROM sessions WHERE token_hash=$1 AND expires_at>now() FOR SHARE',
+              [digest(sessionToken || '')],
+            )
+          ).rows[0];
+          if (session?.user_id !== stored.link_user_id)
+            throw new BadRequestException('Sign in before linking an identity');
+        }
+        const existing = (
           await client.query(
-            'SELECT user_id FROM sessions WHERE token_hash=$1 AND expires_at>now() FOR SHARE',
-            [digest(sessionToken || '')],
+            'SELECT user_id FROM identities WHERE provider=$1 AND provider_id=$2',
+            [provider, identity.id],
           )
         ).rows[0];
-        if (session?.user_id !== stored.link_user_id)
-          throw new BadRequestException('Sign in before linking an identity');
-      }
-      const existing = (
-        await client.query('SELECT user_id FROM identities WHERE provider=$1 AND provider_id=$2', [
-          provider,
-          identity.id,
-        ])
-      ).rows[0];
-      if (existing) {
-        if (stored.link_user_id && existing.user_id !== stored.link_user_id)
-          throw new ConflictException('Identity already linked');
-        return existing.user_id;
-      }
-      const id =
-        stored.link_user_id ||
-        (
-          await client.query('INSERT INTO users(display_name) VALUES ($1) RETURNING id', [
-            String(identity.displayName || 'Pulse user').slice(0, 32),
-          ])
-        ).rows[0].id;
-      await client.query('INSERT INTO identities(provider,provider_id,user_id) VALUES ($1,$2,$3)', [
-        provider,
-        identity.id,
-        id,
-      ]);
-      return id;
-    });
-    await this.sessions.create(userId, response, sessionToken);
-    return stored.next_path;
+        if (existing) {
+          if (stored.link_user_id && existing.user_id !== stored.link_user_id)
+            throw new ConflictException('Identity already linked');
+          return existing.user_id;
+        }
+        const id =
+          stored.link_user_id ||
+          (
+            await client.query('INSERT INTO users(display_name) VALUES ($1) RETURNING id', [
+              String(identity.displayName || 'Pulse user').slice(0, 32),
+            ])
+          ).rows[0].id;
+        await client.query(
+          'INSERT INTO identities(provider,provider_id,user_id) VALUES ($1,$2,$3)',
+          [provider, identity.id, id],
+        );
+        return id;
+      });
+      await this.sessions.create(userId, response, sessionToken);
+      return stored.link_user_id ? `${stored.next_path}?link=connected` : stored.next_path;
+    } catch (error) {
+      // Only a consumed, browser-bound flow may report a link result. Preserve
+      // the signed-in account and never transfer an identity owned by another.
+      if (stored.link_user_id)
+        return `${stored.next_path}?link=${error instanceof ConflictException ? 'conflict' : 'failed'}`;
+      throw error;
+    }
   }
 }

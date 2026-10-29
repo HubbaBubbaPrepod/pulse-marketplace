@@ -6,10 +6,11 @@ export async function generateMetadata({ params }) {
   const { lang } = await params;
   return { title: accountCopy[lang]?.dashboard, robots: { index: false, follow: false } };
 }
-export default async function Page({ params }) {
+export default async function Page({ params, searchParams }) {
   const { lang } = await params;
   if (!accountCopy[lang]) notFound();
   const session = await requireSession(lang, 'author');
+  const query = await searchParams;
   const [repos, revisions, capabilities] = await Promise.all([
     api('/author/repositories', true),
     api('/author/revisions', true),
@@ -23,6 +24,7 @@ export default async function Page({ params }) {
         repositories={repos.items}
         revisions={revisions.items}
         capabilities={capabilities}
+        linkStatus={typeof query.link === 'string' ? query.link : ''}
       />
     </div>
   );

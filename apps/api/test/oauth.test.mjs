@@ -13,17 +13,20 @@ test('OAuth state is browser-bound, expiring and one-use; provider email never m
   await pool.query(`CREATE SCHEMA "${schema}"`);
   const databaseUrl = new URL(process.env.DATABASE_URL);
   databaseUrl.searchParams.set('options', `-c search_path=${schema}`);
+  let providerId = 'provider-user-1',
+    providerFailed = false;
   const provider = {
     available: () => true,
     async authorization(_name, flow) {
       return `https://provider.example/authorize?state=${flow.state}`;
     },
     async identity(_name, _url, flow) {
+      if (providerFailed) throw new Error('Provider exchange failed');
       assert.equal(_url.pathname, `/api/v1/auth/${_name}/callback/`);
       assert.ok(flow.verifier.length >= 43);
       assert.ok(flow.nonce);
       return {
-        id: 'provider-user-1',
+        id: providerId,
         displayName: 'Provider user',
         email: 'existing@example.test',
       };
@@ -82,6 +85,91 @@ test('OAuth state is browser-bound, expiring and one-use; provider email never m
       { headers: { cookie: expired.headers.get('set-cookie').split(';')[0] }, redirect: 'manual' },
     );
     assert.ok(expiredCallback.headers.get('location').includes('error=oauth'));
+
+    const sessionCookie = success.headers
+      .getSetCookie()
+      .find((cookie) => cookie.startsWith('pulse-session='))
+      .split(';')[0];
+    const current = await (
+      await fetch(`${base}/auth/session`, { headers: { cookie: sessionCookie } })
+    ).json();
+    await db.pool.query(
+      "INSERT INTO identities(provider,provider_id,user_id) VALUES ('github','provider-user-1',$1)",
+      [existing],
+    );
+    const link = async (cookie = sessionCookie, csrf = current.csrfToken) => {
+      const start = await fetch(`${base}/auth/link/github`, {
+        method: 'POST',
+        headers: {
+          cookie,
+          origin: 'http://127.0.0.1:3100',
+          'content-type': 'application/json',
+          'x-csrf-token': csrf,
+        },
+        body: '{}',
+      });
+      assert.equal(start.status, 201);
+      const { url } = await start.json();
+      const state = new URL(url).searchParams.get('state');
+      return {
+        callback: `${base}/auth/github/callback?state=${state}&code=test-code`,
+        cookie: `${cookie}; ${start.headers.get('set-cookie').split(';')[0]}`,
+      };
+    };
+    const conflictFlow = await link();
+    const conflict = await fetch(conflictFlow.callback, {
+      headers: { cookie: conflictFlow.cookie },
+      redirect: 'manual',
+    });
+    assert.equal(conflict.headers.get('location'), '/ru/author/?link=conflict');
+    const unchanged = await (
+      await fetch(`${base}/auth/session`, { headers: { cookie: sessionCookie } })
+    ).json();
+    assert.equal(unchanged.user.id, current.user.id);
+    assert.equal(unchanged.user.githubId, null);
+    const owner = await db.pool.query(
+      "SELECT user_id FROM identities WHERE provider='github' AND provider_id='provider-user-1'",
+    );
+    assert.equal(owner.rows[0].user_id, existing);
+
+    const failedFlow = await link();
+    providerFailed = true;
+    const failed = await fetch(failedFlow.callback, {
+      headers: { cookie: failedFlow.cookie },
+      redirect: 'manual',
+    });
+    assert.equal(failed.headers.get('location'), '/ru/author/?link=failed');
+    providerFailed = false;
+
+    providerId = 'unlinked-github-user';
+    const validFlow = await link();
+    const linked = await fetch(validFlow.callback, {
+      headers: { cookie: validFlow.cookie },
+      redirect: 'manual',
+    });
+    assert.equal(linked.headers.get('location'), '/ru/author/?link=connected');
+    const linkedCookie = linked.headers
+      .getSetCookie()
+      .find((cookie) => cookie.startsWith('pulse-session='))
+      .split(';')[0];
+    const linkedSession = await (
+      await fetch(`${base}/auth/session`, { headers: { cookie: linkedCookie } })
+    ).json();
+    assert.equal(linkedSession.user.id, current.user.id);
+    assert.equal(linkedSession.user.githubId, providerId);
+
+    // A valid OAuth binding alone cannot authorize a link after session loss.
+    const lostSessionFlow = await link(linkedCookie, linkedSession.csrfToken);
+    providerId = 'must-not-link-without-session';
+    const lost = await fetch(lostSessionFlow.callback, {
+      headers: { cookie: lostSessionFlow.cookie.split('; ').at(-1) },
+      redirect: 'manual',
+    });
+    assert.equal(lost.headers.get('location'), '/ru/author/?link=failed');
+    const rejected = await db.pool.query('SELECT 1 FROM identities WHERE provider_id=$1', [
+      providerId,
+    ]);
+    assert.equal(rejected.rowCount, 0);
   } finally {
     if (app) await app.close();
     await pool.query(`DROP SCHEMA "${schema}" CASCADE`);

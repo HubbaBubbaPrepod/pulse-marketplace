@@ -12,11 +12,11 @@ export default async function Page({ params, searchParams }) {
   const session = await api('/auth/session', true);
   if (session.user) {
     const query = await searchParams;
-    redirect(
+    const destination =
       typeof query.next === 'string' && /^\/(ru|en)\/(author|moderation)\/$/.test(query.next)
         ? query.next
-        : `/${lang}/author/`,
-    );
+        : `/${lang}/author/`;
+    redirect(query.error === 'oauth' ? `${destination}?link=failed` : destination);
   }
   return (
     <div className="page-container">

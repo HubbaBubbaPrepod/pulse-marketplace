@@ -49,6 +49,11 @@ export const accountCopy = {
     queued: 'Репозиторий поставлен на проверку. Публикация потребует решения модератора.',
     githubRequired: 'Чтобы управлять репозиториями, подключи свой GitHub.',
     linkGithub: 'Подключить GitHub',
+    githubAlreadyLinked:
+      'Этот GitHub уже связан с другим аккаунтом Pulse. Выйди и войди через GitHub, чтобы открыть существующий аккаунт. Совпадение email не объединяет аккаунты; текущая привязка и данные сохранены.',
+    githubLinkFailed:
+      'Не удалось завершить подключение GitHub. Проверь, что ты вошёл в нужный аккаунт, обнови кабинет и повтори попытку.',
+    githubLinked: 'GitHub подключён к этому аккаунту.',
     ownership: 'Подтверди владение этим репозиторием через GitHub.',
     comment: 'Комментарий',
     approve: 'Одобрить версию',
@@ -133,6 +138,11 @@ export const accountCopy = {
     queued: 'Repository queued for review. Publication requires a moderator decision.',
     githubRequired: 'Connect GitHub to manage your repositories.',
     linkGithub: 'Connect GitHub',
+    githubAlreadyLinked:
+      'This GitHub identity already belongs to another Pulse account. Sign out and sign in with GitHub to open that account. Matching email addresses do not merge accounts; the existing link and data are unchanged.',
+    githubLinkFailed:
+      'GitHub connection could not be completed. Check that you are signed in to the intended account, refresh the dashboard and try again.',
+    githubLinked: 'GitHub is connected to this account.',
     ownership: 'Verify repository ownership through GitHub.',
     comment: 'Comment',
     approve: 'Approve version',
